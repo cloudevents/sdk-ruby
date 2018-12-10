@@ -8,13 +8,13 @@ module Cloudevents
       ]
 
       def read(event, request, &block)
-        event.cloud_events_version = request.fetch_header("HTTP_CE_CLOUD_EVENTS_VERSION")
-        event.event_type = request.fetch_header("HTTP_CE_EVENT_TYPE")
-        event.event_type_version = request.fetch_header("HTTP_CE_EVENT_TYPE_VERSION") { nil }
+        event.cloud_events_version = request.fetch_header("HTTP_CE_CLOUDEVENTSVERSION")
+        event.event_type = request.fetch_header("HTTP_CE_EVENTTYPE")
+        event.event_type_version = request.fetch_header("HTTP_CE_EVENTTYPEVERSION") { nil }
         event.source = request.fetch_header("HTTP_CE_SOURCE")
-        event.event_id = request.fetch_header("HTTP_CE_EVENT_ID")
-        event.event_time = request.fetch_header("HTTP_CE_EVENT_TIME") { nil }
-        event.schema_url = request.fetch_header("HTTP_CE_SCHEMA_URL") { nil }
+        event.event_id = request.fetch_header("HTTP_CE_EVENTID")
+        event.event_time = request.fetch_header("HTTP_CE_EVENTTIME") { nil }
+        event.schema_url = request.fetch_header("HTTP_CE_SCHEMAURL") { nil }
         event.content_type = request.content_type
         event.data = block ? block.call(request.body) : request.body.read
         event

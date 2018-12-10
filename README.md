@@ -26,10 +26,10 @@ Start the web application server and send a cloudevent.
 ```sh
 $ ruby app.rb
 $ curl -H 'Content-Type: application/json' \
-       -H 'CE-Cloud-Events-Version: 1' \
-       -H 'CE-Event-Type: com.example.someevent' \
+       -H 'CE-CloudEventsVersion: 1' \
+       -H 'CE-EventType: com.example.someevent' \
        -H 'CE-Source: /mycontext' \
-       -H 'CE-Event-ID: 1234-1234-1234' \
+       -H 'CE-EventID: 1234-1234-1234' \
        -X POST \
        -d 'Hello CloudEvents!' \
        'http://localhost:4567'

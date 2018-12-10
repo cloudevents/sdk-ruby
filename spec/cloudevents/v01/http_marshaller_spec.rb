@@ -50,10 +50,10 @@ describe Cloudevents::V01::HTTPMarshaller do
           request = Rack::Request.new(Rack::MockRequest.env_for(
             "http://example.com/",
             "CONTENT_TYPE" => "application/json",
-            "HTTP_CE_CLOUD_EVENTS_VERSION" => "1",
-            "HTTP_CE_EVENT_TYPE" => "com.example.someevent",
+            "HTTP_CE_CLOUDEVENTSVERSION" => "1",
+            "HTTP_CE_EVENTTYPE" => "com.example.someevent",
             "HTTP_CE_SOURCE" => "/mycontext",
-            "HTTP_CE_EVENT_ID" => "1234-1234-1234",
+            "HTTP_CE_EVENTID" => "1234-1234-1234",
             input: "Hello CloudEvents!",
           ))
           principal = Cloudevents::V01::HTTPMarshaller.default
@@ -76,13 +76,13 @@ describe Cloudevents::V01::HTTPMarshaller do
           request = Rack::Request.new(Rack::MockRequest.env_for(
             "http://example.com/",
             "CONTENT_TYPE" => "application/json",
-            "HTTP_CE_CLOUD_EVENTS_VERSION" => "1",
-            "HTTP_CE_EVENT_TYPE" => "com.example.someevent",
+            "HTTP_CE_CLOUDEVENTSVERSION" => "1",
+            "HTTP_CE_EVENTTYPE" => "com.example.someevent",
             "HTTP_CE_SOURCE" => "/mycontext",
-            "HTTP_CE_EVENT_ID" => "1234-1234-1234",
-            "HTTP_CE_EVENT_TYPE_VERSION" => "1.1",
-            "HTTP_CE_EVENT_TIME" => "2018-04-05T03:56:24Z",
-            "HTTP_CE_SCHEMA_URL" => "http://example.com/schema",
+            "HTTP_CE_EVENTID" => "1234-1234-1234",
+            "HTTP_CE_EVENTTYPEVERSION" => "1.1",
+            "HTTP_CE_EVENTTIME" => "2018-04-05T03:56:24Z",
+            "HTTP_CE_SCHEMAURL" => "http://example.com/schema",
             input: "Hello CloudEvents!",
           ))
           principal = Cloudevents::V01::HTTPMarshaller.default
