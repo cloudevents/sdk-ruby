@@ -8,6 +8,8 @@ will) break with every update.
 This SDK current supports the following versions of CloudEvents:
 - v0.1
 
+## CloudEvents Ruby SDK
+
 Package **cloudevents** provides primitives to work with CloudEvents specification: https://github.com/cloudevents/spec.
 This gem currently supports reading version 0.1 cloudevents in binary and json format.
 
