@@ -2,8 +2,11 @@
 
 ## Status
 
-This SDK is still considered a work in progress, therefore things might (and
-will) break with every update.
+This SDK has not been updated recently and therefore is quite old relative
+to the state of the CloudEvents specification. This repository might be
+deleted, or archived, in the future if a new owner is not found. If you are
+interested in continuing this work please let the CloudEvents project
+know!
 
 This SDK current supports the following versions of CloudEvents:
 - v0.1
