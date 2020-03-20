@@ -87,5 +87,5 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/cloude
   to determine which week will have the call.
 - Slack: #cloudeventssdk channel under
   [CNCF's Slack workspace](https://slack.cncf.io/).
+- Email: https://lists.cncf.io/g/cncf-cloudevents-sdk
 - Contact for additional information: TBD (`@...` on slack).
-
