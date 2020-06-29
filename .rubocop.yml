@@ -1,0 +1,13 @@
+inherit_gem:
+  google-style: google-style.yml
+
+Metrics/BlockLength:
+  Exclude:
+    - "test/**/test_*.rb"
+    - ".toys/**/*.rb"
+Metrics/ClassLength:
+  Max: 200
+Metrics/ModuleLength:
+  Max: 200
+Style/ModuleFunction:
+  Enabled: false
