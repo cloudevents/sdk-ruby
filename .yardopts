@@ -1,0 +1,11 @@
+--no-private
+--title=CloudEvents SDK
+--markup markdown
+--markup-provider redcarpet
+--main=README.md
+./lib/cloud_events/**/*.rb
+./lib/cloud_events.rb
+-
+README.md
+CHANGELOG.md
+LICENSE.md

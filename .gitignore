@@ -1,3 +1,8 @@
 .DS_STORE
-.direnv
-/Gemfile.lock
+.bundle/
+.yardoc/
+Gemfile.lock
+coverage/
+doc/
+pkg/
+tmp/
