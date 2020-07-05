@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-desc "Build and push a release of cloud_events"
+desc "Perform a full release from Github actions"
 
 long_desc \
   "This tool performs an official release of cloud_events. It is intended to" \
@@ -12,32 +12,28 @@ flag :api_key, accept: String, default: ::ENV["RUBYGEMS_API_KEY"]
 flag :enable_releases, accept: String, default: ::ENV["ENABLE_RELEASES"]
 
 include :exec, exit_on_nonzero_status: true
-include :terminal, styled: true
 include :fileutils
+include :terminal, styled: true
 include "release-tools"
 
 def run
   cd context_directory
   version = parse_ref release_ref
   puts "Releasing cloud_events #{version}...", :yellow, :bold
+
   verify_library_version version
   verify_changelog_content version
+  verify_github_checks
+
+  build_gem version
+  dry_run = /^t/i !~ enable_releases.to_s ? true : false
   using_api_key api_key do
-    mkdir_p "pkg"
-    built_file = "pkg/cloud_events-#{version}.gem"
-    exec ["gem", "build", "cloud_events.gemspec", "-o", built_file]
-    if /^t/i =~ enable_releases
-      exec ["gem", "push", built_file]
-      puts "SUCCESS: Released cloud_events #{version}", :green, :bold
-    else
-      error "#{built_file} didn't get built." unless ::File.file? built_file
-      puts "SUCCESS: Mock release of cloud_events #{version}", :green, :bold
-    end
+    push_gem version, dry_run: dry_run
   end
 end
 
 def parse_ref ref
-  match = %r{^refs/tags/v(\d+\.\d+\.\d+)$}.match ref
+  match = %r{^refs/tags/v(\d+\.\d+\.\d+(?:\.(?:\d+|[a-zA-Z][\w]*))*)$}.match ref
   error "Illegal release ref: #{ref}" unless match
   match[1]
 end
@@ -47,7 +43,7 @@ def using_api_key key
   creds_path = "#{home_dir}/.gem/credentials"
   creds_exist = ::File.exist? creds_path
   if creds_exist && !key
-    puts "Using existing Rubygems credentials"
+    logger.info "Using existing Rubygems credentials"
     yield
     return
   end
@@ -58,7 +54,7 @@ def using_api_key key
     ::File.open creds_path, "w", 0o600 do |file|
       file.puts "---\n:rubygems_api_key: #{api_key}"
     end
-    puts "Using provided Rubygems credentials"
+    logger.info "Using provided Rubygems credentials"
     yield
   ensure
     exec ["shred", "-u", creds_path]
