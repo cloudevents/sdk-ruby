@@ -59,7 +59,7 @@ mixin "release-tools" do
   end
 
   def verify_git_clean warn_only: false
-    logger.info("Verifying git clean...")
+    logger.info "Verifying git clean..."
     output = capture(["git", "status", "-s"]).strip
     unless output.empty?
       error "There are local git changes that are not committed.", warn_only: warn_only

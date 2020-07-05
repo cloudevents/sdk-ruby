@@ -22,7 +22,7 @@ def run
 
   puts "Found changelog entry:", :bold
   puts changelog_entry
-  if !yes && !confirm("Release cloud_events #{version}?", :bold, default: true)
+  if !yes && !confirm("Release cloud_events #{version}? ", :bold, default: true)
     error "Release aborted"
   end
 
