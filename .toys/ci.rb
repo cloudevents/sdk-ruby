@@ -19,4 +19,5 @@ def run
   exec_tool ["test"], name: "Tests"
   exec_tool ["rubocop"], name: "Style checker"
   exec_tool ["yardoc"], name: "Docs generation"
+  exec_tool ["build"], name: "Gem build"
 end
