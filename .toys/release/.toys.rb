@@ -15,8 +15,7 @@ mixin "release-tools" do
     lib_vers = ::CloudEvents::VERSION
     unless vers == lib_vers
       error "Tagged version #{vers.inspect} doesn't match library version #{lib_vers.inspect}.",
-            "Modify lib/cloud_events/version.rb and set VERSION = #{vers.inspect}",
-            warn_only: warn_only
+            "Modify lib/cloud_events/version.rb and set VERSION = #{vers.inspect}"
     end
     vers
   end

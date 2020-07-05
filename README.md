@@ -156,7 +156,7 @@ To perform a release:
 
  4. Execute
 
-        toys trigger-release $VERSION
+        toys release trigger $VERSION
 
     where `$VERSION` is the version number (e.g. `0.1.0`). This script will
     verify the version and changelog and will not proceed unless they are
