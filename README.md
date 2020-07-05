@@ -17,6 +17,8 @@ Features:
     specifications.
  *  Extensible to additional formats and protocol bindings, and future
     specification versions.
+ *  Compatible with Ruby 2.4 or later, or JRuby 9.2.x or later. No runtime gem
+    dependencies.
 
 ## Quickstart
 
@@ -139,6 +141,47 @@ toys
 toys test --help
 ```
 
+### Code style
+
+Ruby code in this library generally follows the
+[Google Ruby Style Guide](https://github.com/googleapis/ruby-style), which is
+based on "Seattle Style" Ruby.
+
+Style is enforced by Rubocop rules. You can run rubocop directly using the
+`rubocop` binary:
+
+```sh
+bundle exec rubocop
+```
+
+or via Toys:
+
+```sh
+toys rubocop
+```
+
+That said, we are not style sticklers, and if a break is necessary for code
+readability or practicality, Rubocop rules can be selectively disabled.
+
+### Pull Requests
+
+We welcome contributions from the community! Please take some time to become
+acquainted with the process before submitting a pull request. There are just a
+few things to keep in mind.
+
+ *  **Typically a pull request should relate to an existing issue.** If you
+    have found a bug, want to add an improvement, or suggest an API change,
+    please create an issue before proceeding with a pull request. For very
+    minor changes such as typos in the documentation this isn't necessary.
+ *  **Use Conventional Commit messages.** All commit messages should follow the
+    [Conventional Commits Specification](https://conventionalcommits.org) to
+    make it clear how your change should appear in release notes.
+ *  **Sign your work.** Each PR must be signed. Be sure your git `user.name`
+    and `user.email` are configured then use the `--signoff` flag for your
+    commits. e.g. `git commit --signoff`.
+ *  **Make sure CI passes.** Invoke `toys ci` to run the tests locally before
+    opening a pull request. This will include code style checks.
+
 ### Releasing
 
 Releases can be performed only by users with write access to the repository.
@@ -156,16 +199,22 @@ To perform a release:
 
  4. Execute
 
-        toys release trigger $VERSION
+    ```sh
+    toys release trigger $VERSION
+    ```
 
     where `$VERSION` is the version number (e.g. `0.1.0`). This script will
     verify the version and changelog and will not proceed unless they are
-    correctly formatted and the master branch is up to date. If the check
-    succeeds, the script will create and push a release tag.
+    correctly formatted and the master branch is up to date. It will also check
+    that all GitHub checks against the current commit have succeeded. If these
+    checks pass, the script will create and push a release tag.
 
  5. A GitHub action will then perform the release within a few minutes. You can
     check the [GitHub Actions dashboard](https://github.com/dazuma/toys/actions)
-    for status information.
+    for status information on the release.
+
+    If the release workflow fails, fix the problem, and then you will need to
+    delete the release tag manually before triggering the release again.
 
 ## Community
 
