@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <p>
+      <a href="https://cloudevents.github.io/sdk-ruby/latest">Ruby CloudEvents SDK documentation</a>
+    </p>
+  </body>
+  <script>
+    var version = "0.1.0";
+    if (window.location.href.includes("//cloudevents.github.io/sdk-ruby/latest")) {
+      var loc = window.location.href.replace(
+        "//cloudevents.github.io/sdk-ruby/latest",
+        "//cloudevents.github.io/sdk-ruby/v" + version);
+      window.location.replace(loc);
+    } else {
+      window.location.replace("https://cloudevents.github.io/sdk-ruby/latest");
+    }
+  </script>
+</html>
