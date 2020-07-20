@@ -163,7 +163,7 @@ toys rubocop
 That said, we are not style sticklers, and if a break is necessary for code
 readability or practicality, Rubocop rules can be selectively disabled.
 
-### Pull Requests
+### Pull requests
 
 We welcome contributions from the community! Please take some time to become
 acquainted with the process before submitting a pull request. There are just a
@@ -210,11 +210,17 @@ To perform a release:
     checks pass, the script will create and push a release tag.
 
  5. A GitHub action will then perform the release within a few minutes. You can
-    check the [GitHub Actions dashboard](https://github.com/dazuma/toys/actions)
-    for status information on the release.
+    check the [dashboard](https://github.com/cloudevents/sdk-ruby/actions) for
+    status information on the release.
 
     If the release workflow fails, fix the problem, and then you will need to
     delete the release tag manually before triggering the release again.
+
+### For more information
+
+ *  Library documentation: https://cloudevents.github.io/sdk-ruby
+ *  Issue tracker: https://github.com/cloudevents/sdk-ruby/issues
+ *  Changelog: https://cloudevents.github.io/sdk-ruby/latest/file.CHANGELOG.html
 
 ## Community
 
