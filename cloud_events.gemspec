@@ -3,10 +3,11 @@
 lib = ::File.expand_path "lib", __dir__
 $LOAD_PATH.unshift lib unless $LOAD_PATH.include? lib
 require "cloud_events/version"
+version = ::CloudEvents::VERSION
 
 ::Gem::Specification.new do |spec|
   spec.name = "cloud_events"
-  spec.version = ::CloudEvents::VERSION
+  spec.version = version
   spec.licenses = ["Apache-2.0"]
   spec.authors = ["Daniel Azuma"]
   spec.email = ["dazuma@gmail.com"]
@@ -23,9 +24,9 @@ require "cloud_events/version"
   spec.required_ruby_version = ">= 2.4.0"
 
   if spec.respond_to? :metadata
-    spec.metadata["changelog_uri"] = "https://github.com/cloudevents/sdk-ruby/blob/master/CHANGELOG.md"
+    spec.metadata["changelog_uri"] = "https://cloudevents.github.io/sdk-ruby/v#{version}/file.CHANGELOG.html"
     spec.metadata["source_code_uri"] = "https://github.com/cloudevents/sdk-ruby"
     spec.metadata["bug_tracker_uri"] = "https://github.com/cloudevents/sdk-ruby/issues"
-    spec.metadata["documentation_uri"] = "https://rubydoc.info/gems/cloud_events/#{::CloudEvents::VERSION}"
+    spec.metadata["documentation_uri"] = "https://cloudevents.github.io/sdk-ruby/v#{version}"
   end
 end
