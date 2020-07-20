@@ -15,9 +15,9 @@ module CloudEvents
   #  *  Event classes are defined within this module. For example, events
   #     conforming to the CloudEvents 1.0 specification are of type
   #     {CloudEvents::Event::V1}.
-  #  *  All event classes include this module, so you can use
+  #  *  All event classes include this module itself, so you can use
   #     `is_a? CloudEvents::Event` to test whether an object is an event.
-  #  *  All event objects are immutable. Data and atribute values can be
+  #  *  All event objects are immutable. Data and attribute values can be
   #     retrieved but not modified. To "modify" an event, make a copy with
   #     the desired changes. Generally, event classes will provide a helper
   #     method for this purpose.
