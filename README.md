@@ -209,9 +209,9 @@ To perform a release:
     that all GitHub checks against the current commit have succeeded. If these
     checks pass, the script will create and push a release tag.
 
- 5. A GitHub action will then perform the release within a few minutes. You can
-    check the [dashboard](https://github.com/cloudevents/sdk-ruby/actions) for
-    status information on the release.
+ 5. A GitHub action will then perform the release within a few minutes. The
+    [GitHub actions dashboard](https://github.com/cloudevents/sdk-ruby/actions?query=workflow%3A%22CloudEvents+Release%22)
+    will provide status information on the release workflow.
 
     If the release workflow fails, fix the problem, and then you will need to
     delete the release tag manually before triggering the release again.
