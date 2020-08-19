@@ -106,7 +106,7 @@ Hit `CTRL+C` to stop the server.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/cloudevents/ruby-sdk.
+Bug reports and pull requests are welcome on GitHub at https://github.com/cloudevents/sdk-ruby.
 
 ### Development
 
@@ -195,7 +195,7 @@ To perform a release:
     previous entries.
 
  3. Ensure the above changes are pushed to the GitHub master branch at
-    https://github.com/cloudevents/ruby-sdk.
+    https://github.com/cloudevents/sdk-ruby.
 
  4. Execute
 

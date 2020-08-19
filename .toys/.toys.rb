@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-expand :clean, paths: ["pkg", "doc", ".yardoc", "tmp"]
+expand :clean, paths: :gitignore
 
 expand :minitest, libs: ["lib"], bundler: true
 

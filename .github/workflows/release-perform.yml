@@ -1,0 +1,39 @@
+name: Perform Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      gem:
+        description: Gem to release
+        required: true
+      version:
+        description: Version to release
+        required: true
+
+jobs:
+  perform-release:
+    if: ${{ github.repository_owner == 'cloudevents' }}
+    env:
+      ruby_version: "2.7"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Ruby ${{ env.ruby_version }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.ruby_version }}
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Install Toys
+        run: "gem install --no-document toys"
+      - name: Perform release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          toys release perform --verbose \
+            "--enable-releases=${{ secrets.ENABLE_RELEASES }}" \
+            "--gem=${{ github.event.inputs.gem }}:${{ github.event.inputs.version }}" \
+            "--git-user-email=${{ secrets.GIT_USER_EMAIL }}" \
+            "--git-user-name=${{ secrets.GIT_USER_NAME }}" \
+            "--github-sha=${{ github.sha }}" \
+            "--rubygems-api-key=${{ secrets.RUBYGEMS_API_KEY }}" \
+            < /dev/null
