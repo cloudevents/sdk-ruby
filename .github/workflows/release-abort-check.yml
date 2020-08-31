@@ -6,7 +6,7 @@ on:
 
 jobs:
   aborted-release-check:
-    if: ${{ github.repository_owner == 'cloudevents' && !github.event.pull_request.merged_at }}
+    if: ${{ github.repository == 'cloudevents/sdk-ruby' && !github.event.pull_request.merged_at }}
     env:
       ruby_version: "2.7"
     runs-on: ubuntu-latest

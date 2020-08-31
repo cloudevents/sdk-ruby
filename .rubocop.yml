@@ -21,6 +21,7 @@ Metrics/ModuleLength:
 Naming/FileName:
   Exclude:
     - "examples/*/Gemfile"
+    - ".toys/**/*.rb"
 Style/IfUnlessModifier:
   Enabled: false
 Style/ModuleFunction:

@@ -7,12 +7,12 @@ require "release_utils"
 class ReleasePrepare
   def initialize utils,
                  release_ref: nil,
-                 git_remote: "origin",
+                 git_remote: nil,
                  git_user_name: nil,
                  git_user_email: nil
     @utils = utils
     @release_ref = release_ref
-    @git_remote = git_remote
+    @git_remote = git_remote || "origin"
     @git_user_name = git_user_name
     @git_user_email = git_user_email
     @performed_initial_setup = false
@@ -39,7 +39,7 @@ class ReleasePrepare
   end
 
   # An instance of release PR preparation
-  class Instance
+  class Instance # rubocop:disable Metrics/ClassLength
     def initialize utils, gem_name, override_version, release_ref, git_remote
       @utils = utils
       @gem_name = gem_name
@@ -74,6 +74,12 @@ class ReleasePrepare
     end
 
     private
+
+    SEMVER_CHANGES = {
+      "patch" => 2,
+      "minor" => 1,
+      "major" => 0
+    }.freeze
 
     def verify_gem_name
       @utils.error "Gem #{@gem_name} not known." unless @utils.gem_info @gem_name
@@ -118,38 +124,69 @@ class ReleasePrepare
         sha1 = shas[index]
         sha2 = shas[index + 1]
         unless dir == "."
-          files = @utils.capture(["git", "diff", "--name-only", "#{sha1}..#{sha2}"]).split("\n")
-          next unless files.any? { |file| file.start_with? dir }
+          files = @utils.capture ["git", "diff", "--name-only", "#{sha1}..#{sha2}"]
+          next unless files.split("\n").any? { |file| file.start_with? dir }
         end
-        messages = @utils.capture(["git", "log", "#{sha1}..#{sha2}", "--format=%B"]).split("\n")
-        analyze_message messages.first, messages[1..-1] unless messages.empty?
+        message = @utils.capture ["git", "log", "#{sha1}..#{sha2}", "--format=%B"]
+        analyze_message message
       end
     end
 
-    def analyze_message title, body
+    def analyze_message message
+      lines = message.split "\n"
+      return if lines.empty?
+      bump_segment = analyze_title lines.first
+      bump_segment = analyze_body lines[1..-1], bump_segment
+      @bump_segment = bump_segment if bump_segment < @bump_segment
+    end
+
+    def analyze_title title
+      bump_segment = 2
       match = /^(fix|feat|docs)(?:\([^()]+\))?(!?):\s+(.*)$/.match title
-      if match
+      return bump_segment unless match
+      description = match[3].gsub(/\(#\d+\)$/, "")
+      case match[1]
+      when "fix"
+        @fixes << description
+      when "docs"
+        @docs << description
+      when "feat"
+        @feats << description
+        bump_segment = 1 if bump_segment > 1
+      end
+      if match[2] == "!"
+        bump_segment = 0
+        @breaks << description
+      end
+      bump_segment
+    end
+
+    def analyze_body body, bump_segment
+      footers = body.reduce nil do |list, line|
+        if line.empty?
+          []
+        elsif list
+          list << line
+        end
+      end
+      lock_change = false
+      return bump_segment unless footers
+      footers.each do |line|
+        match = /^(BREAKING CHANGE|[\w-]+):\s+(.*)$/.match line
+        next unless match
         case match[1]
-        when "fix"
-          @fixes << match[3]
-        when "docs"
-          @docs << match[3]
-        when "feat"
-          @feats << match[3]
-          @bump_segment = 1 if @bump_segment > 1
-        end
-        if match[2] == "!"
-          @bump_segment = 0
-          @breaks << match[3]
+        when /^BREAKING[-\s]CHANGE$/
+          bump_segment = 0 unless lock_change
+          @breaks << match[2]
+        when /^semver-change$/i
+          seg = SEMVER_CHANGES[match[2].downcase]
+          if seg
+            bump_segment = seg
+            lock_change = true
+          end
         end
       end
-      body.each do |line|
-        match = /^BREAKING(?:\s|-)CHANGE:\s+(.*)$/.match line
-        if match
-          @bump_segment = 0
-          @breaks << match[1]
-        end
-      end
+      bump_segment
     end
 
     def determine_new_version
