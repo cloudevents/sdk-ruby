@@ -10,7 +10,7 @@ class ReleasePerform
                  release_sha: nil,
                  skip_checks: false,
                  rubygems_api_key: nil,
-                 git_remote: "origin",
+                 git_remote: nil,
                  git_user_name: nil,
                  git_user_email: nil,
                  gh_pages_dir: nil,
@@ -20,7 +20,7 @@ class ReleasePerform
     @release_sha = @utils.current_sha release_sha
     @skip_checks = skip_checks
     @rubygems_api_key = rubygems_api_key
-    @git_remote = git_remote
+    @git_remote = git_remote || "origin"
     @git_user_name = git_user_name
     @git_user_email = git_user_email
     @dry_run = dry_run

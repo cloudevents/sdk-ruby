@@ -7,7 +7,7 @@ on:
 
 jobs:
   tests:
-    if: ${{ github.repository_owner == 'cloudevents' }}
+    if: ${{ github.repository == 'cloudevents/sdk-ruby' }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]

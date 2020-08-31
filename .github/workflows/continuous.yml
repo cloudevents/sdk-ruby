@@ -7,7 +7,7 @@ on:
 
 jobs:
   tests:
-    if: ${{ github.repository_owner == 'cloudevents' }}
+    if: ${{ github.repository == 'cloudevents/sdk-ruby' }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]
@@ -38,7 +38,7 @@ jobs:
           toys "${{ matrix.tool || 'test' }}" < /dev/null
   post-push:
     needs: [tests]
-    if: ${{ always() && github.repository_owner == 'cloudevents' }}
+    if: ${{ always() && github.repository == 'cloudevents/sdk-ruby' }}
     runs-on: ubuntu-latest
     env:
       ruby_version: "2.7"
@@ -55,7 +55,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          toys release perform --verbose \
+          toys release perform --yes --verbose \
             "--ci-result=${{ needs.tests.result }}" \
             "--enable-releases=${{ secrets.ENABLE_RELEASES }}" \
             "--git-user-email=${{ secrets.GIT_USER_EMAIL }}" \

@@ -111,6 +111,9 @@ flag_group desc: "Flags" do
       "If set, all pre-release checks are disabled. This may occasionally be" \
       " useful to repair a broken release, but is generally not recommended."
   end
+  flag :yes, "--yes", "-y" do
+    desc "Automatically answer yes to all confirmations"
+  end
 end
 
 include :exec, exit_on_nonzero_status: true
@@ -180,7 +183,14 @@ def perform_release gem_name, gem_version, utils
                                  docs_builder:     docs_builder,
                                  dry_run:          dry_run
   instance = performer.instance gem_name, gem_version
+  confirm_release gem_name, gem_version, utils
   instance.perform only: only
+end
+
+def confirm_release gem_name, gem_version, utils
+  return if yes
+  return if confirm "Release #{gem_name} #{gem_version}? ", :bold, default: false
+  utils.error "Release aborted"
 end
 
 def mark_release_pr_as_completed gem_name, gem_version, pull, utils

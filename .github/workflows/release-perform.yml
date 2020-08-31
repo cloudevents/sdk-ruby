@@ -12,7 +12,7 @@ on:
 
 jobs:
   perform-release:
-    if: ${{ github.repository_owner == 'cloudevents' }}
+    if: ${{ github.repository == 'cloudevents/sdk-ruby' }}
     env:
       ruby_version: "2.7"
     runs-on: ubuntu-latest
@@ -29,7 +29,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          toys release perform --verbose \
+          toys release perform --yes --verbose \
             "--enable-releases=${{ secrets.ENABLE_RELEASES }}" \
             "--gem=${{ github.event.inputs.gem }}:${{ github.event.inputs.version }}" \
             "--git-user-email=${{ secrets.GIT_USER_EMAIL }}" \
