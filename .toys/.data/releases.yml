@@ -1,0 +1,5 @@
+repo: cloudevents/sdk-ruby
+main_branch: master
+gems:
+  - name: cloud_events
+    docs_builder_tool: [yardoc]
