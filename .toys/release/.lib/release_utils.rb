@@ -371,7 +371,9 @@ class ReleaseUtils # rubocop:disable Metrics/ClassLength
     gem_info["changelog_path"] ||= "CHANGELOG.md"
     gem_info["version_constant"] ||= segments.map { |seg| camelize seg } + ["VERSION"]
     gem_info["gh_pages_directory"] ||= has_multiple_gems ? name : "."
-    gem_info["gh_pages_version_var"] ||= has_multiple_gems ? "version_#{name}".tr("-", "_") : "version"
+    gem_info["gh_pages_version_var"] ||=
+      has_multiple_gems ? "version_#{name}".tr("-", "_") : "version"
+    gem_info["enable_release_automation"] = true if gem_info["enable_release_automation"].nil?
   end
 
   def camelize str
