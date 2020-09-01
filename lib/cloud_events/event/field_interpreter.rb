@@ -14,7 +14,9 @@ module CloudEvents
       end
 
       def finish_attributes
-        @attributes.merge! @args
+        @args.each do |key, value|
+          @attributes[key] = value.to_s unless value.nil?
+        end
         @args = {}
         @attributes
       end
