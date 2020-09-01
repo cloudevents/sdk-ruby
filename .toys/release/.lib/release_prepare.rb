@@ -265,13 +265,33 @@ class ReleasePrepare
     end
 
     def create_release_pr
-      pr_body = <<~STR
+      use_labels = @utils.gem_info @gem_name, "enable_release_automation"
+      body = ::JSON.dump title:                 @release_commit_title,
+                         head:                  @release_branch_name,
+                         base:                  @utils.main_branch,
+                         body:                  build_pr_body(use_labels),
+                         maintainer_can_modify: true
+      response = @utils.capture ["gh", "api", "repos/#{@utils.repo_path}/pulls", "--input", "-",
+                                 "-H", "Accept: application/vnd.github.v3+json"],
+                                in: [:string, body]
+      pr = ::JSON.parse response
+      return unless use_labels
+      @utils.update_release_pr pr["number"], label: @utils.release_pending_label, cur_pr: pr
+    end
+
+    def build_pr_body use_labels
+      label_clause =
+        if use_labels
+          ", ensuring the #{@utils.release_pending_label.inspect} label is set"
+        else
+          ""
+        end
+      <<~STR
         ## Release #{@gem_name} #{@new_version}
 
         This pull request prepares a new release of #{@gem_name}.
 
-         *  To confirm this release, merge this pull request, ensuring the \
-            #{@utils.release_pending_label.inspect} label is set.
+         *  To confirm this release, merge this pull request#{label_clause}.
          *  To abort this release, close this pull request without merging.
 
         An initial changelog has been constructed from \
@@ -285,16 +305,6 @@ class ReleasePrepare
 
         #{@full_changelog}
       STR
-      body = ::JSON.dump title:                 @release_commit_title,
-                         head:                  @release_branch_name,
-                         base:                  @utils.main_branch,
-                         body:                  pr_body,
-                         maintainer_can_modify: true
-      response = @utils.capture ["gh", "api", "repos/#{@utils.repo_path}/pulls", "--input", "-",
-                                 "-H", "Accept: application/vnd.github.v3+json"],
-                                in: [:string, body]
-      pr = ::JSON.parse response
-      @utils.update_release_pr pr["number"], label: @utils.release_pending_label, cur_pr: pr
     end
   end
 end
