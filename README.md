@@ -188,33 +188,24 @@ Releases can be performed only by users with write access to the repository.
 
 To perform a release:
 
- 1. Update `lib/cloud_events/version.rb` with the new release version.
+ 1. Go to the GitHub Actions tab, and launch the "Prepare Release Pull Request"
+    workflow. You can leave the input field blank.
 
- 2. Add an entry to `CHANGELOG.md`. The changelog entry _must_ be headed by
-    the version and release date, and _must_ be consistent with the format of
-    previous entries.
+ 2. The workflow will analyze the commit messages since the last release, and
+    open a pull request with a new version and a changelog entry. You can
+    optionally edit this pull request to modify the changelog or change the
+    version released.
 
- 3. Ensure the above changes are pushed to the GitHub master branch at
-    https://github.com/cloudevents/sdk-ruby.
+ 3. Merge the pull request (keeping the `release: pending` label set.) Once the
+    CI tests have run successfully, a job will run automatically to perform the
+    release, including tagging the commit in git, building and releasing a gem,
+    and building and pushing documentation.
 
- 4. Execute
+These tasks can also be performed manually by running the appropriate scripts
+locally. See `toys release prepare --help` and `toys release perform --help`
+for more information.
 
-    ```sh
-    toys release trigger $VERSION
-    ```
-
-    where `$VERSION` is the version number (e.g. `0.1.0`). This script will
-    verify the version and changelog and will not proceed unless they are
-    correctly formatted and the master branch is up to date. It will also check
-    that all GitHub checks against the current commit have succeeded. If these
-    checks pass, the script will create and push a release tag.
-
- 5. A GitHub action will then perform the release within a few minutes. The
-    [GitHub actions dashboard](https://github.com/cloudevents/sdk-ruby/actions?query=workflow%3A%22CloudEvents+Release%22)
-    will provide status information on the release workflow.
-
-    If the release workflow fails, fix the problem, and then you will need to
-    delete the release tag manually before triggering the release again.
+If a release fails, you may need to delete the release tag before retrying.
 
 ### For more information
 
