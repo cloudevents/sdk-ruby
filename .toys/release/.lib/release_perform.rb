@@ -176,7 +176,9 @@ class ReleasePerform
       @utils.logger.info "Pushing #{@gem_name} docs to gh-pages ..."
       ::Dir.chdir @gh_pages_dir do
         @utils.exec ["git", "add", "."]
-        @utils.exec ["git", "commit", "-m", "Generate yardocs for #{@gem_name} #{@gem_version}"]
+        commit_cmd = ["git", "commit", "-m", "Generate yardocs for #{@gem_name} #{@gem_version}"]
+        commit_cmd << "--signoff" if @utils.signoff_commits?
+        @utils.exec commit_cmd
         if @dry_run
           @utils.logger.info "DRY RUN: Docs pushed to gh-pages"
         else

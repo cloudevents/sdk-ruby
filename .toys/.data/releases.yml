@@ -1,5 +1,6 @@
 repo: cloudevents/sdk-ruby
 main_branch: master
+signoff_commits: true
 gems:
   - name: cloud_events
     docs_builder_tool: [yardoc]

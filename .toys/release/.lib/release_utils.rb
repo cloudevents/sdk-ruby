@@ -24,6 +24,10 @@ class ReleaseUtils # rubocop:disable Metrics/ClassLength
     repo_path.split("/").first
   end
 
+  def signoff_commits?
+    @signoff_commits
+  end
+
   def all_gems
     @gems.keys
   end
@@ -349,6 +353,7 @@ class ReleaseUtils # rubocop:disable Metrics/ClassLength
     info = ::YAML.load_file file_path
     @main_branch = info["main_branch"] || "main"
     @repo_path = info["repo"]
+    @signoff_commits = info["signoff_commits"] ? true : false
     error "Repo key missing from releases.yml" unless @repo_path
     @gems = {}
     @default_gem = nil

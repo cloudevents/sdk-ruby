@@ -144,7 +144,7 @@ class ReleasePrepare
       bump_segment = 2
       match = /^(fix|feat|docs)(?:\([^()]+\))?(!?):\s+(.*)$/.match title
       return bump_segment unless match
-      description = match[3].gsub(/\(#\d+\)$/, "")
+      description = normalize_line match[3], delete_pr_number: true
       case match[1]
       when "fix"
         @fixes << description
@@ -177,7 +177,7 @@ class ReleasePrepare
         case match[1]
         when /^BREAKING[-\s]CHANGE$/
           bump_segment = 0 unless lock_change
-          @breaks << match[2]
+          @breaks << normalize_line(match[2])
         when /^semver-change$/i
           seg = SEMVER_CHANGES[match[2].downcase]
           if seg
@@ -189,11 +189,19 @@ class ReleasePrepare
       bump_segment
     end
 
+    def normalize_line line, delete_pr_number: false
+      match = /^([a-z])(.*)$/.match line
+      line = match[1].upcase + match[2] if match
+      line = line.gsub(/\(#\d+\)$/, "") if delete_pr_number
+      line
+    end
+
     def determine_new_version
       @new_version = @override_version
       if @last_version
         @new_version ||= begin
           segments = @last_version.segments
+          @bump_segment = 1 if segments[0].zero? && @bump_segment.zero?
           segments[@bump_segment] += 1
           segments.fill(0, @bump_segment + 1).join(".")
         end
@@ -216,7 +224,7 @@ class ReleasePrepare
         @changelog_entries << "* Feature: #{line}"
       end
       @fixes.each do |line|
-        @changelog_entries << "* Fixed: #{line}"
+        @changelog_entries << "* Fix: #{line}"
       end
       @docs.each do |line|
         @changelog_entries << "* Documentation: #{line}"
@@ -259,7 +267,9 @@ class ReleasePrepare
         @utils.exec ["git", "branch", "-D", @release_branch_name]
       end
       @utils.exec ["git", "checkout", "-b", @release_branch_name]
-      @utils.exec ["git", "commit", "-a", "-m", @release_commit_title]
+      commit_cmd = ["git", "commit", "-a", "-m", @release_commit_title]
+      commit_cmd << "--signoff" if @utils.signoff_commits?
+      @utils.exec commit_cmd
       @utils.exec ["git", "push", "-f", @git_remote, @release_branch_name]
       @utils.exec ["git", "checkout", @release_ref]
     end
