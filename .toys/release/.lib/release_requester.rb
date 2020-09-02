@@ -4,14 +4,14 @@ require "fileutils"
 require "release_utils"
 
 # A class that creates release PRs
-class ReleasePrepare
+class ReleaseRequester
   def initialize utils,
                  release_ref: nil,
                  git_remote: nil,
                  git_user_name: nil,
                  git_user_email: nil
     @utils = utils
-    @release_ref = release_ref
+    @release_ref = release_ref || utils.current_branch
     @git_remote = git_remote || "origin"
     @git_user_name = git_user_name
     @git_user_email = git_user_email
@@ -19,7 +19,7 @@ class ReleasePrepare
   end
 
   def initial_setup
-    @utils.error "Releases must be prepared from an existing branch" unless @release_ref
+    @utils.error "Releases must be requested from an existing branch" unless @release_ref
     @utils.verify_git_clean
     @utils.verify_repo_identity git_remote: @git_remote
     @utils.verify_github_checks ref: @release_ref
@@ -46,6 +46,7 @@ class ReleasePrepare
       @override_version = override_version
       @release_ref = release_ref
       @git_remote = git_remote
+      @pr_number = nil
       verify_gem_name
       init_analysis
       determine_last_version
@@ -64,8 +65,9 @@ class ReleasePrepare
     attr_reader :full_changelog
     attr_reader :release_commit_title
     attr_reader :release_branch_name
+    attr_reader :pr_number
 
-    def prepare
+    def request
       modify_version_file
       modify_changelog_file
       create_release_commit
@@ -275,41 +277,60 @@ class ReleasePrepare
     end
 
     def create_release_pr
-      use_labels = @utils.gem_info @gem_name, "enable_release_automation"
+      enable_automation = @utils.gem_info @gem_name, "enable_release_automation"
+      pr_body = enable_automation ? build_automation_pr_body : build_standalone_pr_body
       body = ::JSON.dump title:                 @release_commit_title,
                          head:                  @release_branch_name,
                          base:                  @utils.main_branch,
-                         body:                  build_pr_body(use_labels),
+                         body:                  pr_body,
                          maintainer_can_modify: true
       response = @utils.capture ["gh", "api", "repos/#{@utils.repo_path}/pulls", "--input", "-",
                                  "-H", "Accept: application/vnd.github.v3+json"],
                                 in: [:string, body]
-      pr = ::JSON.parse response
-      return unless use_labels
-      @utils.update_release_pr pr["number"], label: @utils.release_pending_label, cur_pr: pr
+      pr_info = ::JSON.parse response
+      @pr_number = pr_info["number"]
+      return unless enable_automation
+      @utils.update_release_pr @pr_number, label: @utils.release_pending_label, cur_pr: pr_info
     end
 
-    def build_pr_body use_labels
-      label_clause =
-        if use_labels
-          ", ensuring the #{@utils.release_pending_label.inspect} label is set"
-        else
-          ""
-        end
+    def build_automation_pr_body
       <<~STR
-        ## Release #{@gem_name} #{@new_version}
+        ## Prepare release of #{@gem_name} #{@new_version}
 
-        This pull request prepares a new release of #{@gem_name}.
+        This pull request prepares a new release of #{@gem_name}, by modifying \
+        the gem version and constructing an initial changelog based on \
+        [conventional commit](https://conventionalcommits.org) messages. The \
+        new changelog entry is also quoted below.
 
-         *  To confirm this release, merge this pull request#{label_clause}.
+         *  To confirm this release, merge this pull request, ensuring the \
+            #{@utils.release_pending_label.inspect} label is set. The release \
+            script will trigger automatically on merge.
          *  To abort this release, close this pull request without merging.
 
-        An initial changelog has been constructed from \
-        [conventional commit](https://conventionalcommits.org) messages, and \
-        is provided in this pull request (and is also quoted below). Feel \
-        free to edit the changelog and/or release version before merging. \
+        You can edit the changelog and/or release version before merging. \
         Note that the changelog header must retain the same format, and must \
         match the release version, or the release will not succeed.
+
+        ---
+
+        #{@full_changelog}
+      STR
+    end
+
+    def build_standalone_pr_body
+      <<~STR
+        ## Prepare release of #{@gem_name} #{@new_version}
+
+        This pull request prepares a new release of #{@gem_name}, by modifying \
+        the gem version and constructing an initial changelog based on \
+        [conventional commit](https://conventionalcommits.org) messages. The \
+        new changelog entry is also quoted below.
+
+        You can edit the changelog and/or release version before merging. \
+        Note that the changelog header must retain the same format, and must \
+        match the release version, or the release will not succeed.
+
+        You can run the `release perform` script once these changes are merged.
 
         ---
 

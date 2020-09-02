@@ -9,6 +9,10 @@ on:
       version:
         description: Version to release
         required: true
+      flags:
+        description: Extra flags to pass to the release script
+        required: false
+        defailt: ""
 
 jobs:
   perform-release:
@@ -31,9 +35,10 @@ jobs:
         run: |
           toys release perform --yes --verbose \
             "--enable-releases=${{ secrets.ENABLE_RELEASES }}" \
-            "--gem=${{ github.event.inputs.gem }}:${{ github.event.inputs.version }}" \
             "--git-user-email=${{ secrets.GIT_USER_EMAIL }}" \
             "--git-user-name=${{ secrets.GIT_USER_NAME }}" \
-            "--github-sha=${{ github.sha }}" \
+            "--release-sha=${{ github.sha }}" \
             "--rubygems-api-key=${{ secrets.RUBYGEMS_API_KEY }}" \
+            ${{ github.event.inputs.flags }} \
+            "${{ github.event.inputs.gem }}" "${{ github.event.inputs.version }}" \
             < /dev/null
