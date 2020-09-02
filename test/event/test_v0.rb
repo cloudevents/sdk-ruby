@@ -24,6 +24,7 @@ describe CloudEvents::Event::V0 do
   let(:my_time_string) { "2020-01-12T20:52:05-08:00" }
   let(:my_date_time) { DateTime.rfc3339 my_time_string }
   let(:my_time) { my_date_time.to_time }
+  let(:my_trace_parent) { "12345678" }
 
   it "handles string inputs" do
     event = CloudEvents::Event::V0.new id:                    my_id,
@@ -203,5 +204,35 @@ describe CloudEvents::Event::V0 do
                                  spec_version: spec_version
     end
     assert_equal "The type field is required", error.message
+  end
+
+  it "handles extension attributes" do
+    event = CloudEvents::Event::V0.new id:           my_id,
+                                       source:       my_source,
+                                       type:         my_type,
+                                       spec_version: spec_version,
+                                       traceparent:  my_trace_parent
+    assert_equal my_trace_parent, event[:traceparent]
+    assert_equal my_trace_parent, event.to_h["traceparent"]
+  end
+
+  it "handles nonstring extension attributes" do
+    event = CloudEvents::Event::V0.new id:           my_id,
+                                       source:       my_source,
+                                       type:         my_type,
+                                       spec_version: spec_version,
+                                       dataref:      my_source
+    assert_equal my_source_string, event[:dataref]
+    assert_equal my_source_string, event.to_h["dataref"]
+  end
+
+  it "handles nil extension attributes" do
+    event = CloudEvents::Event::V0.new id:           my_id,
+                                       source:       my_source,
+                                       type:         my_type,
+                                       spec_version: spec_version,
+                                       traceparent:  nil
+    assert_nil event[:traceparent]
+    refute_includes event.to_h, "traceparent"
   end
 end
