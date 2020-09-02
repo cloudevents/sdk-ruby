@@ -201,7 +201,7 @@ class ReleasePrepare
       if @last_version
         @new_version ||= begin
           segments = @last_version.segments
-          @bump_segment = 1 if segments[0] == 0 && @bump_segment == 0
+          @bump_segment = 1 if segments[0].zero? && @bump_segment.zero?
           segments[@bump_segment] += 1
           segments.fill(0, @bump_segment + 1).join(".")
         end
