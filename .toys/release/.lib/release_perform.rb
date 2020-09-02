@@ -15,6 +15,7 @@ class ReleasePerform
                  git_user_email: nil,
                  gh_pages_dir: nil,
                  docs_builder: nil,
+                 gh_token: nil,
                  dry_run: false
     @utils = utils
     @release_sha = @utils.current_sha release_sha
@@ -26,6 +27,7 @@ class ReleasePerform
     @dry_run = dry_run
     @docs_builder = docs_builder
     @gh_pages_dir = gh_pages_dir
+    @gh_token = gh_token
     @performed_initial_setup = false
   end
 
@@ -204,12 +206,18 @@ class ReleasePerform
     remote_url = @utils.git_remote_url @git_remote
     ::Dir.chdir @gh_pages_dir do
       @utils.exec ["git", "init"]
+      @utils.exec ["git", "config", "--local", "user.email", @git_user_email] if @git_user_email
+      @utils.exec ["git", "config", "--local", "user.name", @git_user_name] if @git_user_name
+      if remote_url.start_with?("https://github.com/") && @gh_token
+        encoded_token = ::Base64.encode64 "x-access-token:#{@gh_token}"
+        @utils.exec ["git", "config", "--local", "http.https://github.com/.extraheader",
+                     "AUTHORIZATION: basic #{encoded_token}"],
+                    log_cmd: '["git", "config", "--local", "http.https://github.com/.extraheader", "****"]'
+      end
       @utils.exec ["git", "remote", "add", @git_remote, remote_url]
       @utils.exec ["git", "fetch", "--no-tags", "--depth=1", "--no-recurse-submodules", @git_remote, "gh-pages"]
       @utils.exec ["git", "branch", "gh-pages", "#{@git_remote}/gh-pages"]
       @utils.exec ["git", "checkout", "gh-pages"]
-      @utils.exec ["git", "config", "user.email", @git_user_email] if @git_user_email
-      @utils.exec ["git", "config", "user.name", @git_user_name] if @git_user_name
     end
   end
 

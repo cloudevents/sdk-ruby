@@ -27,8 +27,8 @@ class ReleasePrepare
       @utils.exec ["git", "fetch", "--unshallow", @git_remote, @release_ref]
     end
     @utils.exec ["git", "fetch", @git_remote, "--tags"]
-    @utils.exec ["git", "config", "user.email", @git_user_email] if @git_user_email
-    @utils.exec ["git", "config", "user.name", @git_user_name] if @git_user_name
+    @utils.exec ["git", "config", "--local", "user.email", @git_user_email] if @git_user_email
+    @utils.exec ["git", "config", "--local", "user.name", @git_user_name] if @git_user_name
     @utils.exec ["git", "checkout", @release_ref]
     @performed_initial_setup = true
   end

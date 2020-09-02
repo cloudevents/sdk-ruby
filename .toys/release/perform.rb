@@ -127,12 +127,6 @@ def run
   cd context_directory
   utils = ReleaseUtils.new self
 
-  unless ::ENV["GITHUB_ACTIONS"]
-    unless confirm "Perform a release locally, outside the normal process? ", :bold, :red
-      utils.error "Release aborted"
-    end
-  end
-
   [:gh_pages_dir, :git_user_email, :git_user_name, :rubygems_api_key].each do |key|
     set key, nil if get(key).to_s.empty?
   end
@@ -180,6 +174,7 @@ def perform_release gem_name, gem_version, utils
                                  git_user_name:    git_user_name,
                                  git_user_email:   git_user_email,
                                  gh_pages_dir:     gh_pages_dir,
+                                 gh_token:         ::ENV["GITHUB_TOKEN"],
                                  docs_builder:     docs_builder,
                                  dry_run:          dry_run
   instance = performer.instance gem_name, gem_version
