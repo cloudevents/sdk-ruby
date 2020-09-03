@@ -29,6 +29,10 @@ class ReleaseUtils # rubocop:disable Metrics/ClassLength
     @signoff_commits
   end
 
+  def enable_release_automation?
+    @enable_release_automation
+  end
+
   def all_gems
     @gems.keys
   end
@@ -358,6 +362,7 @@ class ReleaseUtils # rubocop:disable Metrics/ClassLength
     @repo_path = info["repo"]
     @signoff_commits = info["signoff_commits"] ? true : false
     @docs_builder_tool = info["docs_builder_tool"]
+    @enable_release_automation = info.fetch("enable_release_automation", true) ? true : false
     error "Repo key missing from releases.yml" unless @repo_path
     @gems = {}
     @default_gem = nil
@@ -382,7 +387,6 @@ class ReleaseUtils # rubocop:disable Metrics/ClassLength
     gem_info["gh_pages_directory"] ||= has_multiple_gems ? name : "."
     gem_info["gh_pages_version_var"] ||=
       has_multiple_gems ? "version_#{name}".tr("-", "_") : "version"
-    gem_info["enable_release_automation"] = true if gem_info["enable_release_automation"].nil?
   end
 
   def camelize str

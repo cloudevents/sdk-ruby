@@ -12,7 +12,7 @@ on:
       flags:
         description: Extra flags to pass to the release script
         required: false
-        defailt: ""
+        default: ""
 
 jobs:
   perform-release:

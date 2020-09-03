@@ -277,7 +277,7 @@ class ReleaseRequester
     end
 
     def create_release_pr
-      enable_automation = @utils.gem_info @gem_name, "enable_release_automation"
+      enable_automation = @utils.enable_release_automation?
       pr_body = enable_automation ? build_automation_pr_body : build_standalone_pr_body
       body = ::JSON.dump title:                 @release_commit_title,
                          head:                  @release_branch_name,
