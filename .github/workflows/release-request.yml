@@ -9,7 +9,7 @@ on:
         default: ""
 
 jobs:
-  prepare-release-pr:
+  request-release:
     if: ${{ github.repository == 'cloudevents/sdk-ruby' }}
     env:
       ruby_version: "2.7"

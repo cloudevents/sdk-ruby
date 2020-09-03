@@ -36,7 +36,7 @@ jobs:
         shell: bash
         run: |
           toys "${{ matrix.tool || 'test' }}" < /dev/null
-  post-push:
+  process-releases:
     needs: [tests]
     if: ${{ always() && github.repository == 'cloudevents/sdk-ruby' }}
     runs-on: ubuntu-latest
