@@ -23,6 +23,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          toys release abort --verbose \
+          toys release _on-pr-closed --verbose \
             "--event-path=${{ github.event_path }}" \
             < /dev/null

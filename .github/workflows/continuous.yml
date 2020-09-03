@@ -55,11 +55,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          toys release perform --yes --verbose \
+          toys release _on-push --verbose \
             "--ci-result=${{ needs.tests.result }}" \
             "--enable-releases=${{ secrets.ENABLE_RELEASES }}" \
             "--git-user-email=${{ secrets.GIT_USER_EMAIL }}" \
             "--git-user-name=${{ secrets.GIT_USER_NAME }}" \
-            "--github-sha=${{ github.sha }}" \
             "--rubygems-api-key=${{ secrets.RUBYGEMS_API_KEY }}" \
             < /dev/null
