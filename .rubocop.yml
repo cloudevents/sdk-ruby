@@ -1,19 +1,9 @@
 inherit_gem:
   google-style: google-style.yml
 
-AllCops:
-  Include:
-    - ".toys/**/*.rb"
-    - ".toys/**/.toys.rb"
-    - ".toys/**/.lib/**/*.rb"
-    - "**/*.rb"
-    - "**/Gemfile"
-    - "*.gemspec"
-
 Metrics/BlockLength:
   Exclude:
     - "test/**/test_*.rb"
-    - ".toys/**/*.rb"
 Metrics/ClassLength:
   Max: 200
 Metrics/ModuleLength:
