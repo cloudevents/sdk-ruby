@@ -1,12 +1,13 @@
-name: "(check for aborted release)"
+name: "[release hook] Update open releases"
 
 on:
-  pull_request:
-    types: [closed]
+  push:
+    branches:
+      - master
 
 jobs:
-  aborted-release-check:
-    if: ${{ github.repository == 'cloudevents/sdk-ruby' && !github.event.pull_request.merged_at }}
+  release-update-open-requests:
+    if: ${{ github.repository == 'cloudevents/sdk-ruby' }}
     env:
       ruby_version: "2.7"
     runs-on: ubuntu-latest
@@ -19,10 +20,9 @@ jobs:
         uses: actions/checkout@v2
       - name: Install Toys
         run: "gem install --no-document toys"
-      - name: Aborted release check
+      - name: Update open releases
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          toys release _on-pr-closed --verbose \
-            "--event-path=${{ github.event_path }}" \
+          toys release _onpush --verbose \
             < /dev/null

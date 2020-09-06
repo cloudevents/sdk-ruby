@@ -1,4 +1,4 @@
-name: Request Release
+name: Open release request
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
         default: ""
 
 jobs:
-  request-release:
+  release-request:
     if: ${{ github.repository == 'cloudevents/sdk-ruby' }}
     env:
       ruby_version: "2.7"
