@@ -14,12 +14,18 @@ jobs:
     if: ${{ github.repository == 'cloudevents/sdk-ruby' }}
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
-        ruby: [ "2.4", "2.5", "2.6", "2.7", "jruby" ]
         include:
+          - os: ubuntu-latest
+            ruby: "2.4"
+          - os: ubuntu-latest
+            ruby: "2.5"
+          - os: ubuntu-latest
+            ruby: "2.6"
           - os: ubuntu-latest
             ruby: "2.7"
             tool: ci
+          - os: ubuntu-latest
+            ruby: head
           - os: macos-latest
             ruby: "2.7"
           - os: windows-latest
