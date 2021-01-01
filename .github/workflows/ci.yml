@@ -25,7 +25,7 @@ jobs:
             ruby: "2.7"
             tool: ci
           - os: ubuntu-latest
-            ruby: head
+            ruby: "3.0"
           - os: macos-latest
             ruby: "2.7"
           - os: windows-latest
