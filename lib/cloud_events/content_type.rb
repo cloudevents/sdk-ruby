@@ -14,6 +14,8 @@ module CloudEvents
   # can, and fill the rest with defaults as recommended in RFC 2045 sec 5.2.
   # In case of a parsing error, the {#error_message} field will be set.
   #
+  # This object is immutable, and Ractor-shareable on Ruby 3.
+  #
   class ContentType
     ##
     # Parse the given header value.
@@ -31,6 +33,7 @@ module CloudEvents
       parse consume_comments string.strip
       @canonical_string = "#{@media_type}/#{@subtype}" +
                           @params.map { |k, v| "; #{k}=#{maybe_quote v}" }.join
+      full_freeze
     end
 
     ##
@@ -203,6 +206,18 @@ module CloudEvents
       return str if /^[\w!#\$%&'\*\+\.\^`\{\|\}-]+$/ =~ str
       str = str.gsub("\\", "\\\\\\\\").gsub("\"", "\\\\\"")
       "\"#{str}\""
+    end
+
+    def full_freeze
+      instance_variables.each do |iv|
+        instance_variable_get(iv).freeze
+      end
+      @params.each do |name_val|
+        name_val[0].freeze
+        name_val[1].freeze
+        name_val.freeze
+      end
+      freeze
     end
   end
 end

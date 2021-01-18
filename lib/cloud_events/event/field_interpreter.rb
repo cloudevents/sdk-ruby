@@ -15,10 +15,10 @@ module CloudEvents
 
       def finish_attributes
         @args.each do |key, value|
-          @attributes[key] = value.to_s unless value.nil?
+          @attributes[key.freeze] = value.to_s.freeze unless value.nil?
         end
         @args = {}
-        @attributes
+        @attributes.freeze
       end
 
       def string keys, required: false
@@ -102,7 +102,7 @@ module CloudEvents
         end
       end
 
-      UNDEFINED = ::Object.new
+      UNDEFINED = ::Object.new.freeze
 
       def object keys, required: false, allow_nil: false
         value = UNDEFINED
@@ -117,14 +117,34 @@ module CloudEvents
         end
         if block_given?
           converted, raw = yield value
+          deep_freeze converted
         else
           converted = raw = value
         end
-        @attributes[keys.first] = raw
+        @attributes[keys.first.freeze] = raw.freeze
         converted
       end
 
       private
+
+      def deep_freeze obj
+        case obj
+        when ::Hash
+          obj.each do |key, val|
+            deep_freeze key
+            deep_freeze val
+          end
+        when ::Array
+          obj.each do |val|
+            deep_freeze val
+          end
+        else
+          obj.instance_variables.each do |iv|
+            deep_freeze obj.instance_variable_get iv
+          end
+        end
+        obj.freeze
+      end
 
       def keys_to_strings hash
         result = {}
