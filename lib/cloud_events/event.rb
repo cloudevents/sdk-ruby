@@ -50,6 +50,11 @@ module CloudEvents
       # `spec_version`, the remaining keyword arguments will be passed
       # through to the {CloudEvents::Event::V1} constructor.
       #
+      # Note that argument objects passed in may get deep-frozen if they are
+      # used in the final event object. This is particularly important for the
+      # `:data` field, for example if you pass a structured hash. If this is an
+      # issue, make a deep copy of objects before passing them to this method.
+      #
       # @param spec_version [String] The required `specversion` field.
       # @param kwargs [keywords] Additional parameters for the event.
       #

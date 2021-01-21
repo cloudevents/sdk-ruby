@@ -61,6 +61,7 @@ describe CloudEvents::Event::V0 do
     assert_nil event[:schema_url]
     assert_equal my_subject, event[:subject]
     assert_equal my_time_string, event[:time]
+    assert Ractor.shareable? event if defined? Ractor
   end
 
   it "handles object inputs" do
@@ -94,6 +95,7 @@ describe CloudEvents::Event::V0 do
     assert_nil event[:schema_url]
     assert_equal my_subject, event[:subject]
     assert_equal my_time_string, event[:time]
+    assert Ractor.shareable? event if defined? Ractor
   end
 
   it "handles more object inputs" do
@@ -109,6 +111,7 @@ describe CloudEvents::Event::V0 do
     assert_equal spec_version, event.spec_version
     assert_equal my_simple_data, event.data
     assert_equal my_date_time, event.time
+    assert Ractor.shareable? event if defined? Ractor
   end
 
   it "sets defaults when optional inputs are omitted" do
@@ -140,6 +143,7 @@ describe CloudEvents::Event::V0 do
     assert_nil event[:schema_url]
     assert_nil event[:subject]
     assert_nil event[:time]
+    assert Ractor.shareable? event if defined? Ractor
   end
 
   it "creates a modified copy" do
@@ -158,6 +162,7 @@ describe CloudEvents::Event::V0 do
     assert_equal my_source2, event2.source
     assert_equal my_type2, event2.type
     assert_equal my_schema, event2.schema_url
+    assert Ractor.shareable? event2 if defined? Ractor
   end
 
   it "requires specversion" do

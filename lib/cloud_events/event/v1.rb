@@ -16,9 +16,10 @@ module CloudEvents
     # their own accessor methods that may return typed objects (such as
     # `DateTime` for the `time` attribute).
     #
-    # This object is immutable. The data and attribute values can be
-    # retrieved but not modified. To obtain an event with modifications, use
-    # the {#with} method to create a copy with the desired changes.
+    # This object is immutable, and Ractor-shareable on Ruby 3. The data and
+    # attribute values can be retrieved but not modified. To obtain an event
+    # with modifications, use the {#with} method to create a copy with the
+    # desired changes.
     #
     # See https://github.com/cloudevents/spec/blob/v1.0/spec.md for
     # descriptions of the standard attributes.
@@ -56,6 +57,11 @@ module CloudEvents
       # They are not available as separate methods, but can be accessed via
       # the {Event::V1#[]} operator.
       #
+      # Note that attribute objects passed in may get deep-frozen if they are
+      # used in the final event object. This is particularly important for the
+      # `:data` field, for example if you pass a structured hash. If this is an
+      # issue, make a deep copy of objects before passing to this constructor.
+      #
       # @param attributes [Hash] The data and attributes, as a hash.
       # @param args [keywords] The data and attributes, as keyword arguments.
       #
@@ -71,6 +77,7 @@ module CloudEvents
         @subject = interpreter.string ["subject"]
         @time = interpreter.rfc3339_date_time ["time"]
         @attributes = interpreter.finish_attributes
+        freeze
       end
 
       ##
@@ -109,7 +116,8 @@ module CloudEvents
       end
 
       ##
-      # Return a hash representation of this event.
+      # Return a hash representation of this event. The returned hash is an
+      # unfrozen copy. Modifications do not affect the original event.
       #
       # @return [Hash]
       #
@@ -201,7 +209,7 @@ module CloudEvents
 
       ## @private
       def hash
-        @hash ||= @attributes.hash
+        @attributes.hash
       end
     end
   end
