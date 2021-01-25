@@ -1,5 +1,10 @@
 # Changelog
 
+### v0.2.0 / 2021-01-25
+
+* ADDED: Freeze event objects to make them Ractor-shareable
+* DOCS: Fix formatting of Apache license 
+
 ### v0.1.2 / 2020-09-02
 
 * Fix: Convert extension attributes to strings, and ignore nils 
