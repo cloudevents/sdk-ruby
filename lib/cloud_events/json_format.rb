@@ -137,10 +137,9 @@ module CloudEvents
       structure = event.to_h
       data = event.data
       content_type = event.data_content_type
-      if data.is_a?(::String) && !content_type.nil?
-        if content_type.subtype == "json" || content_type.subtype_format == "json"
-          structure["data"] = ::JSON.parse data rescue data
-        end
+      if data.is_a?(::String) && !content_type.nil? &&
+         (content_type.subtype == "json" || content_type.subtype_format == "json")
+        structure["data"] = ::JSON.parse data rescue data
       end
       structure
     end

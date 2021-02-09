@@ -17,7 +17,7 @@ Features:
     specifications.
  *  Extensible to additional formats and protocol bindings, and future
     specification versions.
- *  Compatible with Ruby 2.4 or later, or JRuby 9.2.x or later. No runtime gem
+ *  Compatible with Ruby 2.5 or later, or JRuby 9.2.x or later. No runtime gem
     dependencies.
 
 ## Quickstart
@@ -35,7 +35,7 @@ A simple [Sinatra](https://sinatrarb.com) app that receives CloudEvents:
 ```ruby
 # examples/server/Gemfile
 source "https://rubygems.org"
-gem "cloud_events", "~> 0.1"
+gem "cloud_events", "~> 0.2"
 gem "sinatra", "~> 2.0"
 ```
 
@@ -59,7 +59,7 @@ A simple Ruby script that sends a CloudEvent:
 ```ruby
 # examples/client/Gemfile
 source "https://rubygems.org"
-gem "cloud_events", "~> 0.1"
+gem "cloud_events", "~> 0.2"
 ```
 
 ```ruby
