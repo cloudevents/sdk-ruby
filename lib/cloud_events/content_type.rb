@@ -140,7 +140,7 @@ module CloudEvents
     end
 
     def consume_token str, downcase: false, error_message: nil
-      match = /^([\w!#\$%&'\*\+\.\^`\{\|\}-]+)(.*)$/.match str
+      match = /^([\w!#$%&'*+.\^`{|}-]+)(.*)$/.match str
       raise ParseError, error_message || "Expected token" unless match
       token = match[1]
       token.downcase! if downcase
@@ -203,7 +203,7 @@ module CloudEvents
     end
 
     def maybe_quote str
-      return str if /^[\w!#\$%&'\*\+\.\^`\{\|\}-]+$/ =~ str
+      return str if /^[\w!#$%&'*+.\^`{|}-]+$/ =~ str
       str = str.gsub("\\", "\\\\\\\\").gsub("\"", "\\\\\"")
       "\"#{str}\""
     end

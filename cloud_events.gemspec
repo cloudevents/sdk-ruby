@@ -21,7 +21,7 @@ version = ::CloudEvents::VERSION
 
   spec.files = ::Dir.glob("lib/**/*.rb") + ::Dir.glob("*.md") + [".yardopts"]
   spec.require_paths = ["lib"]
-  spec.required_ruby_version = ">= 2.4.0"
+  spec.required_ruby_version = ">= 2.5"
 
   if spec.respond_to? :metadata
     spec.metadata["changelog_uri"] = "https://cloudevents.github.io/sdk-ruby/v#{version}/file.CHANGELOG.html"

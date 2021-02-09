@@ -228,21 +228,19 @@ module CloudEvents
       headers = {}
       body = nil
       event.to_h.each do |key, value|
-        if key == "data"
+        case key
+        when "data"
           body = value
-        elsif key == "datacontenttype"
+        when "datacontenttype"
           headers["Content-Type"] = value
         else
           headers["CE-#{key}"] = percent_encode value
         end
       end
-      if body.is_a? ::String
-        headers["Content-Type"] ||= if body.encoding == ::Encoding.ASCII_8BIT
-                                      "application/octet-stream"
-                                    else
-                                      "text/plain; charset=#{body.encoding.name.downcase}"
-                                    end
-      elsif body.nil?
+      case body
+      when ::String
+        headers["Content-Type"] ||= string_content_type body
+      when nil
         headers.delete "Content-Type"
       else
         body = ::JSON.dump body
@@ -287,6 +285,16 @@ module CloudEvents
         end
       end
       arr.pack "C*"
+    end
+
+    private
+
+    def string_content_type str
+      if str.encoding == ::Encoding.ASCII_8BIT
+        "application/octet-stream"
+      else
+        "text/plain; charset=#{str.encoding.name.downcase}"
+      end
     end
   end
 end

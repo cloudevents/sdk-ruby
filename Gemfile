@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 gemspec
 
-gem "google-style", "~> 1.24.0"
+gem "google-style", "~> 1.25.1"
 gem "minitest", "~> 5.14"
 gem "minitest-focus", "~> 1.1"
 gem "minitest-rg", "~> 5.2"
