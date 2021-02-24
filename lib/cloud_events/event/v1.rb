@@ -3,6 +3,9 @@
 require "date"
 require "uri"
 
+require "cloud_events/event/field_interpreter"
+require "cloud_events/event/utils"
+
 module CloudEvents
   module Event
     ##
@@ -43,7 +46,7 @@ module CloudEvents
       #     field.
       #  *  **:type** [`String`] - _required_ - The event `type` field.
       #  *  **:data** [`Object`] - _optional_ - The data associated with the
-      #     event (i.e. the `data` field.)
+      #     event (i.e. the `data` field).
       #  *  **:data_content_type** (or **:datacontenttype**) [`String`,
       #     {ContentType}] - _optional_ - The content-type for the data, if
       #     the data is a string (i.e. the event `datacontenttype` field.)
@@ -71,7 +74,7 @@ module CloudEvents
         @id = interpreter.string ["id"], required: true
         @source = interpreter.uri ["source"], required: true
         @type = interpreter.string ["type"], required: true
-        @data = interpreter.object ["data"], allow_nil: true
+        @data = interpreter.data_object ["data"]
         @data_content_type = interpreter.content_type ["datacontenttype", "data_content_type"]
         @data_schema = interpreter.uri ["dataschema", "data_schema"]
         @subject = interpreter.string ["subject"]
@@ -108,6 +111,8 @@ module CloudEvents
       #     event["time"]     # => String rfc3339 representation
       #     event.time        # => DateTime object
       #
+      # Results are also always frozen and cannot be modified in place.
+      #
       # @param key [String,Symbol] The attribute name.
       # @return [String,nil]
       #
@@ -117,12 +122,12 @@ module CloudEvents
 
       ##
       # Return a hash representation of this event. The returned hash is an
-      # unfrozen copy. Modifications do not affect the original event.
+      # unfrozen deep copy. Modifications do not affect the original event.
       #
       # @return [Hash]
       #
       def to_h
-        @attributes.dup
+        Utils.deep_dup @attributes
       end
 
       ##
