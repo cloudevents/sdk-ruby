@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
+require "cloud_events/event/utils"
+
 module CloudEvents
   module Event
     ##
     # A helper that extracts and interprets event fields from an input hash.
-    #
     # @private
     #
     class FieldInterpreter
       def initialize args
-        @args = keys_to_strings args
+        @args = Utils.keys_to_strings args
         @attributes = {}
       end
 
@@ -26,6 +27,7 @@ module CloudEvents
           case value
           when ::String
             raise AttributeError, "The #{keys.first} field cannot be empty" if value.empty?
+            value.freeze
             [value, value]
           else
             raise AttributeError, "Illegal type for #{keys.first}:" \
@@ -40,12 +42,12 @@ module CloudEvents
           when ::String
             raise AttributeError, "The #{keys.first} field cannot be empty" if value.empty?
             begin
-              [::URI.parse(value), value]
+              [Utils.deep_freeze(::URI.parse(value)), value.freeze]
             rescue ::URI::InvalidURIError => e
               raise AttributeError, "Illegal format for #{keys.first}: #{e.message}"
             end
           when ::URI::Generic
-            [value, value.to_s]
+            [Utils.deep_freeze(value), value.to_s.freeze]
           else
             raise AttributeError, "Illegal type for #{keys.first}:" \
                                   " String or URI expected but #{value.class} found"
@@ -58,15 +60,15 @@ module CloudEvents
           case value
           when ::String
             begin
-              [::DateTime.rfc3339(value), value]
+              [Utils.deep_freeze(::DateTime.rfc3339(value)), value.freeze]
             rescue ::Date::Error => e
               raise AttributeError, "Illegal format for #{keys.first}: #{e.message}"
             end
           when ::DateTime
-            [value, value.rfc3339]
+            [Utils.deep_freeze(value), value.rfc3339.freeze]
           when ::Time
             value = value.to_datetime
-            [value, value.rfc3339]
+            [Utils.deep_freeze(value), value.rfc3339.freeze]
           else
             raise AttributeError, "Illegal type for #{keys.first}:" \
                                   " String, Time, or DateTime expected but #{value.class} found"
@@ -79,7 +81,7 @@ module CloudEvents
           case value
           when ::String
             raise AttributeError, "The #{keys.first} field cannot be empty" if value.empty?
-            [ContentType.new(value), value]
+            [ContentType.new(value), value.freeze]
           when ContentType
             [value, value.to_s]
           else
@@ -94,6 +96,7 @@ module CloudEvents
           case value
           when ::String
             raise SpecVersionError, "Unrecognized specversion: #{value}" unless accept =~ value
+            value.freeze
             [value, value]
           else
             raise AttributeError, "Illegal type for #{keys.first}:" \
@@ -102,7 +105,16 @@ module CloudEvents
         end
       end
 
+      def data_object keys, required: false
+        object keys, required: required, allow_nil: true do |value|
+          Utils.deep_freeze value
+          [value, value]
+        end
+      end
+
       UNDEFINED = ::Object.new.freeze
+
+      private
 
       def object keys, required: false, allow_nil: false
         value = UNDEFINED
@@ -115,43 +127,9 @@ module CloudEvents
           raise AttributeError, "The #{keys.first} field is required" if required
           return nil
         end
-        if block_given?
-          converted, raw = yield value
-          deep_freeze converted
-        else
-          converted = raw = value
-        end
-        @attributes[keys.first.freeze] = raw.freeze
+        converted, raw = yield value
+        @attributes[keys.first.freeze] = raw
         converted
-      end
-
-      private
-
-      def deep_freeze obj
-        case obj
-        when ::Hash
-          obj.each do |key, val|
-            deep_freeze key
-            deep_freeze val
-          end
-        when ::Array
-          obj.each do |val|
-            deep_freeze val
-          end
-        else
-          obj.instance_variables.each do |iv|
-            deep_freeze obj.instance_variable_get iv
-          end
-        end
-        obj.freeze
-      end
-
-      def keys_to_strings hash
-        result = {}
-        hash.each do |key, val|
-          result[key.to_s] = val
-        end
-        result
       end
     end
   end

@@ -231,4 +231,24 @@ describe CloudEvents::Event::V1 do
     assert_nil event[:traceparent]
     refute_includes event.to_h, "traceparent"
   end
+
+  it "returns a deep copy from to_h" do
+    my_data = { "a" => [1, 2, 3, 4] }
+    event = CloudEvents::Event::V1.new id:           my_id,
+                                       source:       my_source_string,
+                                       type:         my_type,
+                                       spec_version: spec_version,
+                                       data:         my_data
+    assert Ractor.shareable? event if defined? Ractor
+
+    data_from_getter = event.data
+    assert_equal my_data, data_from_getter
+    assert data_from_getter.frozen?
+    assert data_from_getter["a"].frozen?
+
+    data_from_hash = event.to_h["data"]
+    assert_equal my_data, data_from_hash
+    refute data_from_hash.frozen?
+    refute data_from_hash["a"].frozen?
+  end
 end
