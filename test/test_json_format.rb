@@ -215,8 +215,23 @@ describe CloudEvents::JsonFormat do
         "type"            => my_type
       }
     end
+    let :my_incomplete_struct_v1 do
+      {
+        "data"            => my_json_data,
+        "datacontenttype" => my_content_type_string,
+        "dataschema"      => nil,
+        "id"              => my_id,
+        "source"          => my_source_string,
+        "specversion"     => spec_version_v1,
+        "time"            => nil,
+        "type"            => my_type
+      }
+    end
     let(:my_json_struct_v1_string) { JSON.dump my_json_struct_v1 }
     let(:my_batch_v1_string) { JSON.dump [my_base64_struct_v1, my_json_struct_v1] }
+    let :my_compacted_incomplete_struct_v1 do
+      my_incomplete_struct_v1.delete_if { |_k, v| v.nil? }
+    end
 
     it "decodes and encodes a struct with string data" do
       event = json_format.decode_hash_structure my_string_struct_v1
@@ -303,6 +318,24 @@ describe CloudEvents::JsonFormat do
       assert_equal my_time, event.time
       string = json_format.encode_batch events, sort: true
       assert_equal my_batch_v1_string, string
+    end
+
+    it "decodes and encodes json with nulls" do
+      event = json_format.decode_hash_structure my_incomplete_struct_v1
+      assert_equal my_id, event.id
+      assert_equal my_source, event.source
+      assert_equal my_type, event.type
+      assert_equal spec_version_v1, event.spec_version
+      assert_equal my_json_data, event.data
+      assert_equal my_content_type, event.data_content_type
+      assert_nil event.data_schema
+      assert_nil event.subject
+      assert_nil event.time
+      hash = event.to_h
+      refute hash.include? "subject"
+      refute hash.include? "time"
+      struct = json_format.encode_hash_structure event
+      assert_equal my_compacted_incomplete_struct_v1, struct
     end
   end
 end
