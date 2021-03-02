@@ -1,5 +1,10 @@
 # Changelog
 
+### v0.3.0 / 2021-03-02
+
+* ADDED: Require Ruby 2.5 or later
+* FIXED: Deep-duplicated event attributes in to_h to avoid returning frozen objects 
+
 ### v0.2.0 / 2021-01-25
 
 * ADDED: Freeze event objects to make them Ractor-shareable
