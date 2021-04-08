@@ -241,7 +241,7 @@ for how PR reviews and approval, and our
 [Code of Conduct](https://github.com/cloudevents/spec/blob/master/community/GOVERNANCE.md#additional-information)
 information.
 
-## Licensing
+## License
 
     Copyright 2020 Google LLC and the CloudEvents Ruby SDK Contributors
 
