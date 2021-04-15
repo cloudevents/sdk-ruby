@@ -89,11 +89,11 @@ module CloudEvents
       if input && content_type&.media_type == "application"
         case content_type.subtype_base
         when "cloudevents"
-          input.set_encoding content_type.charset if content_type.charset
-          return decode_structured_content input.read, content_type.subtype_format, **format_args
+          content = read_with_charset input, content_type.charset
+          return decode_structured_content content, content_type.subtype_format, **format_args
         when "cloudevents-batch"
-          input.set_encoding content_type.charset if content_type.charset
-          return decode_batched_content input.read, content_type.subtype_format, **format_args
+          content = read_with_charset input, content_type.charset
+          return decode_batched_content content, content_type.subtype_format, **format_args
         end
       end
       decode_binary_content env, content_type
@@ -152,10 +152,7 @@ module CloudEvents
       return nil if spec_version.nil?
       raise SpecVersionError, "Unrecognized specversion: #{spec_version}" unless spec_version == "1.0"
       input = env["rack.input"]
-      data = if input
-               input.set_encoding content_type.charset if content_type&.charset
-               input.read
-             end
+      data = read_with_charset input, content_type&.charset if input
       attributes = { "spec_version" => spec_version, "data" => data }
       attributes["data_content_type"] = content_type if content_type
       omit_names = ["specversion", "spec_version", "data", "datacontenttype", "data_content_type"]
@@ -288,6 +285,18 @@ module CloudEvents
     end
 
     private
+
+    def read_with_charset io, charset
+      str = io.read
+      if charset
+        begin
+          str.force_encoding charset
+        rescue ::ArgumentError
+          # Do nothing for now if the charset is unrecognized
+        end
+      end
+      str
+    end
 
     def string_content_type str
       if str.encoding == ::Encoding.ASCII_8BIT

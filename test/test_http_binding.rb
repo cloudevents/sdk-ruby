@@ -6,6 +6,7 @@ require "date"
 require "json"
 require "stringio"
 require "uri"
+require "rack/lint"
 
 describe CloudEvents::HttpBinding do
   let(:http_binding) { CloudEvents::HttpBinding.default }
@@ -116,6 +117,33 @@ describe CloudEvents::HttpBinding do
   it "decodes a binary rack env and re-encodes as structured" do
     env = {
       "rack.input"          => StringIO.new(my_simple_data),
+      "HTTP_CE_ID"          => my_id,
+      "HTTP_CE_SOURCE"      => my_source_string,
+      "HTTP_CE_TYPE"        => my_type,
+      "HTTP_CE_SPECVERSION" => spec_version,
+      "CONTENT_TYPE"        => my_content_type_string,
+      "HTTP_CE_DATASCHEMA"  => my_schema_string,
+      "HTTP_CE_SUBJECT"     => my_subject,
+      "HTTP_CE_TIME"        => my_time_string
+    }
+    event = http_binding.decode_rack_env env
+    assert_equal my_id, event.id
+    assert_equal my_source, event.source
+    assert_equal my_type, event.type
+    assert_equal spec_version, event.spec_version
+    assert_equal my_simple_data, event.data
+    assert_equal my_content_type, event.data_content_type
+    assert_equal my_schema, event.data_schema
+    assert_equal my_subject, event.subject
+    assert_equal my_time, event.time
+    headers, body = http_binding.encode_structured_content event, "json", sort: true
+    assert_equal({ "Content-Type" => "application/cloudevents+json" }, headers)
+    assert_equal my_json_struct_encoded, body
+  end
+
+  it "decodes a binary rack env using an InputWrapper and re-encodes as structured" do
+    env = {
+      "rack.input"          => Rack::Lint::InputWrapper.new(StringIO.new(my_simple_data)),
       "HTTP_CE_ID"          => my_id,
       "HTTP_CE_SOURCE"      => my_source_string,
       "HTTP_CE_TYPE"        => my_type,
