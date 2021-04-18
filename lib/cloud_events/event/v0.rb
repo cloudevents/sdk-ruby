@@ -221,7 +221,7 @@ module CloudEvents
 
       ## @private
       def == other
-        other.is_a?(V1) && @attributes == other.instance_variable_get(:@attributes)
+        other.is_a?(V0) && @attributes == other.instance_variable_get(:@attributes)
       end
       alias eql? ==
 

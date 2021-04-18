@@ -260,4 +260,21 @@ describe CloudEvents::Event::V0 do
     refute data_from_hash.frozen?
     refute data_from_hash["a"].frozen?
   end
+
+  it "checks equality" do
+    event1 = CloudEvents::Event::V0.new id:           my_id,
+                                        source:       my_source,
+                                        type:         my_type,
+                                        spec_version: spec_version
+    event2 = CloudEvents::Event::V0.new id:           my_id,
+                                        source:       my_source,
+                                        type:         my_type,
+                                        spec_version: spec_version
+    event3 = CloudEvents::Event::V0.new id:           my_id,
+                                        source:       my_source2,
+                                        type:         my_type,
+                                        spec_version: spec_version
+    assert_equal event1, event2
+    refute_equal event1, event3
+  end
 end
