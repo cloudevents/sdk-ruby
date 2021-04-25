@@ -1,5 +1,10 @@
 # Changelog
 
+### v0.3.1 / 2021-04-25
+
+* FIXED: Fixed exception when decoding from a rack source that uses InputWrapper 
+* FIXED: Fixed equality checking for V0 events 
+
 ### v0.3.0 / 2021-03-02
 
 * ADDED: Require Ruby 2.5 or later
