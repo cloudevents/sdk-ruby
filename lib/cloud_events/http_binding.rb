@@ -183,7 +183,10 @@ module CloudEvents
       handlers = @structured_formatters[format] || []
       handlers.reverse_each do |handler|
         content = handler.encode event, **format_args
-        return [{ "Content-Type" => "application/cloudevents+#{format}" }, content] if content
+        if content
+          content_type = "application/cloudevents+#{format}; charset=#{charset_of content}"
+          return [{ "Content-Type" => content_type }, content]
+        end
       end
       raise HttpContentError, "Unknown cloudevents format: #{format.inspect}"
     end
@@ -206,7 +209,10 @@ module CloudEvents
       handlers = @batched_formatters[format] || []
       handlers.reverse_each do |handler|
         content = handler.encode_batch events, **format_args
-        return [{ "Content-Type" => "application/cloudevents-batch+#{format}" }, content] if content
+        if content
+          content_type = "application/cloudevents-batch+#{format}; charset=#{charset_of content}"
+          return [{ "Content-Type" => content_type }, content]
+        end
       end
       raise HttpContentError, "Unknown cloudevents format: #{format.inspect}"
     end
@@ -254,7 +260,7 @@ module CloudEvents
     # @return [String] Resulting decoded string in UTF-8.
     #
     def percent_decode str
-      str = str.gsub(/"((?:[^"\\]|\\.)*)"/) { Regexp.last_match(1).gsub(/\\(.)/, '\1') }
+      str = str.gsub(/"((?:[^"\\]|\\.)*)"/) { ::Regexp.last_match(1).gsub(/\\(.)/, '\1') }
       decoded_str = str.gsub(/%[0-9a-fA-F]{2}/) { |m| [m[1..-1].to_i(16)].pack "C" }
       decoded_str.force_encoding ::Encoding::UTF_8
     end
@@ -293,17 +299,27 @@ module CloudEvents
         begin
           str.force_encoding charset
         rescue ::ArgumentError
-          # Do nothing for now if the charset is unrecognized
+          # Use binary for now if the charset is unrecognized
+          str.force_encoding ::Encoding::ASCII_8BIT
         end
       end
       str
     end
 
     def string_content_type str
-      if str.encoding == ::Encoding.ASCII_8BIT
+      if str.encoding == ::Encoding::ASCII_8BIT
         "application/octet-stream"
       else
         "text/plain; charset=#{str.encoding.name.downcase}"
+      end
+    end
+
+    def charset_of str
+      encoding = str.encoding
+      if encoding == ::Encoding::ASCII_8BIT
+        "binary"
+      else
+        encoding.name.downcase
       end
     end
   end

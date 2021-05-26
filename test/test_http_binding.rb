@@ -85,7 +85,7 @@ describe CloudEvents::HttpBinding do
     assert_equal my_subject, event.subject
     assert_equal my_time, event.time
     headers, body = http_binding.encode_batched_content [event], "json", sort: true
-    assert_equal({ "Content-Type" => "application/cloudevents-batch+json" }, headers)
+    assert_equal({ "Content-Type" => "application/cloudevents-batch+json; charset=utf-8" }, headers)
     assert_equal my_json_batch_encoded, body
   end
 
@@ -144,7 +144,7 @@ describe CloudEvents::HttpBinding do
     assert_equal my_subject, event.subject
     assert_equal my_time, event.time
     headers, body = http_binding.encode_structured_content event, "json", sort: true
-    assert_equal({ "Content-Type" => "application/cloudevents+json" }, headers)
+    assert_equal({ "Content-Type" => "application/cloudevents+json; charset=utf-8" }, headers)
     assert_equal my_json_struct_encoded, body
   end
 
@@ -171,7 +171,7 @@ describe CloudEvents::HttpBinding do
     assert_equal my_subject, event.subject
     assert_equal my_time, event.time
     headers, body = http_binding.encode_structured_content event, "json", sort: true
-    assert_equal({ "Content-Type" => "application/cloudevents+json" }, headers)
+    assert_equal({ "Content-Type" => "application/cloudevents+json; charset=utf-8" }, headers)
     assert_equal my_json_struct_encoded, body
   end
 
