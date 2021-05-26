@@ -1,5 +1,11 @@
 # Changelog
 
+### v0.4.0 / 2021-05-26
+
+* ADDED: ContentType can take an optional default charset 
+* FIXED: Binary HTTP format parses quoted tokens according to RFC 7230 section 3.2.6 
+* FIXED: Set charset of encoded structured events 
+
 ### v0.3.1 / 2021-04-25
 
 * FIXED: Fixed exception when decoding from a rack source that uses InputWrapper 
