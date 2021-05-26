@@ -254,6 +254,7 @@ module CloudEvents
     # @return [String] Resulting decoded string in UTF-8.
     #
     def percent_decode str
+      str = str.gsub(/"((?:[^"\\]|\\.)*)"/) { Regexp.last_match(1).gsub(/\\(.)/, '\1') }
       decoded_str = str.gsub(/%[0-9a-fA-F]{2}/) { |m| [m[1..-1].to_i(16)].pack "C" }
       decoded_str.force_encoding ::Encoding::UTF_8
     end
@@ -271,7 +272,7 @@ module CloudEvents
       arr = []
       utf_str = str.to_s.encode ::Encoding::UTF_8
       utf_str.each_byte do |byte|
-        if byte >= 33 && byte <= 126 && byte != 37
+        if byte >= 33 && byte <= 126 && byte != 34 && byte != 37
           arr << byte
         else
           hi = byte / 16

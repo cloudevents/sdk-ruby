@@ -14,8 +14,10 @@ describe CloudEvents::HttpBinding do
   let(:my_source_string) { "/my_source" }
   let(:my_source) { URI.parse my_source_string }
   let(:my_type) { "my_type" }
-  let(:weird_type) { "¡Hola!\n100% 😀 " }
-  let(:encoded_weird_type) { "%C2%A1Hola!%0A100%25%20%F0%9F%98%80%20" }
+  let(:weird_type) { "¡Hola!\n\"100%\" 😀 " }
+  let(:encoded_weird_type) { "%C2%A1Hola!%0A%22100%25%22%20%F0%9F%98%80%20" }
+  let(:quoted_type) { "Hello Ruby world this\"is\\a1string okay" }
+  let(:encoded_quoted_type) { "Hello%20\"Ruby%20world\"%20\"this\\\"is\\\\a\\1string\"%20okay" }
   let(:spec_version) { "1.0" }
   let(:my_simple_data) { "12345" }
   let(:my_content_type_string) { "text/plain; charset=us-ascii" }
@@ -60,6 +62,11 @@ describe CloudEvents::HttpBinding do
   it "percent-decodes a string with special characters" do
     str = http_binding.percent_decode encoded_weird_type
     assert_equal weird_type, str
+  end
+
+  it "percent-decodes a string with quoted tokens" do
+    str = http_binding.percent_decode encoded_quoted_type
+    assert_equal quoted_type, str
   end
 
   it "decodes a structured rack env and re-encodes as batch" do
