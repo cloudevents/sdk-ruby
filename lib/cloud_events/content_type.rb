@@ -21,14 +21,16 @@ module CloudEvents
     # Parse the given header value.
     #
     # @param string [String] Content-Type header value in RFC 2045 format
+    # @param default_charset [String] Optional. The charset to use if none is
+    #     specified. Defaults to `us-ascii`.
     #
-    def initialize string
+    def initialize string, default_charset: nil
       @string = string
       @media_type = "text"
       @subtype_base = @subtype = "plain"
       @subtype_format = nil
       @params = []
-      @charset = "us-ascii"
+      @charset = default_charset || "us-ascii"
       @error_message = nil
       parse consume_comments string.strip
       @canonical_string = "#{@media_type}/#{@subtype}" +

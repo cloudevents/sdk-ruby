@@ -29,6 +29,18 @@ describe CloudEvents::ContentType do
     assert Ractor.shareable? content_type if defined? Ractor
   end
 
+  it "defaults to us-ascii charset" do
+    content_type = CloudEvents::ContentType.new "application/json"
+    assert_equal "us-ascii", content_type.charset
+    assert Ractor.shareable? content_type if defined? Ractor
+  end
+
+  it "defaults to a given charset" do
+    content_type = CloudEvents::ContentType.new "application/json", default_charset: "utf-8"
+    assert_equal "utf-8", content_type.charset
+    assert Ractor.shareable? content_type if defined? Ractor
+  end
+
   it "recognizes charseet param" do
     content_type = CloudEvents::ContentType.new "application/json; charset=utf-8"
     assert_equal [["charset", "utf-8"]], content_type.params
