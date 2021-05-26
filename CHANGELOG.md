@@ -4,7 +4,7 @@
 
 * ADDED: ContentType can take an optional default charset 
 * FIXED: Binary HTTP format parses quoted tokens according to RFC 7230 section 3.2.6 
-* FIXED: Set charset of encoded structured events 
+* FIXED: When encoding structured events for HTTP transport, the content-type now includes the charset
 
 ### v0.3.1 / 2021-04-25
 
