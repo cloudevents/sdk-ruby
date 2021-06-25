@@ -28,9 +28,9 @@ describe CloudEvents::JsonFormat do
   let(:my_subject) { "my_subject" }
   let(:my_time_string) { "2020-01-12T20:52:05-08:00" }
   let(:my_time) { DateTime.rfc3339 my_time_string }
-  let(:structured_content_type_string) { "application/cloudevents+json" }
+  let(:structured_content_type_string) { "application/cloudevents+json; charset=utf-8" }
   let(:structured_content_type) { CloudEvents::ContentType.new structured_content_type_string }
-  let(:batched_content_type_string) { "application/cloudevents-batch+json" }
+  let(:batched_content_type_string) { "application/cloudevents-batch+json; charset=utf-8" }
   let(:batched_content_type) { CloudEvents::ContentType.new batched_content_type_string }
 
   describe "v0" do
@@ -113,7 +113,7 @@ describe CloudEvents::JsonFormat do
     end
 
     it "decodes and encodes json-encoded content" do
-      event = json_format.decode my_json_struct_v0_string
+      event = json_format.decode_event my_json_struct_v0_string, structured_content_type
       assert_equal my_id, event.id
       assert_equal my_source, event.source
       assert_equal my_type, event.type
@@ -124,12 +124,13 @@ describe CloudEvents::JsonFormat do
       assert_equal my_schema, event.schema_url
       assert_equal my_subject, event.subject
       assert_equal my_time, event.time
-      string = json_format.encode event, sort: true
+      string, content_type = json_format.encode_event event, sort: true
       assert_equal my_json_struct_v0_string, string
+      assert_equal structured_content_type, content_type
     end
 
     it "decodes and encodes json-encoded batch" do
-      events = json_format.decode_batch my_batch_v0_string
+      events = json_format.decode_batch my_batch_v0_string, batched_content_type
       assert_equal 2, events.size
       event = events[0]
       assert_equal my_id, event.id
@@ -153,8 +154,9 @@ describe CloudEvents::JsonFormat do
       assert_equal my_schema, event.schema_url
       assert_equal my_subject, event.subject
       assert_equal my_time, event.time
-      string = json_format.encode_batch events, sort: true
+      string, content_type = json_format.encode_batch events, sort: true
       assert_equal my_batch_v0_string, string
+      assert_equal batched_content_type, content_type
     end
 
     it "decodes json string data and expands the JSON" do
@@ -171,6 +173,11 @@ describe CloudEvents::JsonFormat do
                                          data_content_type: my_json_content_type_string
       struct = json_format.encode_hash_structure event
       assert_equal my_json_data, struct["data"]
+    end
+
+    it "refuses to decode non-json content types" do
+      event = json_format.decode_event my_json_struct_v0_string, my_content_type
+      assert_nil event
     end
   end
 
@@ -279,7 +286,7 @@ describe CloudEvents::JsonFormat do
     end
 
     it "decodes and encodes json-encoded content" do
-      event = json_format.decode my_json_struct_v1_string
+      event = json_format.decode_event my_json_struct_v1_string, structured_content_type
       assert_equal my_id, event.id
       assert_equal my_source, event.source
       assert_equal my_type, event.type
@@ -289,12 +296,13 @@ describe CloudEvents::JsonFormat do
       assert_equal my_schema, event.data_schema
       assert_equal my_subject, event.subject
       assert_equal my_time, event.time
-      string = json_format.encode event, sort: true
+      string, content_type = json_format.encode_event event, sort: true
       assert_equal my_json_struct_v1_string, string
+      assert_equal structured_content_type, content_type
     end
 
     it "decodes and encodes json-encoded batch" do
-      events = json_format.decode_batch my_batch_v1_string
+      events = json_format.decode_batch my_batch_v1_string, batched_content_type
       assert_equal 2, events.size
       event = events[0]
       assert_equal my_id, event.id
@@ -316,8 +324,9 @@ describe CloudEvents::JsonFormat do
       assert_equal my_schema, event.data_schema
       assert_equal my_subject, event.subject
       assert_equal my_time, event.time
-      string = json_format.encode_batch events, sort: true
+      string, content_type = json_format.encode_batch events, sort: true
       assert_equal my_batch_v1_string, string
+      assert_equal batched_content_type, content_type
     end
 
     it "decodes and encodes json with nulls" do
@@ -336,6 +345,36 @@ describe CloudEvents::JsonFormat do
       refute hash.include? "time"
       struct = json_format.encode_hash_structure event
       assert_equal my_compacted_incomplete_struct_v1, struct
+    end
+
+    it "refuses to decode non-json content types" do
+      event = json_format.decode_event my_json_struct_v1_string, my_content_type
+      assert_nil event
+    end
+  end
+
+  describe "data conversion" do
+    let(:my_json_string) { '{"foo":"bar"}' }
+    let(:my_json_object) { { "foo" => "bar" } }
+
+    it "decodes a JSON object" do
+      obj, content_type = json_format.decode_data my_json_string, my_json_content_type
+      assert_equal my_json_object, obj
+      assert_equal my_json_content_type, content_type
+    end
+
+    it "encodes a JSON object" do
+      str, content_type = json_format.encode_data my_json_object, my_json_content_type
+      assert_equal my_json_string, str
+      assert_equal my_json_content_type, content_type
+    end
+
+    it "declines to decode when given a non-JSON content type" do
+      assert_nil json_format.decode_data my_json_string, my_content_type
+    end
+
+    it "declines to encode when given a non-JSON content type" do
+      assert_nil json_format.encode_data my_json_object, my_content_type
     end
   end
 end

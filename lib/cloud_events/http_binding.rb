@@ -15,14 +15,21 @@ module CloudEvents
   #
   class HttpBinding
     ##
-    # Returns a default binding, with JSON supported.
+    # The name of the JSON decoder/encoder
+    # @return [String]
+    #
+    JSON_FORMAT = "json"
+
+    ##
+    # Returns a default HTTP binding, including support for JSON format.
     #
     def self.default
       @default ||= begin
         http_binding = new
         json_format = JsonFormat.new
-        http_binding.register_structured_formatter "json", json_format
-        http_binding.register_batched_formatter "json", json_format
+        http_binding.register_formatter json_format, JSON_FORMAT
+        http_binding.default_structured_encoder = JSON_FORMAT
+        http_binding.default_batched_encoder = JSON_FORMAT
         http_binding
       end
     end
@@ -31,43 +38,90 @@ module CloudEvents
     # Create an empty HTTP binding.
     #
     def initialize
-      @structured_formatters = {}
-      @batched_formatters = {}
+      @event_decoders = []
+      @event_encoders = {}
+      @batch_decoders = []
+      @batch_encoders = {}
+      @data_decoders = []
+      @data_encoders = []
+      @default_structured_encoder = nil
+      @default_batched_encoder = nil
     end
 
     ##
-    # Register a formatter for the given type.
+    # Register a formatter for all operations it supports, based on which
+    # methods are implemented by the formatter object. See
+    # {CloudEvents::Format} for a list of possible methods.
     #
-    # A formatter must respond to the methods `#encode` and `#decode`. See
-    # {CloudEvents::JsonFormat} for an example.
+    # @param formatter [Object] The formatter
+    # @param name [String] The encoder name under which this formatter will
+    #     register its encode operations. Optional. If not specified, no
+    #     event or batch encoders will be registered.
     #
-    # @param type [String] The subtype format that should be handled by
-    #     this formatter.
-    # @param formatter [Object] The formatter object.
-    # @return [self]
-    #
-    def register_structured_formatter type, formatter
-      formatters = @structured_formatters[type.to_s.strip.downcase] ||= []
-      formatters << formatter unless formatters.include? formatter
+    def register_formatter formatter, name = nil
+      name = name.to_s.strip.downcase if name
+      decode_event = formatter.respond_to? :decode_event
+      encode_event = name if formatter.respond_to? :encode_event
+      decode_batch = formatter.respond_to? :decode_batch
+      encode_batch = name if formatter.respond_to? :encode_batch
+      decode_data = formatter.respond_to? :decode_data
+      encode_data = formatter.respond_to? :encode_data
+      register_formatter_methods formatter,
+                                 decode_event: decode_event,
+                                 encode_event: encode_event,
+                                 decode_batch: decode_batch,
+                                 encode_batch: encode_batch,
+                                 decode_data: decode_data,
+                                 encode_data: encode_data
       self
     end
 
     ##
-    # Register a batch formatter for the given type.
+    # Registers the given formatter for the given operations. Some arguments
+    # are activated by passing `true`, whereas those that rely on a format name
+    # are activated by passing in a name string.
     #
-    # A batch formatter must respond to the methods `#encode_batch` and
-    # `#decode_batch`. See {CloudEvents::JsonFormat} for an example.
+    # @param formatter [Object] The formatter
+    # @param decode_event [boolean] If true, register the formatter's
+    #     {CloudEvents::Format#decode_event} method.
+    # @param encode_event [String] If set to a string, use the formatter's
+    #     {CloudEvents::Format#encode_event} method when that name is requested.
+    # @param decode_batch [boolean] If true, register the formatter's
+    #     {CloudEvents::Format#decode_batch} method.
+    # @param encode_batch [String] If set to a string, use the formatter's
+    #     {CloudEvents::Format#encode_batch} method when that name is requested.
+    # @param decode_data [boolean] If true, register the formatter's
+    #     {CloudEvents::Format#decode_data} method.
+    # @param encode_data [boolean] If true, register the formatter's
+    #     {CloudEvents::Format#encode_data} method.
     #
-    # @param type [String] The subtype format that should be handled by
-    #     this formatter.
-    # @param formatter [Object] The formatter object.
-    # @return [self]
-    #
-    def register_batched_formatter type, formatter
-      formatters = @batched_formatters[type.to_s.strip.downcase] ||= []
-      formatters << formatter unless formatters.include? formatter
+    def register_formatter_methods formatter,
+                                   decode_event: false,
+                                   encode_event: nil,
+                                   decode_batch: false,
+                                   encode_batch: nil,
+                                   decode_data: false,
+                                   encode_data: false
+      @event_decoders << formatter if decode_event
+      add_named_formatter @event_encoders, formatter, encode_event
+      @batch_decoders << formatter if decode_batch
+      add_named_formatter @batch_encoders, formatter, encode_batch
+      @data_decoders << formatter if decode_data
+      @data_encoders << formatter if encode_data
       self
     end
+
+    ##
+    # The name of the structured encoder to use if none is specified
+    # @return [String,nil]
+    #
+    attr_accessor :default_structured_encoder
+
+    ##
+    # The name of the batched encoder to use if none is specified
+    # @return [String,nil]
+    #
+    attr_accessor :default_batched_encoder
 
     ##
     # Decode an event from the given Rack environment hash. Following the
@@ -80,115 +134,46 @@ module CloudEvents
     #     or binary event.
     # @return [Array<CloudEvents::Event>] if the request includes a batch of
     #     structured events.
-    # @return [nil] if the request was not recognized as a CloudEvent.
+    # @raise [CloudEvents::CloudEventsError] if an event could not be decoded
+    #     from the request.
     #
     def decode_rack_env env, **format_args
       content_type_header = env["CONTENT_TYPE"]
       content_type = ContentType.new content_type_header if content_type_header
-      input = env["rack.input"]
-      if input && content_type&.media_type == "application"
+      if content_type&.media_type == "application"
         case content_type.subtype_base
         when "cloudevents"
-          content = read_with_charset input, content_type.charset
-          return decode_structured_content content, content_type.subtype_format, **format_args
+          content = read_with_charset env["rack.input"], content_type.charset
+          return decode_structured_content content, content_type, **format_args
         when "cloudevents-batch"
-          content = read_with_charset input, content_type.charset
-          return decode_batched_content content, content_type.subtype_format, **format_args
+          content = read_with_charset env["rack.input"], content_type.charset
+          return decode_batched_content content, content_type, **format_args
         end
       end
       decode_binary_content env, content_type
     end
 
     ##
-    # Decode a single event from the given content data. This should be
-    # passed the request body, if the Content-Type is of the form
-    # `application/cloudevents+format`.
-    #
-    # @param input [String] The string content.
-    # @param format [String] The format code (e.g. "json").
-    # @param format_args [keywords] Extra args to pass to the formatter.
-    # @return [CloudEvents::Event]
-    #
-    def decode_structured_content input, format, **format_args
-      handlers = @structured_formatters[format] || []
-      handlers.reverse_each do |handler|
-        event = handler.decode input, **format_args
-        return event if event
-      end
-      raise HttpContentError, "Unknown cloudevents format: #{format.inspect}"
-    end
-
-    ##
-    # Decode a batch of events from the given content data. This should be
-    # passed the request body, if the Content-Type is of the form
-    # `application/cloudevents-batch+format`.
-    #
-    # @param input [String] The string content.
-    # @param format [String] The format code (e.g. "json").
-    # @param format_args [keywords] Extra args to pass to the formatter.
-    # @return [Array<CloudEvents::Event>]
-    #
-    def decode_batched_content input, format, **format_args
-      handlers = @batched_formatters[format] || []
-      handlers.reverse_each do |handler|
-        events = handler.decode_batch input, **format_args
-        return events if events
-      end
-      raise HttpContentError, "Unknown cloudevents batch format: #{format.inspect}"
-    end
-
-    ##
-    # Decode an event from the given Rack environment in binary content mode.
-    #
-    # @param env [Hash] Rack environment hash.
-    # @param content_type [CloudEvents::ContentType] the content type from the
-    #     Rack environment.
-    # @return [CloudEvents::Event] if a CloudEvent could be decoded from the
-    #     Rack environment.
-    # @return [nil] if the Rack environment does not indicate a CloudEvent
-    #
-    def decode_binary_content env, content_type
-      spec_version = env["HTTP_CE_SPECVERSION"]
-      return nil if spec_version.nil?
-      raise SpecVersionError, "Unrecognized specversion: #{spec_version}" unless spec_version == "1.0"
-      input = env["rack.input"]
-      data = read_with_charset input, content_type&.charset if input
-      attributes = { "spec_version" => spec_version, "data" => data }
-      attributes["data_content_type"] = content_type if content_type
-      omit_names = ["specversion", "spec_version", "data", "datacontenttype", "data_content_type"]
-      env.each do |key, value|
-        match = /^HTTP_CE_(\w+)$/.match key
-        next unless match
-        attr_name = match[1].downcase
-        attributes[attr_name] = percent_decode value unless omit_names.include? attr_name
-      end
-      Event.create spec_version: spec_version, attributes: attributes
-    end
-
-    ##
-    # Encode a single event to content data in the given format.
+    # Encode a single event in the given format.
     #
     # The result is a two-element array where the first element is a headers
     # list (as defined in the Rack specification) and the second is a string
     # containing the HTTP body content. The headers list will contain only
-    # one header, a `Content-Type` whose value is of the form
-    # `application/cloudevents+format`.
+    # a `Content-Type` header.
     #
     # @param event [CloudEvents::Event] The event.
-    # @param format [String] The format code (e.g. "json")
+    # @param format [String] The format name. Optional.
     # @param format_args [keywords] Extra args to pass to the formatter.
     # @return [Array(headers,String)]
     #
-    def encode_structured_content event, format, **format_args
-      handlers = @structured_formatters[format] || []
-      handlers.reverse_each do |handler|
-        content = handler.encode event, **format_args
-        if content
-          content_type = "application/cloudevents+#{format}; charset=#{charset_of content}"
-          return [{ "Content-Type" => content_type }, content]
-        end
+    def encode_structured_content event, format = nil, **format_args
+      format ||= default_structured_encoder
+      raise ArgumentError, "Format name not specified, and no default is set" unless format
+      Array(@event_encoders[format]).reverse_each do |handler|
+        result = handler.encode_event event, **format_args
+        return [{ "Content-Type" => result[1].to_s }, result[0]] if result
       end
-      raise HttpContentError, "Unknown cloudevents format: #{format.inspect}"
+      raise ArgumentError, "Unknown format name: #{format.inspect}"
     end
 
     ##
@@ -197,24 +182,21 @@ module CloudEvents
     # The result is a two-element array where the first element is a headers
     # list (as defined in the Rack specification) and the second is a string
     # containing the HTTP body content. The headers list will contain only
-    # one header, a `Content-Type` whose value is of the form
-    # `application/cloudevents-batch+format`.
+    # a `Content-Type` header.
     #
     # @param events [Array<CloudEvents::Event>] The batch of events.
-    # @param format [String] The format code (e.g. "json").
+    # @param format [String] The format name. Optional.
     # @param format_args [keywords] Extra args to pass to the formatter.
     # @return [Array(headers,String)]
     #
-    def encode_batched_content events, format, **format_args
-      handlers = @batched_formatters[format] || []
-      handlers.reverse_each do |handler|
-        content = handler.encode_batch events, **format_args
-        if content
-          content_type = "application/cloudevents-batch+#{format}; charset=#{charset_of content}"
-          return [{ "Content-Type" => content_type }, content]
-        end
+    def encode_batched_content events, format = nil, **format_args
+      format ||= default_batched_encoder
+      raise ArgumentError, "Format name not specified, and no default is set" unless format
+      Array(@batch_encoders[format]).reverse_each do |handler|
+        result = handler.encode_batch events, **format_args
+        return [{ "Content-Type" => result[1].to_s }, result[0]] if result
       end
-      raise HttpContentError, "Unknown cloudevents format: #{format.inspect}"
+      raise ArgumentError, "Unknown format name: #{format.inspect}"
     end
 
     ##
@@ -229,31 +211,22 @@ module CloudEvents
     #
     def encode_binary_content event
       headers = {}
-      body = nil
+      body = event.data
+      content_type = event.data_content_type
       event.to_h.each do |key, value|
-        case key
-        when "data"
-          body = value
-        when "datacontenttype"
-          headers["Content-Type"] = value
-        else
+        unless ["data", "datacontenttype"].include? key
           headers["CE-#{key}"] = percent_encode value
         end
       end
-      case body
-      when ::String
-        headers["Content-Type"] ||= string_content_type body
-      when nil
-        headers.delete "Content-Type"
-      else
-        body = ::JSON.dump body
-        headers["Content-Type"] ||= "application/json; charset=#{body.encoding.name.downcase}"
-      end
+      body, content_type = encode_data body, content_type
+      headers["Content-Type"] = content_type.to_s if content_type
       [headers, body]
     end
 
     ##
     # Decode a percent-encoded string to a UTF-8 string.
+    #
+    # @private
     #
     # @param str [String] Incoming ascii string from an HTTP header, with one
     #     cycle of percent-encoding.
@@ -269,6 +242,8 @@ module CloudEvents
     # Transcode an arbitrarily-encoded string to UTF-8, then percent-encode
     # non-printing and non-ascii characters to result in an ASCII string
     # suitable for setting as an HTTP header value.
+    #
+    # @private
     #
     # @param str [String] Incoming arbitrary string that can be represented
     #     in UTF-8.
@@ -293,7 +268,88 @@ module CloudEvents
 
     private
 
+    def add_named_formatter collection, formatter, name
+      return unless name
+      formatters = collection[name] ||= []
+      formatters << formatter unless formatters.include? formatter
+    end
+
+    ##
+    # Decode a single event from the given request body and content type in
+    # structured mode.
+    #
+    def decode_structured_content input, content_type, **format_args
+      @event_decoders.reverse_each do |decoder|
+        event = decoder.decode_event input, content_type, **format_args
+        return event if event
+      end
+      raise HttpContentError, "Unknown cloudevents content type: #{content_type}"
+    end
+
+    ##
+    # Decode a batch of events from the given request body and content type in
+    # batched structured mode.
+    #
+    def decode_batched_content input, content_type, **format_args
+      @batch_decoders.reverse_each do |decoder|
+        events = decoder.decode_batch input, content_type, **format_args
+        return events if events
+      end
+      raise HttpContentError, "Unknown cloudevents content type: #{content_type}"
+    end
+
+    ##
+    # Decode an event from the given Rack environment in binary content mode.
+    #
+    def decode_binary_content env, content_type
+      spec_version = env["HTTP_CE_SPECVERSION"]
+      case spec_version
+      when nil
+        raise NotCloudEventError, "Content-Type is #{content_type}, and CE-SpecVersion is not present"
+      when /^0\.3|1(\.|$)/
+        data = read_with_charset env["rack.input"], content_type&.charset
+        data, content_type = decode_data data, content_type if content_type
+        attributes = { "spec_version" => spec_version, "data" => data }
+        attributes["data_content_type"] = content_type if content_type
+        omit_names = ["specversion", "spec_version", "data", "datacontenttype", "data_content_type"]
+        env.each do |key, value|
+          match = /^HTTP_CE_(\w+)$/.match key
+          next unless match
+          attr_name = match[1].downcase
+          attributes[attr_name] = percent_decode value unless omit_names.include? attr_name
+        end
+        Event.create spec_version: spec_version, attributes: attributes
+      else
+        raise SpecVersionError, "Unrecognized specversion: #{spec_version}"
+      end
+    end
+
+    def decode_data data_str, content_type, **format_args
+      @data_decoders.reverse_each do |handler|
+        result = handler.decode_data data_str, content_type, **format_args
+        return result if result
+      end
+      [data_str, content_type]
+    end
+
+    def encode_data data_obj, content_type, **format_args
+      @data_encoders.reverse_each do |handler|
+        result = handler.encode_data data_obj, content_type, **format_args
+        return result if result
+      end
+      return [nil, nil] if data_obj.nil?
+      default_str = data_obj.to_s
+      content_type ||=
+        if default_str.encoding == ::Encoding::ASCII_8BIT
+          "application/octet-stream"
+        else
+          "text/plain; charset=#{default_str.encoding.name.downcase}"
+        end
+      [default_str, content_type]
+    end
+
     def read_with_charset io, charset
+      return nil if io.nil?
       str = io.read
       if charset
         begin
@@ -304,23 +360,6 @@ module CloudEvents
         end
       end
       str
-    end
-
-    def string_content_type str
-      if str.encoding == ::Encoding::ASCII_8BIT
-        "application/octet-stream"
-      else
-        "text/plain; charset=#{str.encoding.name.downcase}"
-      end
-    end
-
-    def charset_of str
-      encoding = str.encoding
-      if encoding == ::Encoding::ASCII_8BIT
-        "binary"
-      else
-        encoding.name.downcase
-      end
     end
   end
 end

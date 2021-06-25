@@ -3,6 +3,7 @@
 require "cloud_events/content_type"
 require "cloud_events/errors"
 require "cloud_events/event"
+require "cloud_events/format"
 require "cloud_events/http_binding"
 require "cloud_events/json_format"
 
