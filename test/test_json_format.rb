@@ -351,6 +351,49 @@ describe CloudEvents::JsonFormat do
       event = json_format.decode_event my_json_struct_v1_string, my_content_type
       assert_nil event
     end
+
+    it "raises SpecVersionError when JSON input has a bad specversion" do
+      malformed_input = {
+        "data"            => my_json_data,
+        "datacontenttype" => my_content_type_string,
+        "id"              => my_id,
+        "source"          => my_source_string,
+        "specversion"     => "0.1",
+        "type"            => my_type
+      }
+      malformed_input_string = JSON.dump malformed_input
+      assert_raises CloudEvents::SpecVersionError do
+        json_format.decode_event malformed_input_string, structured_content_type
+      end
+    end
+
+    it "raises AttributeError when JSON input is missing an ID" do
+      malformed_input = {
+        "data"            => my_json_data,
+        "datacontenttype" => my_content_type_string,
+        "source"          => my_source_string,
+        "specversion"     => "1.0",
+        "type"            => my_type
+      }
+      malformed_input_string = JSON.dump malformed_input
+      assert_raises CloudEvents::AttributeError do
+        json_format.decode_event malformed_input_string, structured_content_type
+      end
+    end
+
+    it "raises FormatSyntaxError when decoding malformed JSON event" do
+      error = assert_raises CloudEvents::FormatSyntaxError do
+        json_format.decode_event "!!!", structured_content_type
+      end
+      assert_kind_of JSON::ParserError, error.cause
+    end
+
+    it "raises FormatSyntaxError when decoding malformed JSON batch" do
+      error = assert_raises CloudEvents::FormatSyntaxError do
+        json_format.decode_event "!!!", batched_content_type
+      end
+      assert_kind_of JSON::ParserError, error.cause
+    end
   end
 
   describe "data conversion" do
@@ -361,6 +404,13 @@ describe CloudEvents::JsonFormat do
       obj, content_type = json_format.decode_data my_json_string, my_json_content_type
       assert_equal my_json_object, obj
       assert_equal my_json_content_type, content_type
+    end
+
+    it "raises FormatSyntaxError when decoding malformed JSON" do
+      error = assert_raises CloudEvents::FormatSyntaxError do
+        json_format.decode_data "!!!", my_json_content_type
+      end
+      assert_kind_of JSON::ParserError, error.cause
     end
 
     it "encodes a JSON object" do

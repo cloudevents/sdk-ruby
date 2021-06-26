@@ -3,7 +3,7 @@
 require "date"
 require "uri"
 
-require "cloud_events/event/field_interpreter"
+require "cloud_events/event/opaque"
 require "cloud_events/event/v0"
 require "cloud_events/event/v1"
 

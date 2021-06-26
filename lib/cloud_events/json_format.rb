@@ -29,6 +29,8 @@ module CloudEvents
       return nil unless content_type&.subtype_format == "json"
       structure = ::JSON.parse input
       decode_hash_structure structure
+    rescue ::JSON::JSONError
+      raise CloudEvents::FormatSyntaxError, "JSON syntax error"
     end
 
     ##
@@ -67,6 +69,8 @@ module CloudEvents
       structure_array.map do |structure|
         decode_hash_structure structure
       end
+    rescue ::JSON::JSONError
+      raise CloudEvents::FormatSyntaxError, "JSON syntax error"
     end
 
     ##
@@ -104,6 +108,8 @@ module CloudEvents
     def decode_data data, content_type, **_other_kwargs
       return nil unless content_type&.subtype_base == "json" || content_type&.subtype_format == "json"
       [::JSON.parse(data), content_type]
+    rescue ::JSON::JSONError
+      raise CloudEvents::FormatSyntaxError, "JSON syntax error"
     end
 
     ##
@@ -193,7 +199,7 @@ module CloudEvents
     def decode_hash_structure_v0 structure
       data = structure["data"]
       if data.is_a? ::String
-        content_type = ContentType.new structure["datacontenttype"] rescue nil
+        content_type = ContentType.new structure["datacontenttype"]
         if content_type&.subtype_base == "json" || content_type&.subtype_format == "json"
           structure = structure.dup
           structure["data"] = ::JSON.parse data rescue data
