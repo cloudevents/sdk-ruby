@@ -1,6 +1,9 @@
 inherit_gem:
   google-style: google-style.yml
 
+Lint/UnusedMethodArgument:
+  Exclude:
+    - "lib/cloud_events/format.rb"
 Metrics/BlockLength:
   Exclude:
     - "test/**/test_*.rb"

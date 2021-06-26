@@ -8,6 +8,13 @@ module CloudEvents
   end
 
   ##
+  # An error signaling that a protocol handler does not believe that a piece of
+  # data is intended to be a CloudEvent.
+  #
+  class NotCloudEventError < ::StandardError
+  end
+
+  ##
   # Errors indicating unsupported or incorrectly formatted HTTP content or
   # headers.
   #
