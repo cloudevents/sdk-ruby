@@ -12,127 +12,152 @@ module CloudEvents
   # https://github.com/cloudevents/spec/blob/v1.0/json-format.md.
   #
   class JsonFormat
-    ##
-    # Decode an event from the given input JSON string.
-    #
-    # See {CloudEvents::Format#decode_event} for details.
-    # This formatter determines whether to operate by checking the subtype
-    # format.
-    #
-    # @param input [String] The input as a string.
-    # @param content_type [CloudEvents::ContentType,nil] The input content
-    #     type, or `nil` if none is available.
-    # @return [CloudEvents::Event] if decoding succeeded.
-    # @return [nil] if a different formatter should be used.
-    #
-    def decode_event input, content_type, **_other_kwargs
-      return nil unless content_type&.subtype_format == "json"
-      structure = ::JSON.parse input
-      decode_hash_structure structure
-    rescue ::JSON::JSONError
-      raise CloudEvents::FormatSyntaxError, "JSON syntax error"
-    end
+    # @private
+    UNSPECIFIED = ::Object.new.freeze
 
     ##
-    # Encode an event to a JSON string.
+    # Decode an event or batch from the given input JSON string.
+    # See {CloudEvents::Format#decode_event} for a general description.
     #
-    # See {CloudEvents::Format#encode_event} for details.
+    # Expects `:content` and `:content_type` arguments, and will decline the
+    # request unless both are provided.
     #
-    # @param event [CloudEvents::Event] The input event.
-    # @param sort [boolean] Whether to sort keys of the JSON output.
-    # @return [Array(String,CloudEvents::ContentType)] if encoding succeeded.
+    # If decoding succeeded, returns a hash with _one of_ the following keys:
     #
-    def encode_event event, sort: false, **_other_kwargs
-      structure = encode_hash_structure event
-      structure = sort_keys structure if sort
-      str = ::JSON.dump structure
-      content_type = ContentType.new "application/cloudevents+json; charset=#{charset_of str}"
-      [str, content_type]
-    end
-
-    ##
-    # Decode a batch of events from the given input JSON string.
+    # * `:event` ({CloudEvents::Event}) A single event decoded from the input.
+    # * `:event_batch` (Array of {CloudEvents::Event}) A batch of events
+    #   decoded from the input.
     #
-    # See {CloudEvents::Format#decode_batch} for details.
-    # This formatter determines whether to operate by checking the subtype
-    # format.
+    # @param content [String] Serialized content to decode.
+    # @param content_type [CloudEvents::ContentType] The input content type.
+    # @return [Hash] if accepting the request.
+    # @return [nil] if declining the request.
+    # @raise [CloudEvents::FormatSyntaxError] if the JSON could not be parsed
+    # @raise [CloudEvents::SpecVersionError] if an unsupported specversion is
+    #     found.
     #
-    # @param input [String] The input as a string.
-    # @param content_type [CloudEvents::ContentType,nil] The input content
-    #     type, or `nil` if none is available.
-    # @return [Array<CloudEvents::Event>] if decoding succeeded.
-    # @return [nil] if a different formatter should be used.
-    #
-    def decode_batch input, content_type, **_other_kwargs
-      return nil unless content_type&.subtype_format == "json"
-      structure_array = Array(::JSON.parse(input))
-      structure_array.map do |structure|
-        decode_hash_structure structure
+    def decode_event content: nil, content_type: nil, **_other_kwargs
+      return nil unless content && content_type&.media_type == "application" && content_type&.subtype_format == "json"
+      case content_type.subtype_base
+      when "cloudevents"
+        event = decode_hash_structure ::JSON.parse(content), charset_of(content)
+        { event: event }
+      when "cloudevents-batch"
+        charset = charset_of content
+        batch = Array(::JSON.parse(content)).map do |structure|
+          decode_hash_structure structure, charset
+        end
+        { event_batch: batch }
       end
     rescue ::JSON::JSONError
-      raise CloudEvents::FormatSyntaxError, "JSON syntax error"
+      raise FormatSyntaxError, "JSON syntax error"
     end
 
     ##
-    # Encode a batch of events to a JSON formatted string.
+    # Encode an event or batch to a JSON string. This formatter should be able
+    # to handle any event.
+    # See {CloudEvents::Format#decode_event} for a general description.
     #
-    # See {CloudEvents::Format#encode_batch} for details.
+    # Expects _either_ the `:event` _or_ the `:event_batch` argument, but not
+    # both, and will decline the request unless exactly one is provided.
     #
-    # @param events [Array<CloudEvents::Event>] An array of input events.
+    # If encoding succeeded, returns a hash with the following keys:
+    #
+    # * `:content` (String) The serialized form of the event or batch.
+    # * `:content_type` ({CloudEvents::ContentType}) The content type for the
+    #   output.
+    #
+    # @param event [CloudEvents::Event] An event to encode.
+    # @param event_batch [Array<CloudEvents::Event>] An event batch to encode.
     # @param sort [boolean] Whether to sort keys of the JSON output.
-    # @return [Array(String,CloudEvents::ContentType)] if encoding succeeded.
+    # @return [Hash] if accepting the request.
+    # @return [nil] if declining the request.
     #
-    def encode_batch events, sort: false, **_other_kwargs
-      structure_array = Array(events).map do |event|
+    def encode_event event: nil, event_batch: nil, sort: false, **_other_kwargs
+      if event && !event_batch
         structure = encode_hash_structure event
-        sort ? sort_keys(structure) : structure
+        structure = sort_keys structure if sort
+        subtype = "cloudevents"
+      elsif event_batch && !event
+        structure = event_batch.map do |elem|
+          structure_elem = encode_hash_structure elem
+          sort ? sort_keys(structure_elem) : structure_elem
+        end
+        subtype = "cloudevents-batch"
+      else
+        return nil
       end
-      str = ::JSON.dump structure_array
-      content_type = ContentType.new "application/cloudevents-batch+json; charset=#{charset_of str}"
-      [str, content_type]
+      content = ::JSON.dump structure
+      content_type = ContentType.new "application/#{subtype}+json; charset=#{charset_of content}"
+      { content: content, content_type: content_type }
     end
 
     ##
     # Decode an event data object from a JSON formatted string.
+    # See {CloudEvents::Format#decode_data} for a general description.
     #
-    # See {CloudEvents::Format#decode_data} for details.
-    # This formatter determines whether to operate by checking the given
-    # content type for JSON subtype markers.
+    # Expects `:spec_version`, `:content` and `:content_type` arguments, and
+    # will decline the request unless all three are provided.
     #
-    # @param data [String] The input data string.
-    # @param content_type [CloudEvents::ContentType,nil] The input content
-    #     type, or `nil` if none is available.
-    # @return [Array(Object,CloudEvents::ContentType)] if decoding succeeded.
-    # @return [nil] if a different formatter should be used.
+    # If decoding succeeded, returns a hash with the following keys:
     #
-    def decode_data data, content_type, **_other_kwargs
+    # * `:data` (Object) The payload object to set as the `data` attribute.
+    # * `:content_type` ({CloudEvents::ContentType}) The content type to be set
+    #   as the `datacontenttype` attribute.
+    #
+    # @param content [String] Serialized content to decode.
+    # @param content_type [CloudEvents::ContentType] The input content type.
+    # @return [Hash] if accepting the request.
+    # @return [nil] if declining the request.
+    # @raise [CloudEvents::FormatSyntaxError] if the JSON could not be parsed.
+    # @raise [CloudEvents::SpecVersionError] if an unsupported specversion is
+    #     found.
+    #
+    def decode_data spec_version: nil, content: nil, content_type: nil, **_other_kwargs
+      return nil unless spec_version
+      return nil unless content
       return nil unless content_type&.subtype_base == "json" || content_type&.subtype_format == "json"
-      [::JSON.parse(data), content_type]
+      unless spec_version =~ /^0\.3|1(\.|$)/
+        raise SpecVersionError, "Unrecognized specversion: #{spec_version}"
+      end
+      data = ::JSON.parse content
+      { data: data, content_type: content_type }
     rescue ::JSON::JSONError
-      raise CloudEvents::FormatSyntaxError, "JSON syntax error"
+      raise FormatSyntaxError, "JSON syntax error"
     end
 
     ##
     # Encode an event data object to a JSON formatted string.
+    # See {CloudEvents::Format#encode_data} for a general description.
     #
-    # See {CloudEvents::Format#encode_data} for details.
-    # The input is a Ruby object that can be interpreted as JSON. Most Ruby
-    # objects will work, but normally it will be a JSON value type comprising
-    # hashes, arrays, strings, numbers, booleans, or nil.
-    # This formatter determines whether to operate by checking the given
-    # content type for JSON subtype markers.
+    # Expects `:spec_version`, `:data` and `:content_type` arguments, and will
+    # decline the request unless all three are provided.
+    # The `:data` object can be any Ruby object that can be interpreted as
+    # JSON. Most Ruby objects will work, but normally it will be a JSON value
+    # type comprising hashes, arrays, strings, numbers, booleans, or nil.
+    #
+    # If decoding succeeded, returns a hash with the following keys:
+    #
+    # * `:content` (String) The serialized form of the data.
+    # * `:content_type` ({CloudEvents::ContentType}) The content type for the
+    #   output.
     #
     # @param data [Object] A data object to encode.
-    # @param content_type [CloudEvents::ContentType,nil] The input content
-    #     type, or `nil` if none is available.
+    # @param content_type [CloudEvents::ContentType] The input content type
     # @param sort [boolean] Whether to sort keys of the JSON output.
-    # @return [Array(String,CloudEvents::ContentType)] if encoding succeeded.
-    # @return [nil] if a different formatter should be used.
+    # @return [Hash] if accepting the request.
+    # @return [nil] if declining the request.
     #
-    def encode_data data, content_type, sort: false, **_other_kwargs
+    def encode_data spec_version: nil, data: UNSPECIFIED, content_type: nil, sort: false, **_other_kwargs
+      return nil unless spec_version
+      return nil if data == UNSPECIFIED
       return nil unless content_type&.subtype_base == "json" || content_type&.subtype_format == "json"
+      unless spec_version =~ /^0\.3|1(\.|$)/
+        raise SpecVersionError, "Unrecognized specversion: #{spec_version}"
+      end
       data = sort_keys data if sort
-      [::JSON.dump(data), content_type]
+      content = ::JSON.dump data
+      { content: content, content_type: content_type }
     end
 
     ##
@@ -142,15 +167,16 @@ module CloudEvents
     # @private
     #
     # @param structure [Hash] An input hash.
+    # @param charset [String] The charset.
     # @return [CloudEvents::Event]
     #
-    def decode_hash_structure structure
+    def decode_hash_structure structure, charset = nil
       spec_version = structure["specversion"].to_s
       case spec_version
       when "0.3"
-        decode_hash_structure_v0 structure
+        decode_hash_structure_v0 structure, charset
       when /^1(\.|$)/
-        decode_hash_structure_v1 structure
+        decode_hash_structure_v1 structure, charset
       else
         raise SpecVersionError, "Unrecognized specversion: #{spec_version}"
       end
@@ -196,35 +222,33 @@ module CloudEvents
       end
     end
 
-    def decode_hash_structure_v0 structure
-      data = structure["data"]
-      if data.is_a? ::String
-        content_type = ContentType.new structure["datacontenttype"]
-        if content_type&.subtype_base == "json" || content_type&.subtype_format == "json"
-          structure = structure.dup
-          structure["data"] = ::JSON.parse data rescue data
-          structure["datacontenttype"] = content_type
-        end
+    def decode_hash_structure_v0 structure, charset
+      unless structure.key? "datacontenttype"
+        structure = structure.dup
+        content_type = "application/json"
+        content_type = "#{content_type}; charset=#{charset}" if charset
+        structure["datacontenttype"] = content_type
       end
       Event::V0.new attributes: structure
     end
 
-    def decode_hash_structure_v1 structure
+    def decode_hash_structure_v1 structure, charset
       if structure.key? "data_base64"
         structure = structure.dup
         structure["data"] = ::Base64.decode64 structure.delete "data_base64"
         structure["datacontenttype"] ||= "application/octet-stream"
+      elsif !structure.key? "datacontenttype"
+        structure = structure.dup
+        content_type = "application/json"
+        content_type = "#{content_type}; charset=#{charset}" if charset
+        structure["datacontenttype"] = content_type
       end
       Event::V1.new attributes: structure
     end
 
     def encode_hash_structure_v0 event
       structure = event.to_h
-      data = event.data
-      content_type = event.data_content_type
-      if data.is_a?(::String) && (content_type&.subtype_base == "json" || content_type&.subtype_format == "json")
-        structure["data"] = ::JSON.parse data rescue data
-      end
+      structure["datacontenttype"] ||= "application/json"
       structure
     end
 
@@ -234,6 +258,9 @@ module CloudEvents
       if data.is_a?(::String) && data.encoding == ::Encoding::ASCII_8BIT
         structure.delete "data"
         structure["data_base64"] = ::Base64.encode64 data
+        structure["datacontenttype"] ||= "application/octet-stream"
+      else
+        structure["datacontenttype"] ||= "application/json"
       end
       structure
     end

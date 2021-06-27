@@ -54,8 +54,7 @@ module CloudEvents
   ##
   # Alias of UnsupportedFormatError, for backward compatibility.
   #
-  # @deprecated Will be removed in version 1.0.
-  # @private
+  # @deprecated Will be removed in version 1.0. Use {UnsupportedFormatError}.
   #
   HttpContentError = UnsupportedFormatError
 end
