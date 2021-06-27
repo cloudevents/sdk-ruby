@@ -272,10 +272,11 @@ describe CloudEvents::HttpBinding do
       "CE-id"          => my_id,
       "CE-source"      => my_source_string,
       "CE-type"        => my_type,
-      "CE-specversion" => spec_version
+      "CE-specversion" => spec_version,
+      "Content-Type"   => "text/plain; charset=us-ascii"
     }
     assert_equal expected_headers, headers
-    assert_nil body
+    assert_equal "", body
   end
 
   it "decodes and re-encodes binary, passing through extension headers" do

@@ -17,6 +17,7 @@ describe CloudEvents::JsonFormat do
   let(:my_json_data) { { "a" => 12_345, "b" => "hello", "c" => [true, false, nil] } }
   let(:my_json_string_data) { JSON.dump my_json_data }
   let(:my_data_string) { "12345" }
+  let(:my_json_encoded_data_string) { '"12345"' }
   let(:my_base64_data) { Base64.encode64 my_data_string }
   let(:my_content_encoding) { "8bit" }
   let(:my_content_type_string) { "text/plain; charset=us-ascii" }
@@ -63,20 +64,6 @@ describe CloudEvents::JsonFormat do
         "type"                => my_type
       }
     end
-    let :my_json_string_struct_v0 do
-      {
-        "data"                => my_json_string_data,
-        "datacontentencoding" => my_content_encoding,
-        "datacontenttype"     => my_json_content_type_string,
-        "id"                  => my_id,
-        "schemaurl"           => my_schema_string,
-        "source"              => my_source_string,
-        "specversion"         => spec_version_v0,
-        "subject"             => my_subject,
-        "time"                => my_time_string,
-        "type"                => my_type
-      }
-    end
     let(:my_json_struct_v0_string) { JSON.dump my_json_struct_v0 }
     let(:my_batch_v0_string) { JSON.dump [my_string_struct_v0, my_json_struct_v0] }
 
@@ -113,7 +100,9 @@ describe CloudEvents::JsonFormat do
     end
 
     it "decodes and encodes json-encoded content" do
-      event = json_format.decode_event my_json_struct_v0_string, structured_content_type
+      result = json_format.decode_event content: my_json_struct_v0_string, content_type: structured_content_type
+      event = result[:event]
+      assert_kind_of CloudEvents::Event, event
       assert_equal my_id, event.id
       assert_equal my_source, event.source
       assert_equal my_type, event.type
@@ -124,13 +113,17 @@ describe CloudEvents::JsonFormat do
       assert_equal my_schema, event.schema_url
       assert_equal my_subject, event.subject
       assert_equal my_time, event.time
-      string, content_type = json_format.encode_event event, sort: true
+      result = json_format.encode_event event: event, sort: true
+      string = result[:content]
+      content_type = result[:content_type]
       assert_equal my_json_struct_v0_string, string
       assert_equal structured_content_type, content_type
     end
 
     it "decodes and encodes json-encoded batch" do
-      events = json_format.decode_batch my_batch_v0_string, batched_content_type
+      result = json_format.decode_event content: my_batch_v0_string, content_type: batched_content_type
+      events = result[:event_batch]
+      assert_kind_of Array, events
       assert_equal 2, events.size
       event = events[0]
       assert_equal my_id, event.id
@@ -154,30 +147,15 @@ describe CloudEvents::JsonFormat do
       assert_equal my_schema, event.schema_url
       assert_equal my_subject, event.subject
       assert_equal my_time, event.time
-      string, content_type = json_format.encode_batch events, sort: true
+      result = json_format.encode_event event_batch: events, sort: true
+      string = result[:content]
+      content_type = result[:content_type]
       assert_equal my_batch_v0_string, string
       assert_equal batched_content_type, content_type
     end
 
-    it "decodes json string data and expands the JSON" do
-      event = json_format.decode_hash_structure my_json_string_struct_v0
-      assert_equal my_json_data, event.data
-    end
-
-    it "encodes json string data and expands the JSON" do
-      event = CloudEvents::Event::V0.new spec_version:      spec_version_v0,
-                                         id:                my_id,
-                                         source:            my_source_string,
-                                         type:              my_type,
-                                         data:              my_json_string_data,
-                                         data_content_type: my_json_content_type_string
-      struct = json_format.encode_hash_structure event
-      assert_equal my_json_data, struct["data"]
-    end
-
     it "refuses to decode non-json content types" do
-      event = json_format.decode_event my_json_struct_v0_string, my_content_type
-      assert_nil event
+      assert_nil json_format.decode_event content: my_json_struct_v0_string, content_type: my_content_type
     end
   end
 
@@ -186,7 +164,7 @@ describe CloudEvents::JsonFormat do
     let :my_json_struct_v1 do
       {
         "data"            => my_json_data,
-        "datacontenttype" => my_content_type_string,
+        "datacontenttype" => my_json_content_type_string,
         "dataschema"      => my_schema_string,
         "id"              => my_id,
         "source"          => my_source_string,
@@ -225,12 +203,24 @@ describe CloudEvents::JsonFormat do
     let :my_incomplete_struct_v1 do
       {
         "data"            => my_json_data,
-        "datacontenttype" => my_content_type_string,
+        "datacontenttype" => my_json_content_type_string,
         "dataschema"      => nil,
         "id"              => my_id,
         "source"          => my_source_string,
         "specversion"     => spec_version_v1,
         "time"            => nil,
+        "type"            => my_type
+      }
+    end
+    let :my_typeless_struct_v1 do
+      {
+        "data"            => my_json_data,
+        "dataschema"      => my_schema_string,
+        "id"              => my_id,
+        "source"          => my_source_string,
+        "specversion"     => spec_version_v1,
+        "subject"         => my_subject,
+        "time"            => my_time_string,
         "type"            => my_type
       }
     end
@@ -270,14 +260,14 @@ describe CloudEvents::JsonFormat do
       assert_equal my_base64_struct_v1, struct
     end
 
-    it "decodes and encodes a struct with json data" do
+    it "decodes and encodes a struct with json object data" do
       event = json_format.decode_hash_structure my_json_struct_v1
       assert_equal my_id, event.id
       assert_equal my_source, event.source
       assert_equal my_type, event.type
       assert_equal spec_version_v1, event.spec_version
       assert_equal my_json_data, event.data
-      assert_equal my_content_type, event.data_content_type
+      assert_equal my_json_content_type, event.data_content_type
       assert_equal my_schema, event.data_schema
       assert_equal my_subject, event.subject
       assert_equal my_time, event.time
@@ -285,24 +275,46 @@ describe CloudEvents::JsonFormat do
       assert_equal my_json_struct_v1, struct
     end
 
+    it "decodes a struct without content type" do
+      event = json_format.decode_hash_structure my_typeless_struct_v1, "us-ascii"
+      assert_equal my_json_data, event.data
+      assert_equal my_json_content_type, event.data_content_type
+    end
+
+    it "encodes a struct without content type" do
+      event = CloudEvents::Event.create spec_version: spec_version_v1,
+                                        id:           my_id,
+                                        source:       my_source,
+                                        type:         my_type,
+                                        data:         my_json_data
+      struct = json_format.encode_hash_structure event
+      assert_equal "application/json", struct["datacontenttype"]
+    end
+
     it "decodes and encodes json-encoded content" do
-      event = json_format.decode_event my_json_struct_v1_string, structured_content_type
+      result = json_format.decode_event content: my_json_struct_v1_string, content_type: structured_content_type
+      event = result[:event]
+      assert_kind_of CloudEvents::Event, event
       assert_equal my_id, event.id
       assert_equal my_source, event.source
       assert_equal my_type, event.type
       assert_equal spec_version_v1, event.spec_version
       assert_equal my_json_data, event.data
-      assert_equal my_content_type, event.data_content_type
+      assert_equal my_json_content_type, event.data_content_type
       assert_equal my_schema, event.data_schema
       assert_equal my_subject, event.subject
       assert_equal my_time, event.time
-      string, content_type = json_format.encode_event event, sort: true
+      result = json_format.encode_event event: event, sort: true
+      string = result[:content]
+      content_type = result[:content_type]
       assert_equal my_json_struct_v1_string, string
       assert_equal structured_content_type, content_type
     end
 
     it "decodes and encodes json-encoded batch" do
-      events = json_format.decode_batch my_batch_v1_string, batched_content_type
+      result = json_format.decode_event content: my_batch_v1_string, content_type: batched_content_type
+      events = result[:event_batch]
+      assert_kind_of Array, events
       assert_equal 2, events.size
       event = events[0]
       assert_equal my_id, event.id
@@ -320,11 +332,13 @@ describe CloudEvents::JsonFormat do
       assert_equal my_type, event.type
       assert_equal spec_version_v1, event.spec_version
       assert_equal my_json_data, event.data
-      assert_equal my_content_type, event.data_content_type
+      assert_equal my_json_content_type, event.data_content_type
       assert_equal my_schema, event.data_schema
       assert_equal my_subject, event.subject
       assert_equal my_time, event.time
-      string, content_type = json_format.encode_batch events, sort: true
+      result = json_format.encode_event event_batch: events, sort: true
+      string = result[:content]
+      content_type = result[:content_type]
       assert_equal my_batch_v1_string, string
       assert_equal batched_content_type, content_type
     end
@@ -336,7 +350,7 @@ describe CloudEvents::JsonFormat do
       assert_equal my_type, event.type
       assert_equal spec_version_v1, event.spec_version
       assert_equal my_json_data, event.data
-      assert_equal my_content_type, event.data_content_type
+      assert_equal my_json_content_type, event.data_content_type
       assert_nil event.data_schema
       assert_nil event.subject
       assert_nil event.time
@@ -348,8 +362,7 @@ describe CloudEvents::JsonFormat do
     end
 
     it "refuses to decode non-json content types" do
-      event = json_format.decode_event my_json_struct_v1_string, my_content_type
-      assert_nil event
+      assert_nil json_format.decode_event content: my_json_struct_v1_string, content_type: my_content_type
     end
 
     it "raises SpecVersionError when JSON input has a bad specversion" do
@@ -363,7 +376,7 @@ describe CloudEvents::JsonFormat do
       }
       malformed_input_string = JSON.dump malformed_input
       assert_raises CloudEvents::SpecVersionError do
-        json_format.decode_event malformed_input_string, structured_content_type
+        json_format.decode_event content: malformed_input_string, content_type: structured_content_type
       end
     end
 
@@ -377,20 +390,20 @@ describe CloudEvents::JsonFormat do
       }
       malformed_input_string = JSON.dump malformed_input
       assert_raises CloudEvents::AttributeError do
-        json_format.decode_event malformed_input_string, structured_content_type
+        json_format.decode_event content: malformed_input_string, content_type: structured_content_type
       end
     end
 
     it "raises FormatSyntaxError when decoding malformed JSON event" do
       error = assert_raises CloudEvents::FormatSyntaxError do
-        json_format.decode_event "!!!", structured_content_type
+        json_format.decode_event content: "!!!", content_type: structured_content_type
       end
       assert_kind_of JSON::ParserError, error.cause
     end
 
     it "raises FormatSyntaxError when decoding malformed JSON batch" do
       error = assert_raises CloudEvents::FormatSyntaxError do
-        json_format.decode_event "!!!", batched_content_type
+        json_format.decode_event content: "!!!", content_type: batched_content_type
       end
       assert_kind_of JSON::ParserError, error.cause
     end
@@ -399,32 +412,47 @@ describe CloudEvents::JsonFormat do
   describe "data conversion" do
     let(:my_json_string) { '{"foo":"bar"}' }
     let(:my_json_object) { { "foo" => "bar" } }
+    let(:spec_version_1) { "1.0" }
 
     it "decodes a JSON object" do
-      obj, content_type = json_format.decode_data my_json_string, my_json_content_type
+      result = json_format.decode_data spec_version: spec_version_1,
+                                       content: my_json_string,
+                                       content_type: my_json_content_type
+      obj = result[:data]
+      content_type = result[:content_type]
       assert_equal my_json_object, obj
       assert_equal my_json_content_type, content_type
     end
 
     it "raises FormatSyntaxError when decoding malformed JSON" do
       error = assert_raises CloudEvents::FormatSyntaxError do
-        json_format.decode_data "!!!", my_json_content_type
+        json_format.decode_data spec_version: spec_version_1,
+                                content: "!!!",
+                                content_type: my_json_content_type
       end
       assert_kind_of JSON::ParserError, error.cause
     end
 
     it "encodes a JSON object" do
-      str, content_type = json_format.encode_data my_json_object, my_json_content_type
+      result = json_format.encode_data spec_version: spec_version_1,
+                                       data: my_json_object,
+                                       content_type: my_json_content_type
+      str = result[:content]
+      content_type = result[:content_type]
       assert_equal my_json_string, str
       assert_equal my_json_content_type, content_type
     end
 
     it "declines to decode when given a non-JSON content type" do
-      assert_nil json_format.decode_data my_json_string, my_content_type
+      assert_nil json_format.decode_data spec_version: spec_version_1,
+                                         content: my_json_string,
+                                         content_type: my_content_type
     end
 
     it "declines to encode when given a non-JSON content type" do
-      assert_nil json_format.encode_data my_json_object, my_content_type
+      assert_nil json_format.encode_data spec_version: spec_version_1,
+                                         data: my_json_object,
+                                         content_type: my_content_type
     end
   end
 end

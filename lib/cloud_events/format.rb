@@ -8,162 +8,194 @@ module CloudEvents
   # This module documents the method signatures that may be implemented by
   # formatters.
   #
-  # Note that a formatter need not implement all methods. For example, an event
-  # formatter should implement `decode_event` and `encode_event`, and may also
-  # implement `decode_batch` and `encode_batch`, but might not implement
-  # `decode_data` or `encode_data`. Additionally, this module itself is present
-  # primarily for documentation, and need not be directly included by
-  # implementations.
+  # A formatter is an object that implenets "structured" event encoding and
+  # decoding strategies for a particular format (such as JSON). In general,
+  # this includes four operations:
+  #
+  # * Decoding an entire event or batch of events from a input source.
+  #   This is implemented by the {Format#decode_event} method.
+  # * Encoding an entire event or batch of events to an output sink.
+  #   This is implemented by the {Format#encode_event} method.
+  # * Decoding an event payload (i.e. the `data` attribute) Ruby object from a
+  #   serialized representation.
+  #   This is implemented by the {Format#decode_data} method.
+  # * Encoding an event payload (i.e. the `data` attribute) Ruby object to a
+  #   serialized representation.
+  #   This is implemented by the {Format#encode_data} method.
+  #
+  # Each method takes a set of keyword arguments, and returns either a `Hash`
+  # or `nil`. A Hash indicates that the formatter understands the request and
+  # is returning its response. A return value of `nil` means the formatter does
+  # not understand the request and is declining to perform the operation. In
+  # such a case, it is possible that a different formatter should handle it.
+  #
+  # Both the keyword arguments recognized and the returned hash members may
+  # vary from formatter to formatter; similarly, the keyword arguments provided
+  # and the resturned hash members recognized may also vary for different
+  # callers. This interface will define a set of common argument and result key
+  # names, but both callers and formatters must gracefully handle the case of
+  # missing or extra information. For example, if a formatter expects a certain
+  # argument but does not receive it, it can assume the caller does not have
+  # the required information, and it may respond by returning `nil` to decline
+  # the request. Similarly, if a caller expects a response key but does not
+  # receive it, it can assume the formatter does not provide it, and it may
+  # respond by trying a different formatter.
+  #
+  # Additionally, any particular formatter need not implement all methods. For
+  # example, an event formatter would generally implement {Format#decode_event}
+  # and {Format#encode_event}, but might not implement {Format#decode_data} or
+  # {Format#encode_data}.
+  #
+  # Finally, this module itself is present primarily for documentation, and
+  # need not be directly included by formatter implementations.
   #
   module Format
     ##
-    # Decode an event from the given serialized input.
+    # Decode an event or batch from the given serialized input. This is
+    # typically called by a protocol binding to deserialize event data from an
+    # input stream.
     #
-    # The arguments comprise an input string representing the encoded event
-    # from a protocol source such as an HTTP request body, and a ContentType.
-    # All additional arguments are optional, and may or may not be considered
-    # by the formatter.
+    # Common arguments include:
     #
-    # The formatter must return either an event object, or `nil` to signal that
-    # the formatter does not recognize the input and believes it should be
-    # handled by a different formatter.
-    # It can also raise an error to indicate that it believes it should handle
-    # the input, but that the data is malformed.
+    # * `:content` (String) Serialized content to decode. For example, it could
+    #   be from an HTTP request body.
+    # * `:content_type` ({CloudEvents::ContentType}) The content type. For
+    #   example, it could be from the `Content-Type` header of an HTTP request.
     #
-    # @param input [String] The input as a string.
-    # @param content_type [CloudEvents::ContentType,nil] The input content
-    #     type, or `nil` if none is available.
-    # @return [CloudEvents::Event] if decoding succeeded.
-    # @return [nil] if a different formatter should be used.
+    # The formatter must first determine whether it is able to interpret the
+    # given input. Typically, this is done by inspecting the `content_type`.
+    # If the formatter determines that it is unable to interpret the input, it
+    # should return `nil`. Otherwise, if the formatter determines it can decode
+    # the input, it should return a `Hash`. Common hash keys include:
     #
-    def decode_event input, content_type, **_other_kwargs
+    # * `:event` ({CloudEvents::Event}) A single event decoded from the input.
+    # * `:event_batch` (Array of {CloudEvents::Event}) A batch of events
+    #   decoded from the input.
+    #
+    # The formatter may also raise a {CloudEvents::CloudEventsError} subclass
+    # if it understood the request but determines that the input source is
+    # malformed.
+    #
+    # @param _kwargs [keywords] Arguments
+    # @return [Hash] if accepting the request and returning a result
+    # @return [nil] if declining the request.
+    #
+    def decode_event **_kwargs
       nil
     end
 
     ##
-    # Encode an event to a string.
+    # Encode an event or batch to a string. This is typically called by a
+    # protocol binding to serialize event data to an output stream.
     #
-    # The input must be a CloudEvent object. All additional arguments are
-    # optional, and may or may not be considered by the formatter.
+    # Common arguments include:
     #
-    # The formatter must return either a tuple comprising the serialized form
-    # of the event and an associated ContentType, or `nil` to signal that the
-    # formatter is incapable of handling the given event and believes it should
-    # be handled by a different formatter.
-    # It can also raise an error to indicate that it believes it should handle
-    # the input, but that the input is malformed.
+    # * `:event` ({CloudEvents::Event}) A single event to encode.
+    # * `:event_batch` (Array of {CloudEvents::Event}) A batch of events to
+    #   encode.
     #
-    # Implementations should make sure the encoding of the returned string is
-    # correct. In particular, if the format uses binary data, the returned
-    # string should have the appropriate `ASCII_8BIT` encoding, and the
-    # returned ContentType should specify the appropriate charset.
+    # The formatter must first determine whether it is able to interpret the
+    # given input. Typically, most formatters should be able to handle any
+    # event or event batch, but a specialized formatter that can handle only
+    # certain kinds of events may return `nil` to decline unwanted inputs.
+    # Otherwise, if the formatter determines it can encode the input, it should
+    # return a `Hash`. common hash keys include:
     #
-    # @param event [CloudEvents::Event] The input event.
-    # @return [Array(String,CloudEvents::ContentType)] if encoding succeeded.
-    # @return [nil] if a different formatter should be used.
+    # * `:content` (String) The serialized form of the event. This might, for
+    #   example, be written to an HTTP request body. Care should be taken to
+    #   set the string's encoding properly. In particular, to output binary
+    #   data, the encoding should probably be set to `ASCII_8BIT`.
+    # * `:content_type` ({CloudEvents::ContentType}) The content type for the
+    #   output. This might, for example, be written to the `Content-Type`
+    #   header of an HTTP request.
     #
-    def encode_event event, **_other_kwargs
+    # The formatter may also raise a {CloudEvents::CloudEventsError} subclass
+    # if it understood the request but determines that the input source is
+    # malformed.
+    #
+    # @param _kwargs [keywords] Arguments
+    # @return [Hash] if accepting the request and returning a result
+    # @return [nil] if declining the request.
+    #
+    def encode_event **_kwargs
       nil
     end
 
     ##
-    # Decode a batch of events from the given serialized input.
+    # Decode an event data object from string format. This is typically called
+    # by a protocol binding to deserialize the payload (i.e. `data` attribute)
+    # of an event as part of "binary content mode" decoding.
     #
-    # The arguments comprise an input string representing the encoded batch of
-    # events from a protocol source such as an HTTP request body, and a
-    # ContentType. All additional arguments are optional, and may or may not be
-    # considered by the formatter.
+    # Common arguments include:
     #
-    # The formatter must return either an array (possibly empty) of event
-    # objects, or `nil` to signal that the formatter does not recognize the
-    # input and believes it should be handled by a different formatter.
-    # It can also raise an error to indicate that it believes it should handle
-    # the input, but that the data is malformed.
+    # * `:spec_version` (String) The `specversion` of the event.
+    # * `:content` (String) Serialized payload to decode. For example, it could
+    #   be from an HTTP request body.
+    # * `:content_type` ({CloudEvents::ContentType}) The content type. For
+    #   example, it could be from the `Content-Type` header of an HTTP request.
     #
-    # @param input [String] The input as a string.
-    # @param content_type [CloudEvents::ContentType,nil] The input content
-    #     type, or `nil` if none is available.
-    # @return [Array<CloudEvents::Event>] if decoding succeeded.
-    # @return [nil] if a different formatter should be used.
+    # The formatter must first determine whether it is able to interpret the
+    # given input. Typically, this is done by inspecting the `content_type`.
+    # If the formatter determines that it is unable to interpret the input, it
+    # should return `nil`. Otherwise, if the formatter determines it can decode
+    # the input, it should return a `Hash`. Common hash keys include:
     #
-    def decode_batch input, content_type, **_other_kwargs
+    # * `:data` (Object) The payload object to be set as the `data` attribute
+    #   in a {CloudEvents::Event} object.
+    # * `:content_type` ({CloudEvents::ContentType}) The content type to be set
+    #   as the `datacontenttype` attribute in a {CloudEvents::Event} object.
+    #   In many cases, this may simply be copied from the `:content_type`
+    #   argument, but a formatter could modify it to provide corrections or
+    #   additional information.
+    #
+    # The formatter may also raise a {CloudEvents::CloudEventsError} subclass
+    # if it understood the request but determines that the input source is
+    # malformed.
+    #
+    # @param _kwargs [keywords] Arguments
+    # @return [Hash] if accepting the request and returning a result
+    # @return [nil] if declining the request.
+    #
+    def decode_data **_kwargs
       nil
     end
 
     ##
-    # Encode a batch of events to a string.
+    # Encode an event data object to string format. This is typically called by
+    # a protocol binding to serialize the payload (i.e. `data` attribute and
+    # corresponding `datacontenttype` attribute) of an event as part of "binary
+    # content mode" encoding.
     #
-    # The input must be an array of CloudEvent objects (which could be empty).
-    # All additional arguments are optional, and may or may not be considered
-    # by the formatter.
+    # Common arguments include:
     #
-    # The formatter must return either a tuple comprising the serialized form
-    # of the batch and an associated ContentType, or `nil` to signal that the
-    # formatter is incapable of handling the given batch and believes it should
-    # be handled by a different formatter.
-    # It can also raise an error to indicate that it believes it should handle
-    # the input, but that the input is malformed.
+    # * `:spec_version` (String) The `specversion` of the event.
+    # * `:data` (Object) The payload object from an event's `data` attribute.
+    # * `:content_type` ({CloudEvents::ContentType}) The content type from an
+    #   event's `datacontenttype` attribute.
     #
-    # Implementations should make sure the encoding of the returned string is
-    # correct. In particular, if the format uses binary data, the returned
-    # string should have the appropriate `ASCII_8BIT` encoding, and the
-    # returned ContentType should specify the appropriate charset.
+    # The formatter must first determine whether it is able to interpret the
+    # given input. Typically, this is done by inspecting the `content_type`.
+    # If the formatter determines that it is unable to interpret the input, it
+    # should return `nil`. Otherwise, if the formatter determines it can decode
+    # the input, it should return a `Hash`. Common hash keys include:
     #
-    # @param events [Array<CloudEvents::Event>] An array of input events.
-    # @return [Array(String,CloudEvents::ContentType)] if encoding succeeded.
-    # @return [nil] if a different formatter should be used.
+    # * `:content` (String) The serialized form of the data. This might, for
+    #   example, be written to an HTTP request body. Care should be taken to
+    #   set the string's encoding properly. In particular, to output binary
+    #   data, the encoding should probably be set to `ASCII_8BIT`.
+    # * `:content_type` ({CloudEvents::ContentType}) The content type for the
+    #   output. This might, for example, be written to the `Content-Type`
+    #   header of an HTTP request.
     #
-    def encode_batch events, **_other_kwargs
-      nil
-    end
-
-    ##
-    # Decode an event data object from string format.
+    # The formatter may also raise a {CloudEvents::CloudEventsError} subclass
+    # if it understood the request but determines that the input source is
+    # malformed.
     #
-    # The arguments comprise an input string representing the encoded data from
-    # a protocol source such as an HTTP request body, and a ContentType. All
-    # additional arguments are optional, and may or may not be considered by
-    # the formatter.
+    # @param _kwargs [keywords] Arguments
+    # @return [Hash] if accepting the request and returning a result
+    # @return [nil] if declining the request.
     #
-    # The formatter must return either a tuple comprising the event data object
-    # and a final ContentType (which may be the same as the input ContentType),
-    # or `nil` to signal that the formatter does not recognize the input and
-    # believes it should be handled by a different formatter.
-    # It can also raise an error to indicate that it believes it should handle
-    # the input, but that the input is malformed.
-    #
-    # @param data [String] The input data string.
-    # @param content_type [CloudEvents::ContentType,nil] The input content
-    #     type, or `nil` if none is available.
-    # @return [Array(Object,CloudEvents::ContentType)] if decoding succeeded.
-    # @return [nil] if a different formatter should be used.
-    #
-    def decode_data data, content_type, **_other_kwargs
-      nil
-    end
-
-    ##
-    # Encode an event data object to string format.
-    #
-    # The arguments comprise an object representing the event data, and a
-    # suggested ContentType. All additional arguments are optional, and may or
-    # may not be considered by the formatter.
-    #
-    # The formatter must return either a tuple comprising the encoded data
-    # string and a final ContentType (which may be the same as the input
-    # ContentType), or `nil` to signal that the formatter is incapable of
-    # handling the given data object and believes it should be handled by a
-    # different formatter.
-    # It can also raise an error to indicate that it believes it should handle
-    # the input, but that the input is malformed.
-    #
-    # @param data [Object] A data object to encode.
-    # @param content_type [CloudEvents::ContentType,nil] The input content
-    #     type, or `nil` if none is available.
-    # @return [Array(String,CloudEvents::ContentType)] if encoding succeeded.
-    # @return [nil] if a different formatter should be used.
-    #
-    def encode_data data, content_type, **_other_kwargs
+    def encode_data **_kwargs
       nil
     end
   end
