@@ -23,6 +23,8 @@ module CloudEvents
     ##
     # Returns a default HTTP binding, including support for JSON format.
     #
+    # @return [HttpBinding]
+    #
     def self.default
       @default ||= begin
         http_binding = new
@@ -53,6 +55,7 @@ module CloudEvents
     # @param name [String] The encoder name under which this formatter will
     #     register its encode operations. Optional. If not specified, any event
     #     encoder will _not_ be registered.
+    # @return [self]
     #
     def register_formatter formatter, name = nil
       name = name.to_s.strip.downcase if name
@@ -82,6 +85,7 @@ module CloudEvents
     #     {CloudEvents::Format#decode_data} method.
     # @param encode_data [boolean] If true, register the formatter's
     #     {CloudEvents::Format#encode_data} method.
+    # @return [self]
     #
     def register_formatter_methods formatter,
                                    decode_event: false,
