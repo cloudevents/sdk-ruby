@@ -10,6 +10,7 @@ require "rack/lint"
 
 describe CloudEvents::HttpBinding do
   let(:http_binding) { CloudEvents::HttpBinding.default }
+  let(:minimal_http_binding) { CloudEvents::HttpBinding.new }
   let(:my_id) { "my_id" }
   let(:my_source_string) { "/my_source" }
   let(:my_source) { URI.parse my_source_string }
@@ -101,7 +102,7 @@ describe CloudEvents::HttpBinding do
     assert_equal my_schema, event.data_schema
     assert_equal my_subject, event.subject
     assert_equal my_time, event.time
-    headers, body = http_binding.encode_batched_content [event], "json", sort: true
+    headers, body = http_binding.encode_event [event], structured_format: true, sort: true
     assert_equal({ "Content-Type" => "application/cloudevents-batch+json; charset=utf-8" }, headers)
     assert_equal my_json_batch_encoded, body
   end
@@ -123,7 +124,7 @@ describe CloudEvents::HttpBinding do
     assert_equal my_schema, event.data_schema
     assert_equal my_subject, event.subject
     assert_equal my_time, event.time
-    headers, body = http_binding.encode_binary_content event
+    headers, body = http_binding.encode_event event
     expected_headers = {
       "CE-id"          => my_id,
       "CE-source"      => my_source_string,
@@ -160,7 +161,7 @@ describe CloudEvents::HttpBinding do
     assert_equal my_schema, event.data_schema
     assert_equal my_subject, event.subject
     assert_equal my_time, event.time
-    headers, body = http_binding.encode_structured_content event, "json", sort: true
+    headers, body = http_binding.encode_event event, structured_format: true, sort: true
     assert_equal({ "Content-Type" => "application/cloudevents+json; charset=utf-8" }, headers)
     assert_equal my_json_struct_encoded, body
   end
@@ -180,7 +181,7 @@ describe CloudEvents::HttpBinding do
     assert_equal my_schema, event.data_schema
     assert_equal my_subject, event.subject
     assert_equal my_time, event.time
-    headers, body = http_binding.encode_binary_content event
+    headers, body = http_binding.encode_event event
     expected_headers = {
       "CE-id"          => my_id,
       "CE-source"      => my_source_string,
@@ -217,7 +218,7 @@ describe CloudEvents::HttpBinding do
     assert_equal my_schema, event.data_schema
     assert_equal my_subject, event.subject
     assert_equal my_time, event.time
-    headers, body = http_binding.encode_structured_content event, "json", sort: true
+    headers, body = http_binding.encode_event event, structured_format: true, sort: true
     assert_equal({ "Content-Type" => "application/cloudevents+json; charset=utf-8" }, headers)
     assert_equal my_json_data_struct_encoded, body
   end
@@ -244,7 +245,7 @@ describe CloudEvents::HttpBinding do
     assert_equal my_schema, event.data_schema
     assert_equal my_subject, event.subject
     assert_equal my_time, event.time
-    headers, body = http_binding.encode_structured_content event, "json", sort: true
+    headers, body = http_binding.encode_event event, structured_format: true, sort: true
     assert_equal({ "Content-Type" => "application/cloudevents+json; charset=utf-8" }, headers)
     assert_equal my_json_struct_encoded, body
   end
@@ -266,7 +267,7 @@ describe CloudEvents::HttpBinding do
     assert_nil event.data_schema
     assert_nil event.subject
     assert_nil event.time
-    headers, body = http_binding.encode_binary_content event
+    headers, body = http_binding.encode_event event
     expected_headers = {
       "CE-id"          => my_id,
       "CE-source"      => my_source_string,
@@ -289,7 +290,7 @@ describe CloudEvents::HttpBinding do
     }
     event = http_binding.decode_rack_env env
     assert_equal my_trace_context, event["tracecontext"]
-    headers, body = http_binding.encode_binary_content event
+    headers, body = http_binding.encode_event event
     expected_headers = {
       "CE-id"           => my_id,
       "CE-source"       => my_source_string,
@@ -309,7 +310,7 @@ describe CloudEvents::HttpBinding do
                                       type:              weird_type,
                                       data:              my_simple_data,
                                       data_content_type: my_content_type_string
-    headers, body = http_binding.encode_binary_content event
+    headers, body = http_binding.encode_event event
     expected_headers = {
       "CE-id"          => my_id,
       "CE-source"      => my_source_string,
@@ -330,5 +331,75 @@ describe CloudEvents::HttpBinding do
     }
     reconstituted_event = http_binding.decode_rack_env env
     assert_equal event, reconstituted_event
+  end
+
+  it "raises UnsupportedFormatError when a format is not recognized" do
+    env = {
+      "rack.input"   => StringIO.new(my_json_struct_encoded),
+      "CONTENT_TYPE" => "application/cloudevents+json"
+    }
+    assert_raises CloudEvents::UnsupportedFormatError do
+      minimal_http_binding.decode_rack_env env
+    end
+  end
+
+  it "raises FormatSyntaxError when decoding malformed JSON event" do
+    env = {
+      "rack.input"   => StringIO.new("!!!"),
+      "CONTENT_TYPE" => "application/cloudevents+json"
+    }
+    error = assert_raises CloudEvents::FormatSyntaxError do
+      http_binding.decode_rack_env env
+    end
+    assert_kind_of JSON::ParserError, error.cause
+  end
+
+  it "raises FormatSyntaxError when decoding malformed JSON batch" do
+    env = {
+      "rack.input"   => StringIO.new("!!!"),
+      "CONTENT_TYPE" => "application/cloudevents-batch+json"
+    }
+    error = assert_raises CloudEvents::FormatSyntaxError do
+      http_binding.decode_rack_env env
+    end
+    assert_kind_of JSON::ParserError, error.cause
+  end
+
+  it "raises SpecVersionError when decoding a binary event with a bad specversion" do
+    env = {
+      "HTTP_CE_ID"          => my_id,
+      "HTTP_CE_SOURCE"      => my_source_string,
+      "HTTP_CE_TYPE"        => my_type,
+      "HTTP_CE_SPECVERSION" => "0.1"
+    }
+    assert_raises CloudEvents::SpecVersionError do
+      http_binding.decode_rack_env env
+    end
+  end
+
+  it "decodes and re-encodes a structured event using opaque" do
+    env = {
+      "rack.input"   => StringIO.new(my_json_struct_encoded),
+      "CONTENT_TYPE" => "application/cloudevents+json"
+    }
+    event = minimal_http_binding.decode_rack_env env, allow_opaque: true
+    assert_kind_of CloudEvents::Event::Opaque, event
+    refute event.batch?
+    headers, body = minimal_http_binding.encode_event event
+    assert_equal({ "Content-Type" => "application/cloudevents+json" }, headers)
+    assert_equal my_json_struct_encoded, body
+  end
+
+  it "decodes and re-encodes a batch of events using opaque" do
+    env = {
+      "rack.input"   => StringIO.new(my_json_batch_encoded),
+      "CONTENT_TYPE" => "application/cloudevents-batch+json"
+    }
+    event = minimal_http_binding.decode_rack_env env, allow_opaque: true
+    assert_kind_of CloudEvents::Event::Opaque, event
+    assert event.batch?
+    headers, body = minimal_http_binding.encode_event event
+    assert_equal({ "Content-Type" => "application/cloudevents-batch+json" }, headers)
+    assert_equal my_json_batch_encoded, body
   end
 end

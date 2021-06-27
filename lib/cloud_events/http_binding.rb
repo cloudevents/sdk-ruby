@@ -129,6 +129,9 @@ module CloudEvents
     # the request.
     #
     # @param env [Hash] The Rack environment.
+    # @param allow_opaque [boolean] If true, returns opaque event objects if
+    #     the input is not in a recognized format. If false, raises
+    #     {CloudEvents::UnsupportedFormatError} in that case. Default is false.
     # @param format_args [keywords] Extra args to pass to the formatter.
     # @return [CloudEvents::Event] if the request includes a single structured
     #     or binary event.
@@ -137,38 +140,76 @@ module CloudEvents
     # @raise [CloudEvents::CloudEventsError] if an event could not be decoded
     #     from the request.
     #
-    def decode_rack_env env, **format_args
+    def decode_rack_env env, allow_opaque: false, **format_args
       content_type_header = env["CONTENT_TYPE"]
       content_type = ContentType.new content_type_header if content_type_header
       if content_type&.media_type == "application"
         case content_type.subtype_base
         when "cloudevents"
           content = read_with_charset env["rack.input"], content_type.charset
-          return decode_structured_content content, content_type, **format_args
+          return decode_structured_content content, content_type, allow_opaque, **format_args
         when "cloudevents-batch"
           content = read_with_charset env["rack.input"], content_type.charset
-          return decode_batched_content content, content_type, **format_args
+          return decode_batched_content content, content_type, allow_opaque, **format_args
         end
       end
       decode_binary_content env, content_type
     end
 
     ##
-    # Encode a single event in the given format.
+    # Encode an event or batch of events into HTTP headers and body.
+    #
+    # You may provide an event, an array of events, or an opaque event. You may
+    # also specify what content mode and format to use.
     #
     # The result is a two-element array where the first element is a headers
     # list (as defined in the Rack specification) and the second is a string
-    # containing the HTTP body content. The headers list will contain only
-    # a `Content-Type` header.
+    # containing the HTTP body content. When using structured content mode, the
+    # headers list will contain only a `Content-Type` header and the body will
+    # contain the serialized event. When using binary mode, the header list
+    # will contain the serialized event attributes and the body will contain
+    # the serialized event data.
     #
-    # @param event [CloudEvents::Event] The event.
-    # @param format [String] The format name. Optional.
+    # @param event [CloudEvents::Event,Array<CloudEvents::Event>,CloudEvents::Event::Opaque]
+    #     The event, batch, or opaque event.
+    # @param structured_format [boolean,String] If given, the data will be
+    #     encoded in structured content mode. You can pass a string to select
+    #     a format name, or pass `true` to use the default format. If set to
+    #     `false` (the default), the data will be encoded in binary mode.
     # @param format_args [keywords] Extra args to pass to the formatter.
     # @return [Array(headers,String)]
     #
-    def encode_structured_content event, format = nil, **format_args
-      format ||= default_structured_encoder
-      raise ArgumentError, "Format name not specified, and no default is set" unless format
+    def encode_event event, structured_format: false, **format_args
+      if event.is_a? Event::Opaque
+        [{ "Content-Type" => event.content_type.to_s }, event.content]
+      elsif !structured_format
+        encode_binary_content event, **format_args
+      elsif event.is_a? ::Array
+        structured_format = default_batched_encoder if structured_format == true
+        raise ArgumentError, "Format name not specified, and no default is set" unless structured_format
+        encode_batched_content event, structured_format, **format_args
+      elsif event.is_a? Event
+        structured_format = default_structured_encoder if structured_format == true
+        raise ArgumentError, "Format name not specified, and no default is set" unless structured_format
+        encode_structured_content event, structured_format, **format_args
+      else
+        raise ArgumentError, "Unknown event type: #{event.class}"
+      end
+    end
+
+    ##
+    # Encode a single event in structured content mode in the given format.
+    #
+    # @deprecated Will be removed in vresion 1.0. Use encode_event instead.
+    #
+    # @private
+    #
+    # @param event [CloudEvents::Event] The event.
+    # @param format [String] The format name.
+    # @param format_args [keywords] Extra args to pass to the formatter.
+    # @return [Array(headers,String)]
+    #
+    def encode_structured_content event, format, **format_args
       Array(@event_encoders[format]).reverse_each do |handler|
         result = handler.encode_event event, **format_args
         return [{ "Content-Type" => result[1].to_s }, result[0]] if result
@@ -177,21 +218,18 @@ module CloudEvents
     end
 
     ##
-    # Encode a batch of events to content data in the given format.
+    # Encode a batch of events in structured content mode in the given format.
     #
-    # The result is a two-element array where the first element is a headers
-    # list (as defined in the Rack specification) and the second is a string
-    # containing the HTTP body content. The headers list will contain only
-    # a `Content-Type` header.
+    # @deprecated Will be removed in vresion 1.0. Use encode_event instead.
+    #
+    # @private
     #
     # @param events [Array<CloudEvents::Event>] The batch of events.
-    # @param format [String] The format name. Optional.
+    # @param format [String] The format name.
     # @param format_args [keywords] Extra args to pass to the formatter.
     # @return [Array(headers,String)]
     #
-    def encode_batched_content events, format = nil, **format_args
-      format ||= default_batched_encoder
-      raise ArgumentError, "Format name not specified, and no default is set" unless format
+    def encode_batched_content events, format, **format_args
       Array(@batch_encoders[format]).reverse_each do |handler|
         result = handler.encode_batch events, **format_args
         return [{ "Content-Type" => result[1].to_s }, result[0]] if result
@@ -200,16 +238,17 @@ module CloudEvents
     end
 
     ##
-    # Encode an event to content and headers, in binary content mode.
+    # Encode an event in binary content mode.
     #
-    # The result is a two-element array where the first element is a headers
-    # list (as defined in the Rack specification) and the second is a string
-    # containing the HTTP body content.
+    # @deprecated Will be removed in vresion 1.0. Use encode_event instead.
+    #
+    # @private
     #
     # @param event [CloudEvents::Event] The event.
+    # @param format_args [keywords] Extra args to pass to the formatter.
     # @return [Array(headers,String)]
     #
-    def encode_binary_content event
+    def encode_binary_content event, **format_args
       headers = {}
       body = event.data
       content_type = event.data_content_type
@@ -218,7 +257,7 @@ module CloudEvents
           headers["CE-#{key}"] = percent_encode value
         end
       end
-      body, content_type = encode_data body, content_type
+      body, content_type = encode_data body, content_type, **format_args
       headers["Content-Type"] = content_type.to_s if content_type
       [headers, body]
     end
@@ -278,24 +317,26 @@ module CloudEvents
     # Decode a single event from the given request body and content type in
     # structured mode.
     #
-    def decode_structured_content input, content_type, **format_args
+    def decode_structured_content input, content_type, allow_opaque, **format_args
       @event_decoders.reverse_each do |decoder|
         event = decoder.decode_event input, content_type, **format_args
         return event if event
       end
-      raise HttpContentError, "Unknown cloudevents content type: #{content_type}"
+      return Event::Opaque.new input, content_type, batch: false if allow_opaque
+      raise UnsupportedFormatError, "Unknown cloudevents content type: #{content_type}"
     end
 
     ##
     # Decode a batch of events from the given request body and content type in
     # batched structured mode.
     #
-    def decode_batched_content input, content_type, **format_args
+    def decode_batched_content input, content_type, allow_opaque, **format_args
       @batch_decoders.reverse_each do |decoder|
         events = decoder.decode_batch input, content_type, **format_args
         return events if events
       end
-      raise HttpContentError, "Unknown cloudevents content type: #{content_type}"
+      return Event::Opaque.new input, content_type, batch: true if allow_opaque
+      raise UnsupportedFormatError, "Unknown cloudevents content type: #{content_type}"
     end
 
     ##

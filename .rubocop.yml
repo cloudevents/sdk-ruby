@@ -8,9 +8,9 @@ Metrics/BlockLength:
   Exclude:
     - "test/**/test_*.rb"
 Metrics/ClassLength:
-  Max: 200
+  Max: 250
 Metrics/ModuleLength:
-  Max: 200
+  Max: 250
 Naming/FileName:
   Exclude:
     - "examples/*/Gemfile"

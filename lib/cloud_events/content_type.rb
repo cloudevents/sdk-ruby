@@ -25,7 +25,7 @@ module CloudEvents
     #     specified. Defaults to `us-ascii`.
     #
     def initialize string, default_charset: nil
-      @string = string
+      @string = string.to_s
       @media_type = "text"
       @subtype_base = @subtype = "plain"
       @subtype_format = nil
