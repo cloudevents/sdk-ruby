@@ -1,5 +1,15 @@
 # Changelog
 
+### v0.5.0 / 2021-06-28
+
+* BREAKING CHANGE: Properly handle data when the content-type indicates JSON 
+* BREAKING CHANGE: Decode returns opaque event objects when a formatter is not available 
+
+* ADDED: Decode returns opaque event objects when a formatter is not available 
+* FIXED: Properly handle data when the content-type indicates JSON 
+* FIXED: Set application/json by default when using json structured format 
+* DOCS: A number of documentation fixes 
+
 ### v0.4.0 / 2021-05-26
 
 * ADDED: ContentType can take an optional default charset 
