@@ -13,7 +13,7 @@ Features:
     JSON Batch Format.
  *  Support for sending and receiving CloudEvents via HTTP Bindings.
  *  Supports the [CloudEvent 0.3](https://github.com/cloudevents/spec/tree/v0.3)
-    and [CloudEvents 1.0](https://github.com/cloudevents/spec/tree/v1.0)
+    and [CloudEvents 1.0](https://github.com/cloudevents/spec/tree/v1.0.1)
     specifications.
  *  Extensible to additional formats and protocol bindings, and future
     specification versions.
@@ -35,7 +35,7 @@ A simple [Sinatra](https://sinatrarb.com) app that receives CloudEvents:
 ```ruby
 # examples/server/Gemfile
 source "https://rubygems.org"
-gem "cloud_events", "~> 0.2"
+gem "cloud_events", "~> 0.5"
 gem "sinatra", "~> 2.0"
 ```
 
@@ -59,7 +59,7 @@ A simple Ruby script that sends a CloudEvent:
 ```ruby
 # examples/client/Gemfile
 source "https://rubygems.org"
-gem "cloud_events", "~> 0.2"
+gem "cloud_events", "~> 0.5"
 ```
 
 ```ruby
@@ -69,14 +69,16 @@ require "net/http"
 require "uri"
 
 data = { message: "Hello, CloudEvents!" }
-event = CloudEvents::Event.create spec_version: "1.0",
-                                  id:           "1234-1234-1234",
-                                  source:       "/mycontext",
-                                  type:         "com.example.someevent",
-                                  data:         data
+event = CloudEvents::Event.create \
+  spec_version:      "1.0",
+  id:                "1234-1234-1234",
+  source:            "/mycontext",
+  type:              "com.example.someevent",
+  data_content_type: "application/json",
+  data:              data
 
 cloud_events_http = CloudEvents::HttpBinding.default
-headers, body = cloud_events_http.encode_binary_content event
+headers, body = cloud_events_http.encode_event event
 Net::HTTP.post URI("http://localhost:4567"), body, headers
 ```
 
