@@ -2,15 +2,17 @@
 
 ### v0.5.0 / 2021-06-28
 
-This is a significant update that reworks the interface of the JSON formatter and applies fixes to of its payload encoding behavior. There are several breaking changes to internal interfaces, as well as breaking fixes to the encoding/decoding behavior of HttpBinding class, and a few deprecations.
+This is a significant update that provides several important spec-related and usability fixes. Some of the behavioral changes are breaking, so to preserve compatibility, new methods were added and old methods deprecated, particularly in the HttpBinding class. Additionally, the formatter interface has been simplified and expanded to support payload formatting.
 
-* FIXED: HttpBinding#decode_rack_env in binary content mode now parses JSON content-types and exposes the data attribute as a JSON value. Similarly, encoding in binary content mode serializes a JSON document even if the payload is string-typed. (BREAKING CHANGE)
-* CHANGED: HttpBinding#decode_rack_env raises CloudEvents::NotCloudEventError (rather than returning nil) if given an HTTP request that does not seem to have been intended as a CloudEvent. (BREAKING CHANGE)
+* CHANGED: Deprecated HttpBinding#decode_rack_env and replaced with HttpBinding#decode_event. (The old method remains for backward compatibility, but will be removed in version 1.0). The new decode_event method has the following differences:
+    * decode_event raises NotCloudEventError (rather than returning nil) if given an HTTP request that does not seem to have been intended as a CloudEvent.
+    * decode_event takes an allow_opaque argument that, when set to true, returns a CloudEvents::Event::Opaque (rather than raising an exception) if given a structured event with a format not known by the SDK. Opaque event objects cannot have their fields inspected, but can be reserialized for retransmission to another event handler.
+    * decode_event in binary content mode now parses JSON content-types and exposes the data attribute as a JSON value.
+* CHANGED: Deprecated the HttpBinding encoding entrypoints (encode_structured_content, encode_batched_content, and encode_binary_content) and replaced with a single encode_event entrypoint that handles all cases via the structured_format argument. (The old methods remain for backward compatibility, but will be removed in version 1.0). In addition, the new encode_event method has the following differences:
+    * encode_event in binary content mode now interprets a string-valued data attribute as a JSON string and serializes it (i.e. wraps it in quotes) if the data_content_type has a JSON format. This is for compatibility with the behavior of the JSON structured mode which always treats the data attribute as a JSON value if the data_content_type indicates JSON.
 * CHANGED: The JsonFormat class interface was reworked to be more generic, combine the structured and batched calls, and add calls to handle data payloads. A Format module has been added to specify the interface used by JsonFormat and future formatters. (Breaking change of internal interfaces)
-* ADDED: It is now possible to tell HttpBinding#decode_rack_env to return an opaque object if the request specifies a format that is not known by the SDK. This opaque object cannot have its fields inspected, but can be reserialized for retransmission to another event handler.
-* CHANGED: If opaque objects are disabled and an input request has an unknown format, HttpBinding#decode_rack_env now raises UnsupportedFormatError instead of HttpContentError. (The old exception name is aliased to the new name for backward compatibility, but is deprecated and will be removed in version 1.0.)
-* CHANGED: If format-driven parsing fails, HttpBinding#decode_rack_env will raise FormatSyntaxError instead of, for example, a JSON-specific error. The lower-level parser error can still be accessed as the "cause".
-* CHANGED: Consolidated HttpBinding encoding entrypoints into one HttpBinding#encode_event call. The older encode_structured_content, encode_batched_content, and encode_binary_content calls are now deprecated.
+* CHANGED: Renamed HttpContentError to UnsupportedFormatError to better reflect the specific issue being reported, and to eliminate the coupling to http. The old name remains aliased to the new name, but is deprecated and will be removed in version 1.0.
+* CHANGED: If format-driven parsing (e.g. parsing a JSON document) fails, a FormatSyntaxError will be raised instead of, for example, a JSON-specific error. The lower-level parser error can still be accessed from the exception's "cause".
 * FIXED: JsonFormat now sets the datacontenttype attribute explicitly to "application/json" if it isn't otherwise set.
 
 ### v0.4.0 / 2021-05-26

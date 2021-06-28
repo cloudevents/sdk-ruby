@@ -28,8 +28,7 @@ module CloudEvents
     def self.default
       @default ||= begin
         http_binding = new
-        json_format = JsonFormat.new
-        http_binding.register_formatter json_format, JSON_FORMAT
+        http_binding.register_formatter JsonFormat.new, JSON_FORMAT
         http_binding.default_encoder_name = JSON_FORMAT
         http_binding
       end
@@ -125,12 +124,12 @@ module CloudEvents
     # @raise [CloudEvents::CloudEventsError] if an event could not be decoded
     #     from the request.
     #
-    def decode_rack_env env, allow_opaque: false, **format_args
+    def decode_event env, allow_opaque: false, **format_args
       content_type_string = env["CONTENT_TYPE"]
       content_type = ContentType.new content_type_string if content_type_string
       content = read_with_charset env["rack.input"], content_type&.charset
-      result = decode_binary_content content, content_type, env
-      result ||= decode_structured_content content, content_type, allow_opaque, **format_args
+      result = decode_binary_content(content, content_type, env) ||
+               decode_structured_content(content, content_type, allow_opaque, **format_args)
       if result.nil?
         content_type_string = content_type_string ? content_type_string.inspect : "not present"
         raise NotCloudEventError, "Content-Type is #{content_type_string}, and CE-SpecVersion is not present"
@@ -168,7 +167,7 @@ module CloudEvents
         if event.is_a? ::Array
           raise ::ArgumentError, "Encoding a batch requires structured_format"
         end
-        encode_binary_content event, **format_args
+        encode_binary_content event, legacy_data_encode: false, **format_args
       else
         structured_format = default_encoder_name if structured_format == true
         raise ::ArgumentError, "Format name not specified, and no default is set" unless structured_format
@@ -181,6 +180,31 @@ module CloudEvents
           raise ::ArgumentError, "Unknown event type: #{event.class}"
         end
       end
+    end
+
+    ##
+    # Decode an event from the given Rack environment hash. Following the
+    # CloudEvents spec, this chooses a handler based on the Content-Type of
+    # the request.
+    #
+    # @deprecated Will be removed in version 1.0. Use {#decode_event} instead.
+    #
+    # @param env [Hash] The Rack environment.
+    # @param format_args [keywords] Extra args to pass to the formatter.
+    # @return [CloudEvents::Event] if the request includes a single structured
+    #     or binary event.
+    # @return [Array<CloudEvents::Event>] if the request includes a batch of
+    #     structured events.
+    # @return [nil] if the request does not appear to be a CloudEvent.
+    # @raise [CloudEvents::CloudEventsError] if the request appears to be a
+    #     CloudEvent but decoding failed.
+    #
+    def decode_rack_env env, **format_args
+      content_type_string = env["CONTENT_TYPE"]
+      content_type = ContentType.new content_type_string if content_type_string
+      content = read_with_charset env["rack.input"], content_type&.charset
+      decode_binary_content(content, content_type, env, legacy_data_decode: true) ||
+        decode_structured_content(content, content_type, false, **format_args)
     end
 
     ##
@@ -232,14 +256,28 @@ module CloudEvents
     # @param format_args [keywords] Extra args to pass to the formatter.
     # @return [Array(headers,String)]
     #
-    def encode_binary_content event, **format_args
+    def encode_binary_content event, legacy_data_encode: true, **format_args
       headers = {}
       event.to_h.each do |key, value|
         unless ["data", "datacontenttype"].include? key
           headers["CE-#{key}"] = percent_encode value
         end
       end
-      body, content_type = encode_data event.spec_version, event.data, event.data_content_type, **format_args
+      if legacy_data_encode
+        body = event.data
+        content_type = event.data_content_type&.to_s
+        case body
+        when ::String
+          content_type ||= string_content_type body
+        when nil
+          content_type = nil
+        else
+          body = ::JSON.dump body
+          content_type ||= "application/json; charset=#{body.encoding.name.downcase}"
+        end
+      else
+        body, content_type = encode_data event.spec_version, event.data, event.data_content_type, **format_args
+      end
       headers["Content-Type"] = content_type.to_s if content_type
       [headers, body]
     end
@@ -302,7 +340,7 @@ module CloudEvents
     def decode_structured_content content, content_type, allow_opaque, **format_args
       @event_decoders.reverse_each do |decoder|
         result = decoder.decode_event content: content, content_type: content_type, **format_args
-        event = result[:event] || result[:event_batch]
+        event = result[:event] || result[:event_batch] if result
         return event if event
       end
       if content_type&.media_type == "application" &&
@@ -316,13 +354,20 @@ module CloudEvents
     ##
     # Decode an event from the given Rack environment in binary content mode.
     #
-    def decode_binary_content content, content_type, env
+    # TODO: legacy_data_decode is deprecated and can be removed when
+    # decode_rack_env is removed.
+    #
+    def decode_binary_content content, content_type, env, legacy_data_decode: false
       spec_version = env["HTTP_CE_SPECVERSION"]
       return nil unless spec_version
       unless spec_version =~ /^0\.3|1(\.|$)/
         raise SpecVersionError, "Unrecognized specversion: #{spec_version}"
       end
-      data, content_type = decode_data spec_version, content, content_type
+      if legacy_data_decode
+        data = content
+      else
+        data, content_type = decode_data spec_version, content, content_type
+      end
       attributes = { "spec_version" => spec_version, "data" => data }
       attributes["data_content_type"] = content_type if content_type
       omit_names = ["specversion", "spec_version", "data", "datacontenttype", "data_content_type"]
