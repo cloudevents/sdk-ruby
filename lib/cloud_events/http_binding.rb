@@ -108,9 +108,31 @@ module CloudEvents
     attr_accessor :default_encoder_name
 
     ##
+    # Analyze a Rack environment hash and determine whether it is _probably_
+    # a CloudEvent. This is done by examining headers only, and does not read
+    # or parse the request body. The result is a best guess: false negatives or
+    # false positives are possible for edge cases, but the logic should
+    # generally detect canonically-formatted events.
+    #
+    # @param env [Hash] The Rack environment.
+    # @return [boolean] Whether the request is likely a CloudEvent.
+    #
+    def probable_event? env
+      return true if env["HTTP_CE_SPECVERSION"]
+      content_type = ContentType.new env["CONTENT_TYPE"].to_s
+      content_type.media_type == "application" &&
+        ["cloudevents", "cloudevents-batch"].include?(content_type.subtype_base)
+    end
+
+    ##
     # Decode an event from the given Rack environment hash. Following the
     # CloudEvents spec, this chooses a handler based on the Content-Type of
     # the request.
+    #
+    # Note that this method will read the body (i.e. `rack.input`) stream.
+    # If you need to access the body after calling this method, you will need
+    # to rewind the stream. To determine whether the request is a CloudEvent
+    # without reading the body, use {#probable_event?}.
     #
     # @param env [Hash] The Rack environment.
     # @param allow_opaque [boolean] If true, returns opaque event objects if
@@ -203,6 +225,7 @@ module CloudEvents
       content_type_string = env["CONTENT_TYPE"]
       content_type = ContentType.new content_type_string if content_type_string
       content = read_with_charset env["rack.input"], content_type&.charset
+      env["rack.input"].rewind rescue nil
       decode_binary_content(content, content_type, env, legacy_data_decode: true) ||
         decode_structured_content(content, content_type, false, **format_args)
     end

@@ -458,4 +458,32 @@ describe CloudEvents::HttpBinding do
     assert_equal({ "Content-Type" => "application/cloudevents-batch+json" }, headers)
     assert_equal my_json_batch_encoded, body
   end
+
+  it "detects a probable binary event" do
+    env = {
+      "HTTP_CE_SPECVERSION" => "1.0"
+    }
+    assert http_binding.probable_event? env
+  end
+
+  it "detects a probable structured event" do
+    env = {
+      "CONTENT_TYPE" => "application/cloudevents+myformat"
+    }
+    assert http_binding.probable_event? env
+  end
+
+  it "detects a probable batch event" do
+    env = {
+      "CONTENT_TYPE" => "application/cloudevents-batch+myformat"
+    }
+    assert http_binding.probable_event? env
+  end
+
+  it "detects when something is unlikely an event" do
+    env = {
+      "CONTENT_TYPE" => "application/json"
+    }
+    refute http_binding.probable_event? env
+  end
 end
