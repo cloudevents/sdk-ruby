@@ -1,5 +1,10 @@
 # Changelog
 
+### v0.6.0 / 2021-06-28
+
+* ADDED: Add HttpBinding#probable_event? 
+* FIXED: Fixed a NoMethodError when a format declined to decode an http request 
+
 ### v0.5.0 / 2021-06-28
 
 This is a significant update that provides several important spec-related and usability fixes. Some of the behavioral changes are breaking, so to preserve compatibility, new methods were added and old methods deprecated, particularly in the HttpBinding class. Additionally, the formatter interface has been simplified and expanded to support payload formatting.
