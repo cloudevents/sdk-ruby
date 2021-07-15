@@ -8,7 +8,7 @@ module CloudEvents
   # This module documents the method signatures that may be implemented by
   # formatters.
   #
-  # A formatter is an object that implenets "structured" event encoding and
+  # A formatter is an object that implements "structured" event encoding and
   # decoding strategies for a particular format (such as JSON). In general,
   # this includes four operations:
   #
@@ -182,7 +182,7 @@ module CloudEvents
     # * `:content` (String) The serialized form of the data. This might, for
     #   example, be written to an HTTP request body. Care should be taken to
     #   set the string's encoding properly. In particular, to output binary
-    #   data, the encoding should probably be set to `ASCII_8BIT`.
+    #   data, the encoding should generally be set to `ASCII_8BIT`.
     # * `:content_type` ({CloudEvents::ContentType}) The content type for the
     #   output. This might, for example, be written to the `Content-Type`
     #   header of an HTTP request.
@@ -197,6 +197,81 @@ module CloudEvents
     #
     def encode_data **_kwargs
       nil
+    end
+
+    ##
+    # A convenience formatter that checks multiple formats for one capable of
+    # handling the given input.
+    #
+    class Multi
+      ##
+      # Create a multi format.
+      #
+      # @param formats [Array<Format>] An array of formats to check in order
+      # @param result_checker [Proc] An optional block that determines whether
+      #     a result provided by a format is acceptable. The block takes the
+      #     format's result as an argument, and returns either the result to
+      #     indicate acceptability, or `nil` to indicate not.
+      #
+      def initialize formats = [], &result_checker
+        @formats = formats
+        @result_checker = result_checker
+      end
+
+      ##
+      # The formats to check, in order.
+      #
+      # @return [Array<Format>]
+      #
+      attr_reader :formats
+
+      ##
+      # Implements {Format#decode_event}
+      #
+      def decode_event **kwargs
+        @formats.each do |elem|
+          result = elem.decode_event(**kwargs)
+          result = @result_checker.call result if @result_checker
+          return result if result
+        end
+        nil
+      end
+
+      ##
+      # Implements {Format#encode_event}
+      #
+      def encode_event **kwargs
+        @formats.each do |elem|
+          result = elem.encode_event(**kwargs)
+          result = @result_checker.call result if @result_checker
+          return result if result
+        end
+        nil
+      end
+
+      ##
+      # Implements {Format#decode_data}
+      #
+      def decode_data **kwargs
+        @formats.each do |elem|
+          result = elem.decode_data(**kwargs)
+          result = @result_checker.call result if @result_checker
+          return result if result
+        end
+        nil
+      end
+
+      ##
+      # Implements {Format#encode_data}
+      #
+      def encode_data **kwargs
+        @formats.each do |elem|
+          result = elem.encode_data(**kwargs)
+          result = @result_checker.call result if @result_checker
+          return result if result
+        end
+        nil
+      end
     end
   end
 end

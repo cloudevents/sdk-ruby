@@ -17,6 +17,10 @@ describe CloudEvents::Event::V1 do
   let(:my_simple_data) { "12345" }
   let(:my_content_type_string) { "text/plain; charset=us-ascii" }
   let(:my_content_type) { CloudEvents::ContentType.new my_content_type_string }
+  let(:my_object_data) { { "foo" => "bar" } }
+  let(:my_object_data_encoded) { '{"foo":"bar"}' }
+  let(:my_json_content_type_string) { "application/json; charset=us-ascii" }
+  let(:my_json_content_type) { CloudEvents::ContentType.new my_json_content_type_string }
   let(:my_schema_string) { "/my_schema" }
   let(:my_schema) { URI.parse my_schema_string }
   let(:my_subject) { "my_subject" }
@@ -31,6 +35,7 @@ describe CloudEvents::Event::V1 do
                                        type:              my_type,
                                        spec_version:      spec_version,
                                        data:              my_simple_data,
+                                       data_encoded:      my_simple_data,
                                        data_content_type: my_content_type_string,
                                        data_schema:       my_schema_string,
                                        subject:           my_subject,
@@ -40,6 +45,8 @@ describe CloudEvents::Event::V1 do
     assert_equal my_type, event.type
     assert_equal spec_version, event.spec_version
     assert_equal my_simple_data, event.data
+    assert_equal my_simple_data, event.data_encoded
+    assert event.data_decoded?
     assert_equal my_content_type, event.data_content_type
     assert_equal my_schema, event.data_schema
     assert_equal my_subject, event.subject
@@ -50,6 +57,7 @@ describe CloudEvents::Event::V1 do
     assert_equal spec_version, event[:specversion]
     assert_nil event[:spec_version]
     assert_equal my_simple_data, event[:data]
+    assert_equal my_simple_data, event[:data_encoded]
     assert_equal my_content_type_string, event[:datacontenttype]
     assert_nil event[:data_content_type]
     assert_equal my_schema_string, event[:dataschema]
@@ -64,8 +72,9 @@ describe CloudEvents::Event::V1 do
                                        source:            my_source,
                                        type:              my_type,
                                        spec_version:      spec_version,
-                                       data:              my_simple_data,
-                                       data_content_type: my_content_type,
+                                       data:              my_object_data,
+                                       data_encoded:      my_object_data_encoded,
+                                       data_content_type: my_json_content_type,
                                        data_schema:       my_schema,
                                        subject:           my_subject,
                                        time:              my_date_time
@@ -73,8 +82,10 @@ describe CloudEvents::Event::V1 do
     assert_equal my_source, event.source
     assert_equal my_type, event.type
     assert_equal spec_version, event.spec_version
-    assert_equal my_simple_data, event.data
-    assert_equal my_content_type, event.data_content_type
+    assert_equal my_object_data, event.data
+    assert_equal my_object_data_encoded, event.data_encoded
+    assert event.data_decoded?
+    assert_equal my_json_content_type, event.data_content_type
     assert_equal my_schema, event.data_schema
     assert_equal my_subject, event.subject
     assert_equal my_date_time, event.time
@@ -83,8 +94,9 @@ describe CloudEvents::Event::V1 do
     assert_equal my_type, event[:type]
     assert_equal spec_version, event[:specversion]
     assert_nil event[:spec_version]
-    assert_equal my_simple_data, event[:data]
-    assert_equal my_content_type_string, event[:datacontenttype]
+    assert_equal my_object_data, event[:data]
+    assert_equal my_object_data_encoded, event[:data_encoded]
+    assert_equal my_json_content_type_string, event[:datacontenttype]
     assert_nil event[:data_content_type]
     assert_equal my_schema_string, event[:dataschema]
     assert_nil event[:data_schema]
@@ -119,6 +131,8 @@ describe CloudEvents::Event::V1 do
     assert_equal my_type, event.type
     assert_equal spec_version, event.spec_version
     assert_nil event.data
+    assert_nil event.data_encoded
+    refute event.data_decoded?
     assert_nil event.data_content_type
     assert_nil event.data_schema
     assert_nil event.subject
@@ -129,13 +143,49 @@ describe CloudEvents::Event::V1 do
     assert_equal spec_version, event[:specversion]
     assert_nil event[:spec_version]
     assert_nil event[:data]
+    assert_nil event[:data_encoded]
     assert_nil event[:datacontenttype]
     assert_nil event[:data_content_type]
     assert_nil event[:dataschema]
     assert_nil event[:data_schema]
     assert_nil event[:subject]
     assert_nil event[:time]
+    assert_equal ["id", "source", "specversion", "type"], event.to_h.keys.sort
     assert Ractor.shareable? event if defined? Ractor
+  end
+
+  it "handles data set but not data_encoded" do
+    event = CloudEvents::Event::V1.new id:                my_id,
+                                       source:            my_source_string,
+                                       type:              my_type,
+                                       spec_version:      spec_version,
+                                       data:              my_simple_data,
+                                       data_content_type: my_content_type_string,
+                                       data_schema:       my_schema_string,
+                                       subject:           my_subject,
+                                       time:              my_time_string
+    assert_equal my_simple_data, event.data
+    assert_nil event.data_encoded
+    assert event.data_decoded?
+    assert_equal my_simple_data, event[:data]
+    assert_nil event[:data_encoded]
+  end
+
+  it "handles data_encoded set but not data" do
+    event = CloudEvents::Event::V1.new id:                my_id,
+                                       source:            my_source_string,
+                                       type:              my_type,
+                                       spec_version:      spec_version,
+                                       data_encoded:      my_simple_data,
+                                       data_content_type: my_content_type_string,
+                                       data_schema:       my_schema_string,
+                                       subject:           my_subject,
+                                       time:              my_time_string
+    assert_equal my_simple_data, event.data_encoded
+    assert_equal my_simple_data, event.data
+    refute event.data_decoded?
+    assert_nil event[:data]
+    assert_equal my_simple_data, event[:data_encoded]
   end
 
   it "creates a modified copy" do
@@ -153,6 +203,26 @@ describe CloudEvents::Event::V1 do
     assert_equal my_source2, event2.source
     assert_equal my_type2, event2.type
     assert_equal my_schema, event2.data_schema
+    assert Ractor.shareable? event2 if defined? Ractor
+  end
+
+  it "creates a modified copy changing the data" do
+    event = CloudEvents::Event::V1.new id:                my_id,
+                                       source:            my_source_string,
+                                       type:              my_type,
+                                       spec_version:      spec_version,
+                                       data_encoded:      my_simple_data,
+                                       data_content_type: my_content_type_string,
+                                       data_schema:       my_schema_string,
+                                       subject:           my_subject,
+                                       time:              my_time_string
+    assert_equal my_simple_data, event.data
+    assert_equal my_simple_data, event.data_encoded
+    refute event.data_decoded?
+    event2 = event.with data: my_simple_data
+    assert_nil event2.data_encoded
+    assert_equal my_simple_data, event2.data
+    assert event2.data_decoded?
     assert Ractor.shareable? event2 if defined? Ractor
   end
 
