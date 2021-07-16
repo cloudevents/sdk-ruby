@@ -6,6 +6,7 @@ require "cloud_events/event"
 require "cloud_events/format"
 require "cloud_events/http_binding"
 require "cloud_events/json_format"
+require "cloud_events/text_format"
 
 ##
 # CloudEvents implementation.

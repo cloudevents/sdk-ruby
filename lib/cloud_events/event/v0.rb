@@ -34,7 +34,10 @@ module CloudEvents
       # Create a new cloud event object with the given data and attributes.
       #
       # Event attributes may be presented as keyword arguments, or as a Hash
-      # passed in via the `attributes` argument (but not both).
+      # passed in via the special `:set_attributes` keyword argument (but not
+      # both). The `:set_attributes` keyword argument is useful for passing in
+      # attributes whose keys are strings rather than symbols, which some
+      # versions of Ruby will not accept as keyword arguments.
       #
       # The following standard attributes are supported and exposed as
       # attribute methods on the object.
@@ -68,16 +71,18 @@ module CloudEvents
       # `:data` field, for example if you pass a structured hash. If this is an
       # issue, make a deep copy of objects before passing to this constructor.
       #
-      # @param attributes [Hash] The data and attributes, as a hash.
+      # @param set_attributes [Hash] The data and attributes, as a hash.
+      #     (Also available as `attributes` but this usage is deprecated.)
       # @param args [keywords] The data and attributes, as keyword arguments.
       #
-      def initialize attributes: nil, **args
-        interpreter = FieldInterpreter.new attributes || args
+      def initialize set_attributes: nil, attributes: nil, **args
+        interpreter = FieldInterpreter.new set_attributes || attributes || args
         @spec_version = interpreter.spec_version ["specversion", "spec_version"], accept: /^0\.3$/
         @id = interpreter.string ["id"], required: true
         @source = interpreter.uri ["source"], required: true
         @type = interpreter.string ["type"], required: true
         @data = interpreter.data_object ["data"]
+        @data = nil if @data == FieldInterpreter::UNDEFINED
         @data_content_encoding = interpreter.string ["datacontentencoding", "data_content_encoding"]
         @data_content_type = interpreter.content_type ["datacontenttype", "data_content_type"]
         @schema_url = interpreter.uri ["schemaurl", "schema_url"]
@@ -98,7 +103,7 @@ module CloudEvents
       #
       def with **changes
         attributes = @attributes.merge changes
-        V0.new attributes: attributes
+        V0.new set_attributes: attributes
       end
 
       ##

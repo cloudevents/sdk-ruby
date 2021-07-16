@@ -22,11 +22,11 @@ module CloudEvents
         @attributes.freeze
       end
 
-      def string keys, required: false
+      def string keys, required: false, allow_empty: false
         object keys, required: required do |value|
           case value
           when ::String
-            raise AttributeError, "The #{keys.first} field cannot be empty" if value.empty?
+            raise AttributeError, "The #{keys.first} field cannot be empty" if value.empty? && !allow_empty
             value.freeze
             [value, value]
           else
@@ -125,7 +125,7 @@ module CloudEvents
         end
         if value == UNDEFINED
           raise AttributeError, "The #{keys.first} field is required" if required
-          return nil
+          return allow_nil ? UNDEFINED : nil
         end
         converted, raw = yield value
         @attributes[keys.first.freeze] = raw
