@@ -6,3 +6,4 @@ coverage/
 doc/
 pkg/
 tmp/
+features/conformance
