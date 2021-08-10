@@ -17,6 +17,7 @@ end
 def run
   ::Dir.chdir context_directory
   exec_tool ["test"], name: "Tests"
+  exec_tool ["cucumber"], name: "Behaviors"
   exec_tool ["rubocop"], name: "Style checker"
   exec_tool ["yardoc"], name: "Docs generation"
   exec_tool ["build"], name: "Gem build"
