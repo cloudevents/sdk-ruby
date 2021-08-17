@@ -72,7 +72,7 @@ module CloudEvents
       # issue, make a deep copy of objects before passing to this constructor.
       #
       # @param set_attributes [Hash] The data and attributes, as a hash.
-      #     (Also available as `attributes` but this usage is deprecated.)
+      #     (Also available using the deprecated keyword `attributes`.)
       # @param args [keywords] The data and attributes, as keyword arguments.
       #
       def initialize set_attributes: nil, attributes: nil, **args
