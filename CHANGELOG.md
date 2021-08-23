@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.6.0 / 2021-08-23
+
+* ADDED: Provide data_encoded and additional data methods on the V1 event object
+
 ### v0.5.1 / 2021-06-28
 
 * ADDED: Add HttpBinding#probable_event? 
