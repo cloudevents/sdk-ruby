@@ -133,7 +133,7 @@ module CloudEvents
       # return false to signal the absence of any data.)
       #
       # @param set_attributes [Hash] The data and attributes, as a hash.
-      #     (Also available as `attributes` but this usage is deprecated.)
+      #     (Also available using the deprecated keyword `attributes`.)
       # @param args [keywords] The data and attributes, as keyword arguments.
       #
       def initialize set_attributes: nil, attributes: nil, **args

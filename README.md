@@ -35,7 +35,7 @@ A simple [Sinatra](https://sinatrarb.com) app that receives CloudEvents:
 ```ruby
 # examples/server/Gemfile
 source "https://rubygems.org"
-gem "cloud_events", "~> 0.5"
+gem "cloud_events", "~> 0.6"
 gem "sinatra", "~> 2.0"
 ```
 
@@ -59,7 +59,7 @@ A simple Ruby script that sends a CloudEvent:
 ```ruby
 # examples/client/Gemfile
 source "https://rubygems.org"
-gem "cloud_events", "~> 0.5"
+gem "cloud_events", "~> 0.6"
 ```
 
 ```ruby
