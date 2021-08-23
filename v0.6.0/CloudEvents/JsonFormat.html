@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: CloudEvents::JsonFormat
+  
+    &mdash; CloudEvents
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "CloudEvents::JsonFormat";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (J)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../CloudEvents.html" title="CloudEvents (module)">CloudEvents</a></span></span>
+     &raquo; 
+    <span class="title">JsonFormat</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: CloudEvents::JsonFormat
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">CloudEvents::JsonFormat</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/cloud_events/json_format.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>An implementation of JSON format and JSON batch format.</p>
+
+<p>Supports the CloudEvents 0.3 and CloudEvents 1.0 variants of this format.
+See <a href="https://github.com/cloudevents/spec/blob/v0.3/json-format.md">https://github.com/cloudevents/spec/blob/v0.3/json-format.md</a> and
+<a href="https://github.com/cloudevents/spec/blob/v1.0/json-format.md">https://github.com/cloudevents/spec/blob/v1.0/json-format.md</a>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#decode_data-instance_method" title="#decode_data (instance method)">#<strong>decode_data</strong>(spec_version: nil, content: nil, content_type: nil, **_other_kwargs)  &#x21d2; Hash<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Decode an event data object from a JSON formatted string.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#decode_event-instance_method" title="#decode_event (instance method)">#<strong>decode_event</strong>(content: nil, content_type: nil, data_decoder: nil, **_other_kwargs)  &#x21d2; Hash<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Decode an event or batch from the given input JSON string.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#decode_hash_structure-instance_method" title="#decode_hash_structure (instance method)">#<strong>decode_hash_structure</strong>(structure, charset: nil, data_decoder: nil)  &#x21d2; CloudEvents::Event </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Decode a single event from a hash data structure with keys and types conforming to the JSON envelope.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#encode_data-instance_method" title="#encode_data (instance method)">#<strong>encode_data</strong>(spec_version: nil, data: UNSPECIFIED, content_type: nil, sort: false, **_other_kwargs)  &#x21d2; Hash<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Encode an event data object to a JSON formatted string.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#encode_event-instance_method" title="#encode_event (instance method)">#<strong>encode_event</strong>(event: nil, event_batch: nil, data_encoder: nil, sort: false, **_other_kwargs)  &#x21d2; Hash<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Encode an event or batch to a JSON string.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#encode_hash_structure-instance_method" title="#encode_hash_structure (instance method)">#<strong>encode_hash_structure</strong>(event, data_encoder: nil)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Encode a single event to a hash data structure with keys and types conforming to the JSON envelope.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="decode_data-instance_method">
+  
+    #<strong>decode_data</strong>(spec_version: nil, content: nil, content_type: nil, **_other_kwargs)  &#x21d2; <tt>Hash</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Decode an event data object from a JSON formatted string.
+See <span class='object_link'><a href="Format.html#decode_data-instance_method" title="CloudEvents::Format#decode_data (method)">Format#decode_data</a></span> for a general description.</p>
+
+<p>Expects <code>:spec_version</code>, <code>:content</code> and <code>:content_type</code> arguments, and
+will decline the request unless all three are provided.</p>
+
+<p>If decoding succeeded, returns a hash with the following keys:</p>
+
+<ul>
+<li><code>:data</code> (Object) The payload object to set as the <code>data</code> attribute.</li>
+<li><code>:content_type</code> (<span class='object_link'><a href="ContentType.html" title="CloudEvents::ContentType (class)">ContentType</a></span>) The content type to be set
+as the <code>datacontenttype</code> attribute.</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Serialized content to decode.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>content_type</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="ContentType.html" title="CloudEvents::ContentType (class)">CloudEvents::ContentType</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The input content type.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if accepting the request.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if declining the request.</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FormatSyntaxError.html" title="CloudEvents::FormatSyntaxError (class)">CloudEvents::FormatSyntaxError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if the JSON could not be parsed.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="SpecVersionError.html" title="CloudEvents::SpecVersionError (class)">CloudEvents::SpecVersionError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if an unsupported specversion is
+found.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/json_format.rb', line 123</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_decode_data'>decode_data</span> <span class='label'>spec_version:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>content:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>content_type:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__other_kwargs'>_other_kwargs</span>
+  <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='id identifier rubyid_spec_version'>spec_version</span>
+  <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='id identifier rubyid_content'>content</span>
+  <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='id identifier rubyid_json_content_type?'>json_content_type?</span> <span class='id identifier rubyid_content_type'>content_type</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_spec_version'>spec_version</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^0\.3|1(\.|$)</span><span class='regexp_end'>/</span></span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="SpecVersionError.html" title="CloudEvents::SpecVersionError (class)">SpecVersionError</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unrecognized specversion: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_spec_version'>spec_version</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>JSON</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span> <span class='id identifier rubyid_content'>content</span>
+  <span class='lbrace'>{</span> <span class='label'>data:</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='label'>content_type:</span> <span class='id identifier rubyid_content_type'>content_type</span> <span class='rbrace'>}</span>
+<span class='kw'>rescue</span> <span class='op'>::</span><span class='const'>JSON</span><span class='op'>::</span><span class='const'>JSONError</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="FormatSyntaxError.html" title="CloudEvents::FormatSyntaxError (class)">FormatSyntaxError</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>JSON syntax error</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="decode_event-instance_method">
+  
+    #<strong>decode_event</strong>(content: nil, content_type: nil, data_decoder: nil, **_other_kwargs)  &#x21d2; <tt>Hash</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Decode an event or batch from the given input JSON string.
+See <span class='object_link'><a href="Format.html#decode_event-instance_method" title="CloudEvents::Format#decode_event (method)">Format#decode_event</a></span> for a general description.</p>
+
+<p>Expects <code>:content</code> and <code>:content_type</code> arguments, and will decline the
+request unless both are provided.</p>
+
+<p>If decoding succeeded, returns a hash with <em>one of</em> the following keys:</p>
+
+<ul>
+<li><code>:event</code> (<span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">Event</a></span>) A single event decoded from the input.</li>
+<li><code>:event_batch</code> (Array of <span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">Event</a></span>) A batch of events
+decoded from the input.</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Serialized content to decode.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>content_type</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="ContentType.html" title="CloudEvents::ContentType (class)">CloudEvents::ContentType</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The input content type.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>data_decoder</span>
+      
+      
+        <span class='type'>(<tt>#<span class='object_link'><a href="#decode_data-instance_method" title="CloudEvents::JsonFormat#decode_data (method)">decode_data</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Optional data field decoder, used for
+non-JSON content types.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if accepting the request.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if declining the request.</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FormatSyntaxError.html" title="CloudEvents::FormatSyntaxError (class)">CloudEvents::FormatSyntaxError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if the JSON could not be parsed</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="SpecVersionError.html" title="CloudEvents::SpecVersionError (class)">CloudEvents::SpecVersionError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if an unsupported specversion is
+found.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/json_format.rb', line 41</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_decode_event'>decode_event</span> <span class='label'>content:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>content_type:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>data_decoder:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__other_kwargs'>_other_kwargs</span>
+  <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='id identifier rubyid_content'>content</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_content_type'>content_type</span><span class='op'>&amp;.</span><span class='id identifier rubyid_media_type'>media_type</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>application</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_content_type'>content_type</span><span class='op'>&amp;.</span><span class='id identifier rubyid_subtype_format'>subtype_format</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>json</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>case</span> <span class='id identifier rubyid_content_type'>content_type</span><span class='period'>.</span><span class='id identifier rubyid_subtype_base'>subtype_base</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>cloudevents</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_event'>event</span> <span class='op'>=</span> <span class='id identifier rubyid_decode_hash_structure'>decode_hash_structure</span> <span class='op'>::</span><span class='const'>JSON</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>charset:</span> <span class='id identifier rubyid_charset_of'>charset_of</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>data_decoder:</span> <span class='id identifier rubyid_data_decoder'>data_decoder</span>
+    <span class='lbrace'>{</span> <span class='label'>event:</span> <span class='id identifier rubyid_event'>event</span> <span class='rbrace'>}</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>cloudevents-batch</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_charset'>charset</span> <span class='op'>=</span> <span class='id identifier rubyid_charset_of'>charset_of</span> <span class='id identifier rubyid_content'>content</span>
+    <span class='id identifier rubyid_batch'>batch</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>JSON</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_structure'>structure</span><span class='op'>|</span>
+      <span class='id identifier rubyid_decode_hash_structure'>decode_hash_structure</span> <span class='id identifier rubyid_structure'>structure</span><span class='comma'>,</span> <span class='label'>charset:</span> <span class='id identifier rubyid_charset'>charset</span><span class='comma'>,</span> <span class='label'>data_decoder:</span> <span class='id identifier rubyid_data_decoder'>data_decoder</span>
+    <span class='kw'>end</span>
+    <span class='lbrace'>{</span> <span class='label'>event_batch:</span> <span class='id identifier rubyid_batch'>batch</span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+<span class='kw'>rescue</span> <span class='op'>::</span><span class='const'>JSON</span><span class='op'>::</span><span class='const'>JSONError</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="FormatSyntaxError.html" title="CloudEvents::FormatSyntaxError (class)">FormatSyntaxError</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>JSON syntax error</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="decode_hash_structure-instance_method">
+  
+    #<strong>decode_hash_structure</strong>(structure, charset: nil, data_decoder: nil)  &#x21d2; <tt><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Decode a single event from a hash data structure with keys and types
+conforming to the JSON envelope.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>structure</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>An input hash.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>charset</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The charset of the original encoded JSON document
+if known. Used to provide default content types.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>data_decoder</span>
+      
+      
+        <span class='type'>(<tt>#<span class='object_link'><a href="#decode_data-instance_method" title="CloudEvents::JsonFormat#decode_data (method)">decode_data</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Optional data field decoder, used for
+non-JSON content types.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/json_format.rb', line 181</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_decode_hash_structure'>decode_hash_structure</span> <span class='id identifier rubyid_structure'>structure</span><span class='comma'>,</span> <span class='label'>charset:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>data_decoder:</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_spec_version'>spec_version</span> <span class='op'>=</span> <span class='id identifier rubyid_structure'>structure</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>specversion</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='kw'>case</span> <span class='id identifier rubyid_spec_version'>spec_version</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.3</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_decode_hash_structure_v0'>decode_hash_structure_v0</span> <span class='id identifier rubyid_structure'>structure</span><span class='comma'>,</span> <span class='id identifier rubyid_charset'>charset</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^1(\.|$)</span><span class='regexp_end'>/</span></span>
+    <span class='id identifier rubyid_decode_hash_structure_v1'>decode_hash_structure_v1</span> <span class='id identifier rubyid_structure'>structure</span><span class='comma'>,</span> <span class='id identifier rubyid_charset'>charset</span><span class='comma'>,</span> <span class='id identifier rubyid_spec_version'>spec_version</span><span class='comma'>,</span> <span class='id identifier rubyid_data_decoder'>data_decoder</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="SpecVersionError.html" title="CloudEvents::SpecVersionError (class)">SpecVersionError</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unrecognized specversion: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_spec_version'>spec_version</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="encode_data-instance_method">
+  
+    #<strong>encode_data</strong>(spec_version: nil, data: UNSPECIFIED, content_type: nil, sort: false, **_other_kwargs)  &#x21d2; <tt>Hash</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Encode an event data object to a JSON formatted string.
+See <span class='object_link'><a href="Format.html#encode_data-instance_method" title="CloudEvents::Format#encode_data (method)">Format#encode_data</a></span> for a general description.</p>
+
+<p>Expects <code>:spec_version</code>, <code>:data</code> and <code>:content_type</code> arguments, and will
+decline the request unless all three are provided.
+The <code>:data</code> object can be any Ruby object that can be interpreted as
+JSON. Most Ruby objects will work, but normally it will be a JSON value
+type comprising hashes, arrays, strings, numbers, booleans, or nil.</p>
+
+<p>If decoding succeeded, returns a hash with the following keys:</p>
+
+<ul>
+<li><code>:content</code> (String) The serialized form of the data.</li>
+<li><code>:content_type</code> (<span class='object_link'><a href="ContentType.html" title="CloudEvents::ContentType (class)">ContentType</a></span>) The content type for the
+output.</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>data</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>UNSPECIFIED</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>A data object to encode.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>content_type</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="ContentType.html" title="CloudEvents::ContentType (class)">CloudEvents::ContentType</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The input content type</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>sort</span>
+      
+      
+        <span class='type'>(<tt>boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether to sort keys of the JSON output.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if accepting the request.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if declining the request.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/json_format.rb', line 158</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_encode_data'>encode_data</span> <span class='label'>spec_version:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>data:</span> <span class='const'>UNSPECIFIED</span><span class='comma'>,</span> <span class='label'>content_type:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>sort:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__other_kwargs'>_other_kwargs</span>
+  <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='id identifier rubyid_spec_version'>spec_version</span>
+  <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='id identifier rubyid_data'>data</span> <span class='op'>==</span> <span class='const'>UNSPECIFIED</span>
+  <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='id identifier rubyid_json_content_type?'>json_content_type?</span> <span class='id identifier rubyid_content_type'>content_type</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_spec_version'>spec_version</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^0\.3|1(\.|$)</span><span class='regexp_end'>/</span></span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="SpecVersionError.html" title="CloudEvents::SpecVersionError (class)">SpecVersionError</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unrecognized specversion: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_spec_version'>spec_version</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='id identifier rubyid_sort_keys'>sort_keys</span> <span class='id identifier rubyid_data'>data</span> <span class='kw'>if</span> <span class='id identifier rubyid_sort'>sort</span>
+  <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>JSON</span><span class='period'>.</span><span class='id identifier rubyid_dump'>dump</span> <span class='id identifier rubyid_data'>data</span>
+  <span class='lbrace'>{</span> <span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='label'>content_type:</span> <span class='id identifier rubyid_content_type'>content_type</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="encode_event-instance_method">
+  
+    #<strong>encode_event</strong>(event: nil, event_batch: nil, data_encoder: nil, sort: false, **_other_kwargs)  &#x21d2; <tt>Hash</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Encode an event or batch to a JSON string. This formatter should be able
+to handle any event.
+See <span class='object_link'><a href="Format.html#decode_event-instance_method" title="CloudEvents::Format#decode_event (method)">Format#decode_event</a></span> for a general description.</p>
+
+<p>Expects <em>either</em> the <code>:event</code> <em>or</em> the <code>:event_batch</code> argument, but not
+both, and will decline the request unless exactly one is provided.</p>
+
+<p>If encoding succeeded, returns a hash with the following keys:</p>
+
+<ul>
+<li><code>:content</code> (String) The serialized form of the event or batch.</li>
+<li><code>:content_type</code> (<span class='object_link'><a href="ContentType.html" title="CloudEvents::ContentType (class)">ContentType</a></span>) The content type for the
+output.</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>event</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>An event to encode.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>event_batch</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span>&gt;</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>An event batch to encode.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>data_encoder</span>
+      
+      
+        <span class='type'>(<tt>#<span class='object_link'><a href="#encode_data-instance_method" title="CloudEvents::JsonFormat#encode_data (method)">encode_data</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Optional data field encoder, used for
+non-JSON content types.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>sort</span>
+      
+      
+        <span class='type'>(<tt>boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether to sort keys of the JSON output.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if accepting the request.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if declining the request.</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FormatSyntaxError.html" title="CloudEvents::FormatSyntaxError (class)">CloudEvents::FormatSyntaxError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if the JSON could not be parsed</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/json_format.rb', line 81</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_encode_event'>encode_event</span> <span class='label'>event:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>event_batch:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>data_encoder:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>sort:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__other_kwargs'>_other_kwargs</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_event'>event</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_event_batch'>event_batch</span>
+    <span class='id identifier rubyid_structure'>structure</span> <span class='op'>=</span> <span class='id identifier rubyid_encode_hash_structure'>encode_hash_structure</span> <span class='id identifier rubyid_event'>event</span><span class='comma'>,</span> <span class='label'>data_encoder:</span> <span class='id identifier rubyid_data_encoder'>data_encoder</span>
+    <span class='id identifier rubyid_structure'>structure</span> <span class='op'>=</span> <span class='id identifier rubyid_sort_keys'>sort_keys</span> <span class='id identifier rubyid_structure'>structure</span> <span class='kw'>if</span> <span class='id identifier rubyid_sort'>sort</span>
+    <span class='id identifier rubyid_subtype'>subtype</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>cloudevents</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_event_batch'>event_batch</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_event'>event</span>
+    <span class='id identifier rubyid_structure'>structure</span> <span class='op'>=</span> <span class='id identifier rubyid_event_batch'>event_batch</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_elem'>elem</span><span class='op'>|</span>
+      <span class='id identifier rubyid_structure_elem'>structure_elem</span> <span class='op'>=</span> <span class='id identifier rubyid_encode_hash_structure'>encode_hash_structure</span> <span class='id identifier rubyid_elem'>elem</span><span class='comma'>,</span> <span class='label'>data_encoder:</span> <span class='id identifier rubyid_data_encoder'>data_encoder</span>
+      <span class='id identifier rubyid_sort'>sort</span> <span class='op'>?</span> <span class='id identifier rubyid_sort_keys'>sort_keys</span><span class='lparen'>(</span><span class='id identifier rubyid_structure_elem'>structure_elem</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='id identifier rubyid_structure_elem'>structure_elem</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_subtype'>subtype</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>cloudevents-batch</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>else</span>
+    <span class='kw'>return</span> <span class='kw'>nil</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>JSON</span><span class='period'>.</span><span class='id identifier rubyid_dump'>dump</span> <span class='id identifier rubyid_structure'>structure</span>
+  <span class='id identifier rubyid_content_type'>content_type</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="ContentType.html" title="CloudEvents::ContentType (class)">ContentType</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="ContentType.html#initialize-instance_method" title="CloudEvents::ContentType#initialize (method)">new</a></span></span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>application/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_subtype'>subtype</span><span class='embexpr_end'>}</span><span class='tstring_content'>+json; charset=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_charset_of'>charset_of</span> <span class='id identifier rubyid_content'>content</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='lbrace'>{</span> <span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='label'>content_type:</span> <span class='id identifier rubyid_content_type'>content_type</span> <span class='rbrace'>}</span>
+<span class='kw'>rescue</span> <span class='op'>::</span><span class='const'>JSON</span><span class='op'>::</span><span class='const'>JSONError</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="FormatSyntaxError.html" title="CloudEvents::FormatSyntaxError (class)">FormatSyntaxError</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>JSON syntax error</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="encode_hash_structure-instance_method">
+  
+    #<strong>encode_hash_structure</strong>(event, data_encoder: nil)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Encode a single event to a hash data structure with keys and types
+conforming to the JSON envelope.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>event</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>An input event.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>data_encoder</span>
+      
+      
+        <span class='type'>(<tt>#<span class='object_link'><a href="#encode_data-instance_method" title="CloudEvents::JsonFormat#encode_data (method)">encode_data</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Optional data field encoder, used for
+non-JSON content types.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The hash structure.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/json_format.rb', line 202</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_encode_hash_structure'>encode_hash_structure</span> <span class='id identifier rubyid_event'>event</span><span class='comma'>,</span> <span class='label'>data_encoder:</span> <span class='kw'>nil</span>
+  <span class='kw'>case</span> <span class='id identifier rubyid_event'>event</span>
+  <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">Event</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Event/V0.html" title="CloudEvents::Event::V0 (class)">V0</a></span></span>
+    <span class='id identifier rubyid_encode_hash_structure_v0'>encode_hash_structure_v0</span> <span class='id identifier rubyid_event'>event</span>
+  <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">Event</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Event/V1.html" title="CloudEvents::Event::V1 (class)">V1</a></span></span>
+    <span class='id identifier rubyid_encode_hash_structure_v1'>encode_hash_structure_v1</span> <span class='id identifier rubyid_event'>event</span><span class='comma'>,</span> <span class='id identifier rubyid_data_encoder'>data_encoder</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="SpecVersionError.html" title="CloudEvents::SpecVersionError (class)">SpecVersionError</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unrecognized event type: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Mon Aug 23 04:03:50 2021 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.26 (ruby-2.7.4).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: CloudEvents::Event::V0
+  
+    &mdash; CloudEvents
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "CloudEvents::Event::V0";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (V)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../CloudEvents.html" title="CloudEvents (module)">CloudEvents</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Event.html" title="CloudEvents::Event (module)">Event</a></span></span>
+     &raquo; 
+    <span class="title">V0</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: CloudEvents::Event::V0
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">CloudEvents::Event::V0</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="../Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/cloud_events/event/v0.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>A CloudEvents V0 data type.</p>
+
+<p>This object represents a complete CloudEvent, including the event data
+and context attributes. It supports the standard required and optional
+attributes defined in CloudEvents V0.3, and arbitrary extension
+attributes. All attribute values can be obtained (in their string form)
+via the <span class='object_link'><a href="#[]-instance_method" title="CloudEvents::Event::V0#[] (method)">#[]</a></span> method. Additionally, standard attributes have
+their own accessor methods that may return typed objects (such as
+<code>DateTime</code> for the <code>time</code> attribute).</p>
+
+<p>This object is immutable, and Ractor-shareable on Ruby 3. The data and
+attribute values can be retrieved but not modified. To obtain an event
+with modifications, use the <span class='object_link'><a href="#with-instance_method" title="CloudEvents::Event::V0#with (method)">#with</a></span> method to create a copy with the
+desired changes.</p>
+
+<p>See <a href="https://github.com/cloudevents/spec/blob/v0.3/spec.md">https://github.com/cloudevents/spec/blob/v0.3/spec.md</a> for
+descriptions of the standard attributes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#data-instance_method" title="#data (instance method)">#<strong>data</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The event-specific data, or <code>nil</code> if there is no data.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#data_content_encoding-instance_method" title="#data_content_encoding (instance method)">#<strong>data_content_encoding</strong>  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+      (also: #datacontentencoding)
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The optional <code>datacontentencoding</code> field as a <code>String</code> object, or <code>nil</code> if the field is absent.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#data_content_type-instance_method" title="#data_content_type (instance method)">#<strong>data_content_type</strong>  &#x21d2; CloudEvents::ContentType<sup>?</sup> </a>
+    
+
+    
+      (also: #datacontenttype)
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The optional <code>datacontenttype</code> field as a <span class='object_link'><a href="../ContentType.html" title="CloudEvents::ContentType (class)">ContentType</a></span> object, or <code>nil</code> if the field is absent.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#id-instance_method" title="#id (instance method)">#<strong>id</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The <code>id</code> field.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#schema_url-instance_method" title="#schema_url (instance method)">#<strong>schema_url</strong>  &#x21d2; URI<sup>?</sup> </a>
+    
+
+    
+      (also: #schemaurl)
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The optional <code>schemaurl</code> field as a <code>URI</code> object, or <code>nil</code> if the field is absent.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#source-instance_method" title="#source (instance method)">#<strong>source</strong>  &#x21d2; URI </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The <code>source</code> field as a <code>URI</code> object.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#spec_version-instance_method" title="#spec_version (instance method)">#<strong>spec_version</strong>  &#x21d2; String </a>
+    
+
+    
+      (also: #specversion)
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The <code>specversion</code> field.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#subject-instance_method" title="#subject (instance method)">#<strong>subject</strong>  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The optional <code>subject</code> field, or <code>nil</code> if the field is absent.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#time-instance_method" title="#time (instance method)">#<strong>time</strong>  &#x21d2; DateTime<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The optional <code>time</code> field as a <code>DateTime</code> object, or <code>nil</code> if the field is absent.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#type-instance_method" title="#type (instance method)">#<strong>type</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The <code>type</code> field.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#[]-instance_method" title="#[] (instance method)">#<strong>[]</strong>(key)  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return the value of the given named attribute.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(set_attributes: nil, attributes: nil, **args)  &#x21d2; V0 </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Create a new cloud event object with the given data and attributes.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_h-instance_method" title="#to_h (instance method)">#<strong>to_h</strong>  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return a hash representation of this event.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#with-instance_method" title="#with (instance method)">#<strong>with</strong>(**changes)  &#x21d2; FunctionFramework::CloudEvents::Event </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Create and return a copy of this event with the given changes.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Event.html#create-class_method" title="CloudEvents::Event.create (method)">create</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(set_attributes: nil, attributes: nil, **args)  &#x21d2; <tt><span class='object_link'><a href="" title="CloudEvents::Event::V0 (class)">V0</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Create a new cloud event object with the given data and attributes.</p>
+
+<p>Event attributes may be presented as keyword arguments, or as a Hash
+passed in via the special <code>:set_attributes</code> keyword argument (but not
+both). The <code>:set_attributes</code> keyword argument is useful for passing in
+attributes whose keys are strings rather than symbols, which some
+versions of Ruby will not accept as keyword arguments.</p>
+
+<p>The following standard attributes are supported and exposed as
+attribute methods on the object.</p>
+
+<ul>
+<li> <strong>:spec_version</strong> (or <strong>:specversion</strong>) [<code>String</code>] - <em>required</em> -
+The CloudEvents spec version (i.e. the <code>specversion</code> field.)</li>
+<li> <strong>:id</strong> [<code>String</code>] - <em>required</em> - The event <code>id</code> field.</li>
+<li> <strong>:source</strong> [<code>String</code>, <code>URI</code>] - <em>required</em> - The event <code>source</code>
+field.</li>
+<li> <strong>:type</strong> [<code>String</code>] - <em>required</em> - The event <code>type</code> field.</li>
+<li> <strong>:data</strong> [<code>Object</code>] - <em>optional</em> - The data associated with the
+event (i.e. the <code>data</code> field).</li>
+<li> <strong>:data_content_encoding</strong> (or <strong>:datacontentencoding</strong>)
+[<code>String</code>] - <em>optional</em> - The content-encoding for the data (i.e.
+the <code>datacontentencoding</code> field.)</li>
+<li> <strong>:data_content_type</strong> (or <strong>:datacontenttype</strong>) [<code>String</code>,
+<span class='object_link'><a href="../ContentType.html" title="CloudEvents::ContentType (class)">ContentType</a></span>] - <em>optional</em> - The content-type for the data, if
+the data is a string (i.e. the event <code>datacontenttype</code> field.)</li>
+<li> <strong>:schema_url</strong> (or <strong>:schemaurl</strong>) [<code>String</code>, <code>URI</code>] -
+<em>optional</em> - The event <code>schemaurl</code> field.</li>
+<li> <strong>:subject</strong> [<code>String</code>] - <em>optional</em> - The event <code>subject</code> field.</li>
+<li> <strong>:time</strong> [<code>String</code>, <code>DateTime</code>, <code>Time</code>] - <em>optional</em> - The
+event <code>time</code> field.</li>
+</ul>
+
+<p>Any additional attributes are assumed to be extension attributes.
+They are not available as separate methods, but can be accessed via
+the <span class='object_link'><a href="V1.html#[]-instance_method" title="CloudEvents::Event::V1#[] (method)">CloudEvents::Event::V1#[]</a></span> operator.</p>
+
+<p>Note that attribute objects passed in may get deep-frozen if they are
+used in the final event object. This is particularly important for the
+<code>:data</code> field, for example if you pass a structured hash. If this is an
+issue, make a deep copy of objects before passing to this constructor.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>set_attributes</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The data and attributes, as a hash.
+(Also available using the deprecated keyword <code>attributes</code>.)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>args</span>
+      
+      
+        <span class='type'>(<tt>keywords</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The data and attributes, as keyword arguments.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 78</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span> <span class='label'>set_attributes:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>attributes:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_args'>args</span>
+  <span class='id identifier rubyid_interpreter'>interpreter</span> <span class='op'>=</span> <span class='const'>FieldInterpreter</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='id identifier rubyid_set_attributes'>set_attributes</span> <span class='op'>||</span> <span class='id identifier rubyid_attributes'>attributes</span> <span class='op'>||</span> <span class='id identifier rubyid_args'>args</span>
+  <span class='ivar'>@spec_version</span> <span class='op'>=</span> <span class='id identifier rubyid_interpreter'>interpreter</span><span class='period'>.</span><span class='id identifier rubyid_spec_version'>spec_version</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>specversion</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>spec_version</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>accept:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^0\.3$</span><span class='regexp_end'>/</span></span>
+  <span class='ivar'>@id</span> <span class='op'>=</span> <span class='id identifier rubyid_interpreter'>interpreter</span><span class='period'>.</span><span class='id identifier rubyid_string'>string</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>required:</span> <span class='kw'>true</span>
+  <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_interpreter'>interpreter</span><span class='period'>.</span><span class='id identifier rubyid_uri'>uri</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>source</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>required:</span> <span class='kw'>true</span>
+  <span class='ivar'>@type</span> <span class='op'>=</span> <span class='id identifier rubyid_interpreter'>interpreter</span><span class='period'>.</span><span class='id identifier rubyid_string'>string</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>type</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>required:</span> <span class='kw'>true</span>
+  <span class='ivar'>@data</span> <span class='op'>=</span> <span class='id identifier rubyid_interpreter'>interpreter</span><span class='period'>.</span><span class='id identifier rubyid_data_object'>data_object</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>data</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+  <span class='ivar'>@data</span> <span class='op'>=</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='ivar'>@data</span> <span class='op'>==</span> <span class='const'>FieldInterpreter</span><span class='op'>::</span><span class='const'>UNDEFINED</span>
+  <span class='ivar'>@data_content_encoding</span> <span class='op'>=</span> <span class='id identifier rubyid_interpreter'>interpreter</span><span class='period'>.</span><span class='id identifier rubyid_string'>string</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>datacontentencoding</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>data_content_encoding</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+  <span class='ivar'>@data_content_type</span> <span class='op'>=</span> <span class='id identifier rubyid_interpreter'>interpreter</span><span class='period'>.</span><span class='id identifier rubyid_content_type'>content_type</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>datacontenttype</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>data_content_type</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+  <span class='ivar'>@schema_url</span> <span class='op'>=</span> <span class='id identifier rubyid_interpreter'>interpreter</span><span class='period'>.</span><span class='id identifier rubyid_uri'>uri</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>schemaurl</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>schema_url</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+  <span class='ivar'>@subject</span> <span class='op'>=</span> <span class='id identifier rubyid_interpreter'>interpreter</span><span class='period'>.</span><span class='id identifier rubyid_string'>string</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>subject</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+  <span class='ivar'>@time</span> <span class='op'>=</span> <span class='id identifier rubyid_interpreter'>interpreter</span><span class='period'>.</span><span class='id identifier rubyid_rfc3339_date_time'>rfc3339_date_time</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>time</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+  <span class='ivar'>@attributes</span> <span class='op'>=</span> <span class='id identifier rubyid_interpreter'>interpreter</span><span class='period'>.</span><span class='id identifier rubyid_finish_attributes'>finish_attributes</span>
+  <span class='id identifier rubyid_freeze'>freeze</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="data-instance_method">
+  
+    #<strong>data</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The event-specific data, or <code>nil</code> if there is no data.</p>
+
+<p>Data may be one of the following types:</p>
+
+<ul>
+<li> Binary data, represented by a <code>String</code> using the <code>ASCII-8BIT</code>
+encoding.</li>
+<li> A string in some other encoding such as <code>UTF-8</code> or <code>US-ASCII</code>.</li>
+<li> Any JSON data type, such as a Boolean, Integer, Array, Hash, or
+<code>nil</code>.</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+183
+184
+185</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 183</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_data'>data</span>
+  <span class='ivar'>@data</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="data_content_encoding-instance_method">
+  
+    #<strong>data_content_encoding</strong>  &#x21d2; <tt>String</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='datacontentencoding-instance_method'>datacontentencoding</span></span>
+    </span>
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The optional <code>datacontentencoding</code> field as a <code>String</code> object, or
+<code>nil</code> if the field is absent.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+191
+192
+193</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 191</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_data_content_encoding'>data_content_encoding</span>
+  <span class='ivar'>@data_content_encoding</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="data_content_type-instance_method">
+  
+    #<strong>data_content_type</strong>  &#x21d2; <tt><span class='object_link'><a href="../ContentType.html" title="CloudEvents::ContentType (class)">CloudEvents::ContentType</a></span></tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='datacontenttype-instance_method'>datacontenttype</span></span>
+    </span>
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The optional <code>datacontenttype</code> field as a <span class='object_link'><a href="../ContentType.html" title="CloudEvents::ContentType (class)">ContentType</a></span>
+object, or <code>nil</code> if the field is absent.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../ContentType.html" title="CloudEvents::ContentType (class)">CloudEvents::ContentType</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+200
+201
+202</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 200</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_data_content_type'>data_content_type</span>
+  <span class='ivar'>@data_content_type</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="id-instance_method">
+  
+    #<strong>id</strong>  &#x21d2; <tt>String</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The <code>id</code> field. Required.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+147
+148
+149</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 147</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_id'>id</span>
+  <span class='ivar'>@id</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="schema_url-instance_method">
+  
+    #<strong>schema_url</strong>  &#x21d2; <tt>URI</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='schemaurl-instance_method'>schemaurl</span></span>
+    </span>
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The optional <code>schemaurl</code> field as a <code>URI</code> object, or <code>nil</code> if the
+field is absent.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>URI</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+209
+210
+211</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 209</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_schema_url'>schema_url</span>
+  <span class='ivar'>@schema_url</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="source-instance_method">
+  
+    #<strong>source</strong>  &#x21d2; <tt>URI</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The <code>source</code> field as a <code>URI</code> object. Required.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>URI</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+154
+155
+156</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 154</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_source'>source</span>
+  <span class='ivar'>@source</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="spec_version-instance_method">
+  
+    #<strong>spec_version</strong>  &#x21d2; <tt>String</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='specversion-instance_method'>specversion</span></span>
+    </span>
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The <code>specversion</code> field. Required.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+168
+169
+170</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 168</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_spec_version'>spec_version</span>
+  <span class='ivar'>@spec_version</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="subject-instance_method">
+  
+    #<strong>subject</strong>  &#x21d2; <tt>String</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The optional <code>subject</code> field, or <code>nil</code> if the field is absent.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+217
+218
+219</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 217</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_subject'>subject</span>
+  <span class='ivar'>@subject</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="time-instance_method">
+  
+    #<strong>time</strong>  &#x21d2; <tt>DateTime</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The optional <code>time</code> field as a <code>DateTime</code> object, or <code>nil</code> if the
+field is absent.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>DateTime</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+225
+226
+227</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 225</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_time'>time</span>
+  <span class='ivar'>@time</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="type-instance_method">
+  
+    #<strong>type</strong>  &#x21d2; <tt>String</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The <code>type</code> field. Required.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+161
+162
+163</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 161</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_type'>type</span>
+  <span class='ivar'>@type</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="[]-instance_method">
+  
+    #<strong>[]</strong>(key)  &#x21d2; <tt>String</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the value of the given named attribute. Both standard and
+extension attributes are supported.</p>
+
+<p>Attribute names must be given as defined in the standard CloudEvents
+specification. For example <code>specversion</code> rather than <code>spec_version</code>.</p>
+
+<p>Results are given in their &quot;raw&quot; form, generally a string. This may
+be different from the Ruby object returned from corresponding
+attribute methods. For example:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_event'>event</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>time</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>     <span class='comment'># =&gt; String rfc3339 representation
+</span><span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span>        <span class='comment'># =&gt; DateTime object
+</span></code></pre>
+
+<p>Results are also always frozen and cannot be modified in place.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>key</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The attribute name.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+128
+129
+130</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 128</span>
+
+<span class='kw'>def</span> <span class='op'>[]</span> <span class='id identifier rubyid_key'>key</span>
+  <span class='ivar'>@attributes</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_h-instance_method">
+  
+    #<strong>to_h</strong>  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return a hash representation of this event. The returned hash is an
+unfrozen deep copy. Modifications do not affect the original event.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+138
+139
+140</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 138</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_h'>to_h</span>
+  <span class='const'>Utils</span><span class='period'>.</span><span class='id identifier rubyid_deep_dup'>deep_dup</span> <span class='ivar'>@attributes</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="with-instance_method">
+  
+    #<strong>with</strong>(**changes)  &#x21d2; <tt>FunctionFramework::CloudEvents::Event</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Create and return a copy of this event with the given changes. See
+the constructor for the parameters that can be passed. In general,
+you can pass a new value for any attribute, or pass <code>nil</code> to remove
+an optional attribute.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>changes</span>
+      
+      
+        <span class='type'>(<tt>keywords</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>See <span class='object_link'><a href="#initialize-instance_method" title="CloudEvents::Event::V0#initialize (method)">#initialize</a></span> for a list of arguments.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>FunctionFramework::CloudEvents::Event</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+104
+105
+106
+107</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/event/v0.rb', line 104</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_with'>with</span> <span class='op'>**</span><span class='id identifier rubyid_changes'>changes</span>
+  <span class='id identifier rubyid_attributes'>attributes</span> <span class='op'>=</span> <span class='ivar'>@attributes</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span> <span class='id identifier rubyid_changes'>changes</span>
+  <span class='const'><span class='object_link'><a href="" title="CloudEvents::Event::V0 (class)">V0</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='label'>set_attributes:</span> <span class='id identifier rubyid_attributes'>attributes</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Mon Aug 23 04:03:50 2021 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.26 (ruby-2.7.4).
+</div>
+
+    </div>
+  </body>
+</html>
