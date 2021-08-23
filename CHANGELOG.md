@@ -1,5 +1,16 @@
 # Changelog
 
+### v0.6.0 / 2021-08-23
+
+This update further clarifies and cleans up the encoding behavior of event payloads. In particular, the event object now includes explicitly encoded data in the new `data_encoded` field, and provides information on whether the existing `data` field contains an encoded or decoded form of the payload.
+
+* Added `data_encoded`, `data_decoded?` and `data?` methods to `CloudEvents::Event::V1`, added `:data_encoded` as an input attribute, and clarified the encoding semantics of each field.
+* Changed `:attributes` keyword argument in event constructors to `:set_attributes`, to avoid any possible collision with a real extension attribute name. (The old argument name is deprecated and will be removed in 1.0.)
+* Fixed various inconsistencies in the data encoding behavior of `JsonFormat` and `HttpBinding`.
+* Support passing a data content encoder/decoder into `JsonFormat#encode_event` and `JsonFormat#decode_event`.
+* Provided `TextFormat` to handle media types with trivial encoding.
+* Provided `Format::Multi` to handle checking a series of encoders/decoders.
+
 ### v0.5.1 / 2021-06-28
 
 * ADDED: Add HttpBinding#probable_event? 
