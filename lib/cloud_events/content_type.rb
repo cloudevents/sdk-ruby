@@ -32,7 +32,7 @@ module CloudEvents
       @params = []
       @charset = default_charset || "us-ascii"
       @error_message = nil
-      parse consume_comments string.strip
+      parse consume_comments @string.strip
       @canonical_string = "#{@media_type}/#{@subtype}" +
                           @params.map { |k, v| "; #{k}=#{maybe_quote v}" }.join
       full_freeze
