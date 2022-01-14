@@ -358,6 +358,28 @@ describe CloudEvents::HttpBinding do
         http_binding.decode_event env
       end
     end
+
+    it "raises NotCloudEventError when the method is GET" do
+      env = {
+        "REQUEST_METHOD" => "GET",
+        "rack.input"   => StringIO.new(my_json_struct_encoded),
+        "CONTENT_TYPE" => "application/cloudevents+json"
+      }
+      assert_raises CloudEvents::NotCloudEventError do
+        http_binding.decode_event env
+      end
+    end
+
+    it "raises NotCloudEventError when the method is HEAD" do
+      env = {
+        "REQUEST_METHOD" => "HEAD",
+        "rack.input"   => StringIO.new(my_json_struct_encoded),
+        "CONTENT_TYPE" => "application/cloudevents+json"
+      }
+      assert_raises CloudEvents::NotCloudEventError do
+        http_binding.decode_event env
+      end
+    end
   end
 
   describe "encode_event" do
@@ -465,9 +487,25 @@ describe CloudEvents::HttpBinding do
       assert http_binding.probable_event? env
     end
 
-    it "detects when something is unlikely an event" do
+    it "detects a content type that is unlikely an event" do
       env = {
         "CONTENT_TYPE" => "application/json"
+      }
+      refute http_binding.probable_event? env
+    end
+
+    it "detects that an HTTP GET unlikely an event" do
+      env = {
+        "REQUEST_METHOD" => "GET",
+        "HTTP_CE_SPECVERSION" => "1.0"
+      }
+      refute http_binding.probable_event? env
+    end
+
+    it "detects that an HTTP HEAD unlikely an event" do
+      env = {
+        "REQUEST_METHOD" => "HEAD",
+        "HTTP_CE_SPECVERSION" => "1.0"
       }
       refute http_binding.probable_event? env
     end
