@@ -20,6 +20,9 @@ module CloudEvents
     #
     JSON_FORMAT = "json"
 
+    # @private
+    ILLEGAL_METHODS = ["GET", "HEAD"].freeze
+
     ##
     # Returns a default HTTP binding, including support for JSON format.
     #
@@ -134,6 +137,7 @@ module CloudEvents
     # @return [boolean] Whether the request is likely a CloudEvent.
     #
     def probable_event? env
+      return false if ILLEGAL_METHODS.include? env["REQUEST_METHOD"]
       return true if env["HTTP_CE_SPECVERSION"]
       content_type = ContentType.new env["CONTENT_TYPE"].to_s
       content_type.media_type == "application" &&
@@ -163,6 +167,8 @@ module CloudEvents
     #     from the request.
     #
     def decode_event env, allow_opaque: false, **format_args
+      request_method = env["REQUEST_METHOD"]
+      raise NotCloudEventError, "Request method is #{request_method}" if ILLEGAL_METHODS.include? request_method
       content_type_string = env["CONTENT_TYPE"]
       content_type = ContentType.new content_type_string if content_type_string
       content = read_with_charset env["rack.input"], content_type&.charset
