@@ -1,5 +1,10 @@
 # Changelog
 
+### v0.7.0 / 2022-01-14
+
+* ADDED: Detect illegal HTTP CloudEvents with GET or HEAD as the method
+* FIXED: Fix NoMethodError when passing nil content to ContentType
+
 ### v0.6.0 / 2021-08-23
 
 This update further clarifies and cleans up the encoding behavior of event payloads. In particular, the event object now includes explicitly encoded data in the new `data_encoded` field, and provides information on whether the existing `data` field contains an encoded or decoded form of the payload.
