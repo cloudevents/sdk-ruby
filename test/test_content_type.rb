@@ -61,6 +61,15 @@ describe CloudEvents::ContentType do
     assert Ractor.shareable? content_type if defined? Ractor
   end
 
+  it "handles nil content" do
+    content_type = CloudEvents::ContentType.new nil
+    assert_equal "text", content_type.media_type
+    assert_equal "plain", content_type.subtype
+    assert_equal "plain", content_type.subtype_base
+    assert_nil content_type.subtype_format
+    assert Ractor.shareable? content_type if defined? Ractor
+  end
+
   it "remembers the input string" do
     header = "Application/CloudEvents+JSON; charset=utf-8"
     content_type = CloudEvents::ContentType.new header
