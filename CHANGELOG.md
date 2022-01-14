@@ -1,5 +1,11 @@
 # Changelog
 
+### v0.7.0 / 2022-01-14
+
+* HttpBinding#probable_event? returns false if the request method is GET or HEAD.
+* HttpBinding#decode_event raises NotCloudEventError if the request method is GET or HEAD. 
+* Fixed a NoMethodError if nil content was passed to the ContentType constructor.
+
 ### v0.6.0 / 2021-08-23
 
 This update further clarifies and cleans up the encoding behavior of event payloads. In particular, the event object now includes explicitly encoded data in the new `data_encoded` field, and provides information on whether the existing `data` field contains an encoded or decoded form of the payload.
