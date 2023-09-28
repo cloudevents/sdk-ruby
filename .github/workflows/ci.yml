@@ -23,17 +23,19 @@ jobs:
             ruby: "2.7"
           - os: ubuntu-latest
             ruby: "3.0"
-            tool: ci
           - os: ubuntu-latest
             ruby: "3.1"
+          - os: ubuntu-latest
+            ruby: "3.2"
+            tool: ci
           - os: ubuntu-latest
             ruby: jruby
           - os: ubuntu-latest
             ruby: truffleruby
           - os: macos-latest
-            ruby: "3.0"
+            ruby: "3.2"
           - os: windows-latest
-            ruby: "3.0"
+            ruby: "3.2"
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
@@ -48,5 +50,7 @@ jobs:
         run: "bundle install && gem install --no-document toys"
       - name: Run ${{ matrix.tool || 'test' }}
         shell: bash
+        env:
+          MT_COMPAT: "true"
         run: |
           toys "${{ matrix.tool || 'test' }}" < /dev/null
