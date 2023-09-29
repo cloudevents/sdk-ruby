@@ -184,31 +184,6 @@ few things to keep in mind.
  *  **Make sure CI passes.** Invoke `toys ci` to run the tests locally before
     opening a pull request. This will include code style checks.
 
-### Releasing
-
-Releases can be performed only by users with write access to the repository.
-
-To perform a release:
-
- 1. Go to the GitHub Actions tab, and launch the "Request Release" workflow.
-    You can leave the input field blank.
-
- 2. The workflow will analyze the commit messages since the last release, and
-    open a pull request with a new version and a changelog entry. You can
-    optionally edit this pull request to modify the changelog or change the
-    version released.
-
- 3. Merge the pull request (keeping the `release: pending` label set.) Once the
-    CI tests have run successfully, a job will run automatically to perform the
-    release, including tagging the commit in git, building and releasing a gem,
-    and building and pushing documentation.
-
-These tasks can also be performed manually by running the appropriate scripts
-locally. See `toys release request --help` and `toys release perform --help`
-for more information.
-
-If a release fails, you may need to delete the release tag before retrying.
-
 ### For more information
 
  *  Library documentation: https://cloudevents.github.io/sdk-ruby
@@ -243,18 +218,9 @@ for how PR reviews and approval, and our
 [Code of Conduct](https://github.com/cloudevents/spec/blob/master/community/GOVERNANCE.md#additional-information)
 information.
 
-## Licensing
+## Additional SDK Resources
 
-    Copyright 2020 Google LLC and the CloudEvents Ruby SDK Contributors
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this software except in compliance with the License.
-    You may obtain a copy of the License at
-
-        https://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+- [List of current active maintainers](MAINTAINERS.md)
+- [How to contribute to the project](CONTRIBUTING.md)
+- [SDK's License](LICENSE)
+- [SDK's Release process](RELEASING.md)
