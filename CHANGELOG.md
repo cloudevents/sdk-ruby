@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.7.1 / 2023-10-04
+
+* DOCS: Governance docs per CE PR 1226
+
 ### v0.7.0 / 2022-01-14
 
 * HttpBinding#probable_event? returns false if the request method is GET or HEAD.
