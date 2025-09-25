@@ -9,6 +9,11 @@ Given "HTTP Protocol Binding is supported" do
 end
 
 Given "an HTTP request" do |str|
+  # WEBrick parsing wants the lines delimited by \r\n, but the input
+  # content-length assumes \n within the body.
+  parts = str.split "\n\n"
+  parts[0].gsub! "\n", "\r\n"
+  str = "#{parts[0]}\r\n\r\n#{parts[1]}"
   webrick_request = WEBrick::HTTPRequest.new WEBrick::Config::HTTP
   webrick_request.parse StringIO.new str
   @rack_request = {}

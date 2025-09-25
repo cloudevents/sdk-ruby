@@ -30,8 +30,8 @@ module CloudEvents
             value.freeze
             [value, value]
           else
-            raise AttributeError, "Illegal type for #{keys.first}:" \
-                                  " String expected but #{value.class} found"
+            raise AttributeError, "Illegal type for #{keys.first}: " \
+                                  "String expected but #{value.class} found"
           end
         end
       end
@@ -49,8 +49,8 @@ module CloudEvents
           when ::URI::Generic
             [Utils.deep_freeze(value), value.to_s.freeze]
           else
-            raise AttributeError, "Illegal type for #{keys.first}:" \
-                                  " String or URI expected but #{value.class} found"
+            raise AttributeError, "Illegal type for #{keys.first}: " \
+                                  "String or URI expected but #{value.class} found"
           end
         end
       end
@@ -70,8 +70,8 @@ module CloudEvents
             value = value.to_datetime
             [Utils.deep_freeze(value), value.rfc3339.freeze]
           else
-            raise AttributeError, "Illegal type for #{keys.first}:" \
-                                  " String, Time, or DateTime expected but #{value.class} found"
+            raise AttributeError, "Illegal type for #{keys.first}: " \
+                                  "String, Time, or DateTime expected but #{value.class} found"
           end
         end
       end
@@ -85,8 +85,8 @@ module CloudEvents
           when ContentType
             [value, value.to_s]
           else
-            raise AttributeError, "Illegal type for #{keys.first}:" \
-                                  " String, or ContentType expected but #{value.class} found"
+            raise AttributeError, "Illegal type for #{keys.first}: " \
+                                  "String, or ContentType expected but #{value.class} found"
           end
         end
       end
@@ -99,8 +99,8 @@ module CloudEvents
             value.freeze
             [value, value]
           else
-            raise AttributeError, "Illegal type for #{keys.first}:" \
-                                  " String expected but #{value.class} found"
+            raise AttributeError, "Illegal type for #{keys.first}: " \
+                                  "String expected but #{value.class} found"
           end
         end
       end
@@ -121,7 +121,7 @@ module CloudEvents
         keys.each do |key|
           key_present = @args.key? key
           val = @args.delete key
-          value = val if allow_nil && key_present || !allow_nil && !val.nil?
+          value = val if (allow_nil && key_present) || (!allow_nil && !val.nil?)
         end
         if value == UNDEFINED
           raise AttributeError, "The #{keys.first} field is required" if required

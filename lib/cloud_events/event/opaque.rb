@@ -73,7 +73,7 @@ module CloudEvents
 
       ## @private
       def hash
-        @content.hash ^ @content_type.hash ^ @batch.hash
+        [@content, @content_type, @batch].hash
       end
     end
   end

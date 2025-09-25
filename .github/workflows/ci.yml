@@ -16,26 +16,38 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            ruby: "2.5"
-          - os: ubuntu-latest
-            ruby: "2.6"
-          - os: ubuntu-latest
             ruby: "2.7"
+            flags: "--test --cucumber"
           - os: ubuntu-latest
             ruby: "3.0"
+            flags: "--test --cucumber"
           - os: ubuntu-latest
             ruby: "3.1"
+            flags: "--test --cucumber"
           - os: ubuntu-latest
             ruby: "3.2"
-            tool: ci
+            flags: "--test --cucumber"
+          - os: ubuntu-latest
+            ruby: "3.3"
+            flags: "--test --cucumber"
+          - os: ubuntu-latest
+            ruby: "3.4"
+            flags: "--test --cucumber"
+          - os: ubuntu-latest
+            ruby: "3.4"
+            flags: "--rubocop --yard --build"
           - os: ubuntu-latest
             ruby: jruby
+            flags: "--test --cucumber"
           - os: ubuntu-latest
             ruby: truffleruby
+            flags: "--test --cucumber"
           - os: macos-latest
-            ruby: "3.2"
+            ruby: "3.4"
+            flags: "--test --cucumber"
           - os: windows-latest
-            ruby: "3.2"
+            ruby: "3.4"
+            flags: "--test --cucumber"
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
@@ -44,13 +56,11 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
       - name: Install dependencies
         shell: bash
         run: "bundle install && gem install --no-document toys"
-      - name: Run ${{ matrix.tool || 'test' }}
+      - name: Run ${{ matrix.flags }}
         shell: bash
-        env:
-          MT_COMPAT: "true"
         run: |
-          toys "${{ matrix.tool || 'test' }}" < /dev/null
+          toys ci --only ${{ matrix.flags }} < /dev/null

@@ -46,10 +46,10 @@ module CloudEvents
       end
       @event_encoders = {}
       @data_decoders = Format::Multi.new do |result|
-        result&.key?(:data) && result&.key?(:content_type) ? result : nil
+        result&.key?(:data) && result.key?(:content_type) ? result : nil
       end
       @data_encoders = Format::Multi.new do |result|
-        result&.key?(:content) && result&.key?(:content_type) ? result : nil
+        result&.key?(:content) && result.key?(:content_type) ? result : nil
       end
       text_format = TextFormat.new
       @data_decoders.formats.replace [text_format, DefaultDataFormat]
@@ -110,7 +110,7 @@ module CloudEvents
       @event_decoders.formats.unshift formatter if decode_event
       if encode_event
         encoders = @event_encoders[encode_event] ||= Format::Multi.new do |result|
-          result&.key?(:content) && result&.key?(:content_type) ? result : nil
+          result&.key?(:content) && result.key?(:content_type) ? result : nil
         end
         encoders.formats.unshift formatter
       end
@@ -325,7 +325,7 @@ module CloudEvents
     #
     def percent_decode str
       str = str.gsub(/"((?:[^"\\]|\\.)*)"/) { ::Regexp.last_match(1).gsub(/\\(.)/, '\1') }
-      decoded_str = str.gsub(/%[0-9a-fA-F]{2}/) { |m| [m[1..-1].to_i(16)].pack "C" }
+      decoded_str = str.gsub(/%[0-9a-fA-F]{2}/) { |m| [m[1..].to_i(16)].pack "C" }
       decoded_str.force_encoding ::Encoding::UTF_8
     end
 

@@ -67,7 +67,7 @@ module CloudEvents
 
     def text_content_type? content_type
       content_type&.media_type == "text" ||
-        content_type&.media_type == "application" && content_type&.subtype == "octet-stream"
+        (content_type&.media_type == "application" && content_type&.subtype == "octet-stream")
     end
   end
 end

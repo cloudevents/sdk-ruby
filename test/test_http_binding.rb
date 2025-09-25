@@ -6,7 +6,6 @@ require "date"
 require "json"
 require "stringio"
 require "uri"
-require "rack/lint"
 
 describe CloudEvents::HttpBinding do
   let(:http_binding) { CloudEvents::HttpBinding.default }
@@ -261,7 +260,7 @@ describe CloudEvents::HttpBinding do
     end
 
     it "decodes a binary mode rack env using an InputWrapper" do
-      my_simple_binary_mode["rack.input"] = Rack::Lint::InputWrapper.new StringIO.new my_simple_data
+      my_simple_binary_mode["rack.input"] = StringIO.new my_simple_data
       event = http_binding.decode_event my_simple_binary_mode
       assert_equal my_simple_event, event
     end

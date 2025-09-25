@@ -152,7 +152,7 @@ module CloudEvents
 
     def consume_special str, expected, error_message: nil
       raise ParseError, error_message || "Expected #{expected.inspect}" unless str.start_with? expected
-      consume_comments str[1..-1].strip
+      consume_comments str[1..].strip
     end
 
     def consume_token_or_quoted str, error_message: nil
@@ -177,7 +177,7 @@ module CloudEvents
         end
       end
       index += 1
-      str = consume_comments str[index..-1].strip
+      str = consume_comments str[index..].strip
       [arr.join, str]
     end
 
@@ -194,14 +194,14 @@ module CloudEvents
         when "\\"
           index += 2
         when "("
-          str = consume_comments str[index..-1]
+          str = consume_comments str[index..]
           index = 0
         else
           index += 1
         end
       end
       index += 1
-      consume_comments str[index..-1].strip
+      consume_comments str[index..].strip
     end
 
     def maybe_quote str
