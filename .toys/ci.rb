@@ -1,24 +1,18 @@
 # frozen_string_literal: true
 
+load_git remote: "https://github.com/dazuma/toys.git",
+         path: "common-tools/ci",
+         update: 3600
+
 desc "Run all CI checks"
 
-include :exec, result_callback: :handle_result
-include :terminal
-
-def handle_result result
-  if result.success?
-    puts "** #{result.name} passed\n\n", :green, :bold
-  else
-    puts "** CI terminated: #{result.name} failed!", :red, :bold
-    exit 1
-  end
-end
-
-def run
-  ::Dir.chdir context_directory
-  exec_tool ["test"], name: "Tests"
-  exec_tool ["cucumber"], name: "Behaviors"
-  exec_tool ["rubocop"], name: "Style checker"
-  exec_tool ["yardoc"], name: "Docs generation"
-  exec_tool ["build"], name: "Gem build"
+expand("toys-ci") do |toys_ci|
+  toys_ci.only_flag = true
+  toys_ci.fail_fast_flag = true
+  toys_ci.job("Bundle update", flag: :bundle, exec: ["bundle", "update"])
+  toys_ci.job("Rubocop", flag: :rubocop, tool: ["rubocop"])
+  toys_ci.job("Tests", flag: :test, tool: ["test"])
+  toys_ci.job("Cucumber", flag: :cucumber, tool: ["cucumber"])
+  toys_ci.job("Yardoc", flag: :yard, tool: ["yardoc"])
+  toys_ci.job("Gem build", flag: :build, tool: ["build"])
 end

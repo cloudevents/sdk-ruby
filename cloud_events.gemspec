@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-lib = ::File.expand_path "lib", __dir__
-$LOAD_PATH.unshift lib unless $LOAD_PATH.include? lib
-require "cloud_events/version"
+require_relative "lib/cloud_events/version"
 version = ::CloudEvents::VERSION
 
 ::Gem::Specification.new do |spec|
@@ -13,15 +11,15 @@ version = ::CloudEvents::VERSION
   spec.email = ["dazuma@gmail.com"]
 
   spec.summary = "Ruby SDK for CloudEvents"
-  spec.description = \
-    "The official Ruby implementation of the CloudEvents Specification." \
-    " Provides data types for events, and HTTP/JSON bindings for marshalling" \
-    " and unmarshalling event data."
+  spec.description =
+    "The official Ruby implementation of the CloudEvents Specification. " \
+    "Provides data types for events, and HTTP/JSON bindings for marshalling " \
+    "and unmarshalling event data."
   spec.homepage = "https://github.com/cloudevents/sdk-ruby"
 
   spec.files = ::Dir.glob("lib/**/*.rb") + ::Dir.glob("*.md") + [".yardopts"]
   spec.require_paths = ["lib"]
-  spec.required_ruby_version = ">= 2.5"
+  spec.required_ruby_version = ">= 2.7"
 
   if spec.respond_to? :metadata
     spec.metadata["changelog_uri"] = "https://cloudevents.github.io/sdk-ruby/v#{version}/file.CHANGELOG.html"
