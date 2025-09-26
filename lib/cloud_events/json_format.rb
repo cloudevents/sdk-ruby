@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "base64"
 require "json"
 
 module CloudEvents
@@ -256,7 +255,7 @@ module CloudEvents
 
     def retrieve_content_from_data_fields structure, charset
       if structure.key? "data_base64"
-        content = ::Base64.decode64 structure.delete "data_base64"
+        content = structure.delete("data_base64").unpack1 "m"
         content_type = structure["datacontenttype"] || "application/octet-stream"
       else
         content = structure["data"]
@@ -318,7 +317,7 @@ module CloudEvents
         structure["datacontenttype"] = result[:content_type].to_s
       end
       if data_encoded.encoding == ::Encoding::ASCII_8BIT
-        structure["data_base64"] = ::Base64.encode64 data_encoded
+        structure["data_base64"] = [data_encoded].pack "m0"
         structure.delete "data"
       else
         structure["data"] = data_encoded

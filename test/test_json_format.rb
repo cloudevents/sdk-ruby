@@ -2,7 +2,6 @@
 
 require_relative "helper"
 
-require "base64"
 require "date"
 require "json"
 require "stringio"
@@ -19,8 +18,8 @@ describe CloudEvents::JsonFormat do
   let(:my_doubly_encoded_json_string_data) { JSON.dump my_json_string_data }
   let(:my_data_string) { "12345" }
   let(:my_json_encoded_data_string) { '"12345"' }
-  let(:my_base64_data) { "/w==\n" }
-  let(:my_binary_string) { Base64.decode64 my_base64_data }
+  let(:my_base64_data) { "/w==" }
+  let(:my_binary_string) { my_base64_data.unpack1 "m" }
   let(:my_content_encoding) { "8bit" }
   let(:my_content_type_string) { "text/plain; charset=us-ascii" }
   let(:my_content_type) { CloudEvents::ContentType.new my_content_type_string }

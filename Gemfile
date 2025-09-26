@@ -1,14 +1,11 @@
 source "https://rubygems.org"
 gemspec
 
-gem "base64", "~> 0.3"
 gem "cucumber", "~> 9.2"
 gem "google-style", "~> 1.27.1"
-gem "logger", "~> 1.7"
 gem "minitest", "~> 5.25"
 gem "minitest-focus", "~> 1.4"
 gem "minitest-rg", "~> 5.3"
-gem "ostruct", "~> 0.6"
 gem "rack", "~> 3.2"
 gem "redcarpet", "~> 3.6" unless ::RUBY_PLATFORM == "java"
 gem "webrick", "~> 1.9"
