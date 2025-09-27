@@ -75,7 +75,7 @@ module CloudEvents
       #     (Also available using the deprecated keyword `attributes`.)
       # @param args [keywords] The data and attributes, as keyword arguments.
       #
-      def initialize set_attributes: nil, attributes: nil, **args
+      def initialize(set_attributes: nil, attributes: nil, **args)
         interpreter = FieldInterpreter.new(set_attributes || attributes || args)
         @spec_version = interpreter.spec_version(["specversion", "spec_version"], accept: /^0\.3$/)
         @id = interpreter.string(["id"], required: true)
@@ -88,7 +88,7 @@ module CloudEvents
         @schema_url = interpreter.uri(["schemaurl", "schema_url"])
         @subject = interpreter.string(["subject"])
         @time = interpreter.rfc3339_date_time(["time"])
-        @attributes = interpreter.finish_attributes
+        @attributes = interpreter.finish_attributes(requires_lc_start: true)
         freeze
       end
 
@@ -101,7 +101,7 @@ module CloudEvents
       # @param changes [keywords] See {#initialize} for a list of arguments.
       # @return [FunctionFramework::CloudEvents::Event]
       #
-      def with **changes
+      def with(**changes)
         attributes = @attributes.merge(changes)
         V0.new(set_attributes: attributes)
       end

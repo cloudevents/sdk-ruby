@@ -58,7 +58,7 @@ module CloudEvents
       # @param spec_version [String] The required `specversion` field.
       # @param kwargs [keywords] Additional parameters for the event.
       #
-      def create spec_version:, **kwargs
+      def create(spec_version:, **kwargs)
         case spec_version
         when "0.3"
           V0.new(spec_version: spec_version, **kwargs)

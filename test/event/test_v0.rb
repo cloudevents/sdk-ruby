@@ -211,6 +211,25 @@ describe CloudEvents::Event::V0 do
     assert_equal "The type field is required", error.message
   end
 
+  it "validates attribute name" do
+    error = assert_raises(CloudEvents::AttributeError) do
+      CloudEvents::Event::V0.new(id:           my_id,
+                                 source:       my_source,
+                                 type:         my_type,
+                                 spec_version: spec_version,
+                                 "1parent":    my_trace_parent)
+    end
+    assert_includes error.message, "Illegal key: \"1parent\""
+    error = assert_raises(CloudEvents::AttributeError) do
+      CloudEvents::Event::V0.new(id:           my_id,
+                                 source:       my_source,
+                                 type:         my_type,
+                                 spec_version: spec_version,
+                                 trace_parent: my_trace_parent)
+    end
+    assert_includes error.message, "Illegal key: \"trace_parent\""
+  end
+
   it "handles extension attributes" do
     event = CloudEvents::Event::V0.new(id:           my_id,
                                        source:       my_source,
