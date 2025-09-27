@@ -14,8 +14,9 @@ module CloudEvents
         @attributes = {}
       end
 
-      def finish_attributes
+      def finish_attributes(requires_lc_start: false)
         @args.each do |key, value|
+          check_attribute_name(key, requires_lc_start)
           @attributes[key.freeze] = value.to_s.freeze unless value.nil?
         end
         @args = {}
@@ -130,6 +131,13 @@ module CloudEvents
         converted, raw = yield(value)
         @attributes[keys.first.freeze] = raw
         converted
+      end
+
+      def check_attribute_name(key, requires_lc_start)
+        regex = requires_lc_start ? /^[a-z][a-z0-9]*$/ : /^[a-z0-9]+$/
+        unless regex.match?(key)
+          raise(AttributeError, "Illegal key: #{key.inspect} must consist only of digits and lower-case letters")
+        end
       end
     end
   end

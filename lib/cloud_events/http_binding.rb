@@ -166,7 +166,7 @@ module CloudEvents
     # @raise [CloudEvents::CloudEventsError] if an event could not be decoded
     #     from the request.
     #
-    def decode_event env, allow_opaque: false, **format_args
+    def decode_event(env, allow_opaque: false, **format_args)
       request_method = env["REQUEST_METHOD"]
       raise(NotCloudEventError, "Request method is #{request_method}") if ILLEGAL_METHODS.include?(request_method)
       content_type_string = env["CONTENT_TYPE"]
@@ -204,7 +204,7 @@ module CloudEvents
     # @param format_args [keywords] Extra args to pass to the formatter.
     # @return [Array(headers,String)]
     #
-    def encode_event event, structured_format: false, **format_args
+    def encode_event(event, structured_format: false, **format_args)
       if event.is_a?(Event::Opaque)
         [{ "Content-Type" => event.content_type.to_s }, event.content]
       elsif !structured_format
@@ -243,7 +243,7 @@ module CloudEvents
     # @raise [CloudEvents::CloudEventsError] if the request appears to be a
     #     CloudEvent but decoding failed.
     #
-    def decode_rack_env env, **format_args
+    def decode_rack_env(env, **format_args)
       content_type_string = env["CONTENT_TYPE"]
       content_type = ContentType.new(content_type_string) if content_type_string
       content = read_with_charset(env["rack.input"], content_type&.charset)
@@ -262,7 +262,7 @@ module CloudEvents
     # @param format_args [keywords] Extra args to pass to the formatter.
     # @return [Array(headers,String)]
     #
-    def encode_structured_content event, format_name, **format_args
+    def encode_structured_content(event, format_name, **format_args)
       result = @event_encoders[format_name]&.encode_event(event: event,
                                                           data_encoder: @data_encoders,
                                                           **format_args)
@@ -280,7 +280,7 @@ module CloudEvents
     # @param format_args [keywords] Extra args to pass to the formatter.
     # @return [Array(headers,String)]
     #
-    def encode_batched_content event_batch, format_name, **format_args
+    def encode_batched_content(event_batch, format_name, **format_args)
       result = @event_encoders[format_name]&.encode_event(event_batch: event_batch,
                                                           data_encoder: @data_encoders,
                                                           **format_args)
@@ -297,7 +297,7 @@ module CloudEvents
     # @param format_args [keywords] Extra args to pass to the formatter.
     # @return [Array(headers,String)]
     #
-    def encode_binary_content event, legacy_data_encode: true, **format_args
+    def encode_binary_content(event, legacy_data_encode: true, **format_args)
       headers = {}
       event.to_h.each do |key, value|
         unless ["data", "data_encoded", "datacontenttype"].include?(key)
@@ -369,7 +369,7 @@ module CloudEvents
     # Decode a single event from the given request body and content type in
     # structured mode.
     #
-    def decode_structured_content content, content_type, allow_opaque, **format_args
+    def decode_structured_content(content, content_type, allow_opaque, **format_args)
       result = @event_decoders.decode_event(content: content,
                                             content_type: content_type,
                                             data_decoder: @data_decoders,
@@ -389,7 +389,7 @@ module CloudEvents
     # TODO: legacy_data_decode is deprecated and can be removed when
     # decode_rack_env is removed.
     #
-    def decode_binary_content content, content_type, env, legacy_data_decode, **format_args
+    def decode_binary_content(content, content_type, env, legacy_data_decode, **format_args)
       spec_version = env["HTTP_CE_SPECVERSION"]
       return nil unless spec_version
       unless spec_version =~ /^0\.3|1(\.|$)/
@@ -479,13 +479,13 @@ module CloudEvents
     # @private
     module DefaultDataFormat
       # @private
-      def self.decode_data content: nil, content_type: nil, **_extra_kwargs
+      def self.decode_data(content: nil, content_type: nil, **_extra_kwargs)
         return nil unless content_type.nil?
         { data: content, content_type: nil }
       end
 
       # @private
-      def self.encode_data data: nil, content_type: nil, **_extra_kwargs
+      def self.encode_data(data: nil, content_type: nil, **_extra_kwargs)
         return nil unless content_type.nil?
         { content: data.to_s, content_type: nil }
       end

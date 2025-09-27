@@ -136,7 +136,7 @@ module CloudEvents
       #     (Also available using the deprecated keyword `attributes`.)
       # @param args [keywords] The data and attributes, as keyword arguments.
       #
-      def initialize set_attributes: nil, attributes: nil, **args
+      def initialize(set_attributes: nil, attributes: nil, **args)
         interpreter = FieldInterpreter.new(set_attributes || attributes || args)
         @spec_version = interpreter.spec_version(["specversion", "spec_version"], accept: /^1(\.|$)/)
         @id = interpreter.string(["id"], required: true)
@@ -167,7 +167,7 @@ module CloudEvents
       # @param changes [keywords] See {#initialize} for a list of arguments.
       # @return [FunctionFramework::CloudEvents::Event]
       #
-      def with **changes
+      def with(**changes)
         changes = Utils.keys_to_strings(changes)
         attributes = @attributes.dup
         if changes.key?("data") || changes.key?("data_encoded")

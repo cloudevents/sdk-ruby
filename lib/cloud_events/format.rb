@@ -79,7 +79,7 @@ module CloudEvents
     # @return [Hash] if accepting the request and returning a result
     # @return [nil] if declining the request.
     #
-    def decode_event **_kwargs
+    def decode_event(**_kwargs)
       nil
     end
 
@@ -116,7 +116,7 @@ module CloudEvents
     # @return [Hash] if accepting the request and returning a result
     # @return [nil] if declining the request.
     #
-    def encode_event **_kwargs
+    def encode_event(**_kwargs)
       nil
     end
 
@@ -155,7 +155,7 @@ module CloudEvents
     # @return [Hash] if accepting the request and returning a result
     # @return [nil] if declining the request.
     #
-    def decode_data **_kwargs
+    def decode_data(**_kwargs)
       nil
     end
 
@@ -194,7 +194,7 @@ module CloudEvents
     # @return [Hash] if accepting the request and returning a result
     # @return [nil] if declining the request.
     #
-    def encode_data **_kwargs
+    def encode_data(**_kwargs)
       nil
     end
 
@@ -227,7 +227,7 @@ module CloudEvents
       ##
       # Implements {Format#decode_event}
       #
-      def decode_event **kwargs
+      def decode_event(**kwargs)
         @formats.each do |elem|
           result = elem.decode_event(**kwargs)
           result = @result_checker.call(result) if @result_checker
@@ -239,7 +239,7 @@ module CloudEvents
       ##
       # Implements {Format#encode_event}
       #
-      def encode_event **kwargs
+      def encode_event(**kwargs)
         @formats.each do |elem|
           result = elem.encode_event(**kwargs)
           result = @result_checker.call(result) if @result_checker
@@ -251,7 +251,7 @@ module CloudEvents
       ##
       # Implements {Format#decode_data}
       #
-      def decode_data **kwargs
+      def decode_data(**kwargs)
         @formats.each do |elem|
           result = elem.decode_data(**kwargs)
           result = @result_checker.call(result) if @result_checker
@@ -263,7 +263,7 @@ module CloudEvents
       ##
       # Implements {Format#encode_data}
       #
-      def encode_data **kwargs
+      def encode_data(**kwargs)
         @formats.each do |elem|
           result = elem.encode_data(**kwargs)
           result = @result_checker.call(result) if @result_checker

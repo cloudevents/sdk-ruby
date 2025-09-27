@@ -30,7 +30,7 @@ module CloudEvents
     # @return [Hash] if accepting the request.
     # @return [nil] if declining the request.
     #
-    def decode_data content: nil, content_type: nil, **_other_kwargs
+    def decode_data(content: nil, content_type: nil, **_other_kwargs)
       return nil unless content
       return nil unless text_content_type?(content_type)
       { data: content.to_s, content_type: content_type }
@@ -56,7 +56,7 @@ module CloudEvents
     # @return [Hash] if accepting the request.
     # @return [nil] if declining the request.
     #
-    def encode_data data: UNSPECIFIED, content_type: nil, **_other_kwargs
+    def encode_data(data: UNSPECIFIED, content_type: nil, **_other_kwargs)
       return nil if data == UNSPECIFIED
       return nil unless text_content_type?(content_type)
       { content: data.to_s, content_type: content_type }
