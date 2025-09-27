@@ -2,7 +2,6 @@
 
 require_relative "helper"
 
-require "base64"
 require "date"
 require "json"
 require "stringio"
