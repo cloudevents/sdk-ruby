@@ -212,7 +212,7 @@ module CloudEvents
       #     format's result as an argument, and returns either the result to
       #     indicate acceptability, or `nil` to indicate not.
       #
-      def initialize formats = [], &result_checker
+      def initialize(formats = [], &result_checker)
         @formats = formats
         @result_checker = result_checker
       end
@@ -230,7 +230,7 @@ module CloudEvents
       def decode_event **kwargs
         @formats.each do |elem|
           result = elem.decode_event(**kwargs)
-          result = @result_checker.call result if @result_checker
+          result = @result_checker.call(result) if @result_checker
           return result if result
         end
         nil
@@ -242,7 +242,7 @@ module CloudEvents
       def encode_event **kwargs
         @formats.each do |elem|
           result = elem.encode_event(**kwargs)
-          result = @result_checker.call result if @result_checker
+          result = @result_checker.call(result) if @result_checker
           return result if result
         end
         nil
@@ -254,7 +254,7 @@ module CloudEvents
       def decode_data **kwargs
         @formats.each do |elem|
           result = elem.decode_data(**kwargs)
-          result = @result_checker.call result if @result_checker
+          result = @result_checker.call(result) if @result_checker
           return result if result
         end
         nil
@@ -266,7 +266,7 @@ module CloudEvents
       def encode_data **kwargs
         @formats.each do |elem|
           result = elem.encode_data(**kwargs)
-          result = @result_checker.call result if @result_checker
+          result = @result_checker.call(result) if @result_checker
           return result if result
         end
         nil

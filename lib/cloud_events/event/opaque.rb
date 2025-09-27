@@ -24,7 +24,7 @@ module CloudEvents
       #     or not provided, the value will be inferred from the content type
       #     if possible, or otherwise set to `nil` indicating not known.
       #
-      def initialize content, content_type, batch: nil
+      def initialize(content, content_type, batch: nil)
         @content = content.freeze
         @content_type = content_type
         if batch.nil? && content_type&.media_type == "application"
@@ -63,7 +63,7 @@ module CloudEvents
       end
 
       ## @private
-      def == other
+      def ==(other)
         Opaque === other &&
           @content == other.content &&
           @content_type == other.content_type &&
