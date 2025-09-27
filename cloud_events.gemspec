@@ -21,7 +21,7 @@ version = ::CloudEvents::VERSION
   spec.require_paths = ["lib"]
   spec.required_ruby_version = ">= 2.7"
 
-  if spec.respond_to? :metadata
+  if spec.respond_to?(:metadata)
     spec.metadata["changelog_uri"] = "https://cloudevents.github.io/sdk-ruby/v#{version}/file.CHANGELOG.html"
     spec.metadata["source_code_uri"] = "https://github.com/cloudevents/sdk-ruby"
     spec.metadata["bug_tracker_uri"] = "https://github.com/cloudevents/sdk-ruby/issues"

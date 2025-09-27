@@ -61,11 +61,11 @@ module CloudEvents
       def create spec_version:, **kwargs
         case spec_version
         when "0.3"
-          V0.new spec_version: spec_version, **kwargs
+          V0.new(spec_version: spec_version, **kwargs)
         when /^1(\.|$)/
-          V1.new spec_version: spec_version, **kwargs
+          V1.new(spec_version: spec_version, **kwargs)
         else
-          raise SpecVersionError, "Unrecognized specversion: #{spec_version}"
+          raise(SpecVersionError, "Unrecognized specversion: #{spec_version}")
         end
       end
       alias new create

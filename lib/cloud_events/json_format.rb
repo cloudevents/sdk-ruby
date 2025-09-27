@@ -41,17 +41,17 @@ module CloudEvents
       return nil unless content && content_type&.media_type == "application" && content_type&.subtype_format == "json"
       case content_type.subtype_base
       when "cloudevents"
-        event = decode_hash_structure ::JSON.parse(content), charset: charset_of(content), data_decoder: data_decoder
+        event = decode_hash_structure(::JSON.parse(content), charset: charset_of(content), data_decoder: data_decoder)
         { event: event }
       when "cloudevents-batch"
-        charset = charset_of content
+        charset = charset_of(content)
         batch = Array(::JSON.parse(content)).map do |structure|
-          decode_hash_structure structure, charset: charset, data_decoder: data_decoder
+          decode_hash_structure(structure, charset: charset, data_decoder: data_decoder)
         end
         { event_batch: batch }
       end
     rescue ::JSON::JSONError
-      raise FormatSyntaxError, "JSON syntax error"
+      raise(FormatSyntaxError, "JSON syntax error")
     end
 
     ##
@@ -79,23 +79,23 @@ module CloudEvents
     #
     def encode_event event: nil, event_batch: nil, data_encoder: nil, sort: false, **_other_kwargs
       if event && !event_batch
-        structure = encode_hash_structure event, data_encoder: data_encoder
-        structure = sort_keys structure if sort
+        structure = encode_hash_structure(event, data_encoder: data_encoder)
+        structure = sort_keys(structure) if sort
         subtype = "cloudevents"
       elsif event_batch && !event
         structure = event_batch.map do |elem|
-          structure_elem = encode_hash_structure elem, data_encoder: data_encoder
+          structure_elem = encode_hash_structure(elem, data_encoder: data_encoder)
           sort ? sort_keys(structure_elem) : structure_elem
         end
         subtype = "cloudevents-batch"
       else
         return nil
       end
-      content = ::JSON.dump structure
-      content_type = ContentType.new "application/#{subtype}+json; charset=#{charset_of content}"
+      content = ::JSON.dump(structure)
+      content_type = ContentType.new("application/#{subtype}+json; charset=#{charset_of(content)}")
       { content: content, content_type: content_type }
     rescue ::JSON::JSONError
-      raise FormatSyntaxError, "JSON syntax error"
+      raise(FormatSyntaxError, "JSON syntax error")
     end
 
     ##
@@ -122,14 +122,14 @@ module CloudEvents
     def decode_data spec_version: nil, content: nil, content_type: nil, **_other_kwargs
       return nil unless spec_version
       return nil unless content
-      return nil unless json_content_type? content_type
+      return nil unless json_content_type?(content_type)
       unless spec_version =~ /^0\.3|1(\.|$)/
-        raise SpecVersionError, "Unrecognized specversion: #{spec_version}"
+        raise(SpecVersionError, "Unrecognized specversion: #{spec_version}")
       end
-      data = ::JSON.parse content
+      data = ::JSON.parse(content)
       { data: data, content_type: content_type }
     rescue ::JSON::JSONError
-      raise FormatSyntaxError, "JSON syntax error"
+      raise(FormatSyntaxError, "JSON syntax error")
     end
 
     ##
@@ -157,12 +157,12 @@ module CloudEvents
     def encode_data spec_version: nil, data: UNSPECIFIED, content_type: nil, sort: false, **_other_kwargs
       return nil unless spec_version
       return nil if data == UNSPECIFIED
-      return nil unless json_content_type? content_type
+      return nil unless json_content_type?(content_type)
       unless spec_version =~ /^0\.3|1(\.|$)/
-        raise SpecVersionError, "Unrecognized specversion: #{spec_version}"
+        raise(SpecVersionError, "Unrecognized specversion: #{spec_version}")
       end
-      data = sort_keys data if sort
-      content = ::JSON.dump data
+      data = sort_keys(data) if sort
+      content = ::JSON.dump(data)
       { content: content, content_type: content_type }
     end
 
@@ -177,15 +177,15 @@ module CloudEvents
     #     non-JSON content types.
     # @return [CloudEvents::Event]
     #
-    def decode_hash_structure structure, charset: nil, data_decoder: nil
+    def decode_hash_structure(structure, charset: nil, data_decoder: nil)
       spec_version = structure["specversion"].to_s
       case spec_version
       when "0.3"
-        decode_hash_structure_v0 structure, charset
+        decode_hash_structure_v0(structure, charset)
       when /^1(\.|$)/
-        decode_hash_structure_v1 structure, charset, spec_version, data_decoder
+        decode_hash_structure_v1(structure, charset, spec_version, data_decoder)
       else
-        raise SpecVersionError, "Unrecognized specversion: #{spec_version}"
+        raise(SpecVersionError, "Unrecognized specversion: #{spec_version}")
       end
     end
 
@@ -198,33 +198,33 @@ module CloudEvents
     #     non-JSON content types.
     # @return [String] The hash structure.
     #
-    def encode_hash_structure event, data_encoder: nil
+    def encode_hash_structure(event, data_encoder: nil)
       case event
       when Event::V0
-        encode_hash_structure_v0 event
+        encode_hash_structure_v0(event)
       when Event::V1
-        encode_hash_structure_v1 event, data_encoder
+        encode_hash_structure_v1(event, data_encoder)
       else
-        raise SpecVersionError, "Unrecognized event type: #{event.class}"
+        raise(SpecVersionError, "Unrecognized event type: #{event.class}")
       end
     end
 
     private
 
-    def json_content_type? content_type
+    def json_content_type?(content_type)
       content_type&.subtype_base == "json" || content_type&.subtype_format == "json"
     end
 
-    def sort_keys obj
-      return obj unless obj.is_a? ::Hash
+    def sort_keys(obj)
+      return obj unless obj.is_a?(::Hash)
       result = {}
       obj.keys.sort.each do |key|
-        result[key] = sort_keys obj[key]
+        result[key] = sort_keys(obj[key])
       end
       result
     end
 
-    def charset_of str
+    def charset_of(str)
       encoding = str.encoding
       if encoding == ::Encoding::ASCII_8BIT
         "binary"
@@ -233,29 +233,29 @@ module CloudEvents
       end
     end
 
-    def decode_hash_structure_v0 structure, charset
-      unless structure.key? "datacontenttype"
+    def decode_hash_structure_v0(structure, charset)
+      unless structure.key?("datacontenttype")
         structure = structure.dup
         content_type = "application/json"
         content_type = "#{content_type}; charset=#{charset}" if charset
         structure["datacontenttype"] = content_type
       end
-      Event::V0.new attributes: structure
+      Event::V0.new(attributes: structure)
     end
 
-    def decode_hash_structure_v1 structure, charset, spec_version, data_decoder
+    def decode_hash_structure_v1(structure, charset, spec_version, data_decoder)
       unless structure.key?("data") || structure.key?("data_base64")
-        return Event::V1.new set_attributes: structure
+        return Event::V1.new(set_attributes: structure)
       end
       structure = structure.dup
-      content, content_type = retrieve_content_from_data_fields structure, charset
-      populate_data_fields_from_content structure, content, content_type, spec_version, data_decoder
-      Event::V1.new set_attributes: structure
+      content, content_type = retrieve_content_from_data_fields(structure, charset)
+      populate_data_fields_from_content(structure, content, content_type, spec_version, data_decoder)
+      Event::V1.new(set_attributes: structure)
     end
 
-    def retrieve_content_from_data_fields structure, charset
-      if structure.key? "data_base64"
-        content = structure.delete("data_base64").unpack1 "m"
+    def retrieve_content_from_data_fields(structure, charset)
+      if structure.key?("data_base64")
+        content = structure.delete("data_base64").unpack1("m")
         content_type = structure["datacontenttype"] || "application/octet-stream"
       else
         content = structure["data"]
@@ -265,60 +265,60 @@ module CloudEvents
       [content, ContentType.new(content_type)]
     end
 
-    def populate_data_fields_from_content structure, content, content_type, spec_version, data_decoder
-      if json_content_type? content_type
-        structure["data_encoded"] = ::JSON.dump content
+    def populate_data_fields_from_content(structure, content, content_type, spec_version, data_decoder)
+      if json_content_type?(content_type)
+        structure["data_encoded"] = ::JSON.dump(content)
         structure["data"] = content
       else
         structure["data_encoded"] = content = content.to_s
-        result = data_decoder&.decode_data spec_version: spec_version, content: content, content_type: content_type
+        result = data_decoder&.decode_data(spec_version: spec_version, content: content, content_type: content_type)
         if result
           structure["data"] = result[:data]
           content_type = result[:content_type]
         else
-          structure.delete "data"
+          structure.delete("data")
         end
       end
       structure["datacontenttype"] = content_type
     end
 
-    def encode_hash_structure_v0 event
+    def encode_hash_structure_v0(event)
       structure = event.to_h
       structure["datacontenttype"] ||= "application/json"
       structure
     end
 
-    def encode_hash_structure_v1 event, data_encoder
+    def encode_hash_structure_v1(event, data_encoder)
       structure = event.to_h
       return structure unless structure.key?("data") || structure.key?("data_encoded")
       content_type = event.data_content_type
       if content_type.nil? || json_content_type?(content_type)
-        encode_data_fields_for_json_content structure, event
+        encode_data_fields_for_json_content(structure, event)
       else
-        encode_data_fields_for_other_content structure, event, data_encoder
+        encode_data_fields_for_other_content(structure, event, data_encoder)
       end
       structure
     end
 
-    def encode_data_fields_for_json_content structure, event
-      structure["data"] = ::JSON.parse event.data unless event.data_decoded?
-      structure.delete "data_encoded"
+    def encode_data_fields_for_json_content(structure, event)
+      structure["data"] = ::JSON.parse(event.data) unless event.data_decoded?
+      structure.delete("data_encoded")
       structure["datacontenttype"] ||= "application/json"
     end
 
-    def encode_data_fields_for_other_content structure, event, data_encoder
-      data_encoded = structure.delete "data_encoded"
+    def encode_data_fields_for_other_content(structure, event, data_encoder)
+      data_encoded = structure.delete("data_encoded")
       unless data_encoded
-        result = data_encoder&.encode_data spec_version: event.spec_version,
+        result = data_encoder&.encode_data(spec_version: event.spec_version,
                                            data: event.data,
-                                           content_type: event.data_content_type
-        raise UnsupportedFormatError, "Unable to encode data of media type #{event.data_content_type}" unless result
+                                           content_type: event.data_content_type)
+        raise(UnsupportedFormatError, "Unable to encode data of media type #{event.data_content_type}") unless result
         data_encoded = result[:content]
         structure["datacontenttype"] = result[:content_type].to_s
       end
       if data_encoded.encoding == ::Encoding::ASCII_8BIT
-        structure["data_base64"] = [data_encoded].pack "m0"
-        structure.delete "data"
+        structure["data_base64"] = [data_encoded].pack("m0")
+        structure.delete("data")
       else
         structure["data"] = data_encoded
       end

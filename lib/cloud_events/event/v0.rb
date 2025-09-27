@@ -76,18 +76,18 @@ module CloudEvents
       # @param args [keywords] The data and attributes, as keyword arguments.
       #
       def initialize set_attributes: nil, attributes: nil, **args
-        interpreter = FieldInterpreter.new set_attributes || attributes || args
-        @spec_version = interpreter.spec_version ["specversion", "spec_version"], accept: /^0\.3$/
-        @id = interpreter.string ["id"], required: true
-        @source = interpreter.uri ["source"], required: true
-        @type = interpreter.string ["type"], required: true
-        @data = interpreter.data_object ["data"]
+        interpreter = FieldInterpreter.new(set_attributes || attributes || args)
+        @spec_version = interpreter.spec_version(["specversion", "spec_version"], accept: /^0\.3$/)
+        @id = interpreter.string(["id"], required: true)
+        @source = interpreter.uri(["source"], required: true)
+        @type = interpreter.string(["type"], required: true)
+        @data = interpreter.data_object(["data"])
         @data = nil if @data == FieldInterpreter::UNDEFINED
-        @data_content_encoding = interpreter.string ["datacontentencoding", "data_content_encoding"]
-        @data_content_type = interpreter.content_type ["datacontenttype", "data_content_type"]
-        @schema_url = interpreter.uri ["schemaurl", "schema_url"]
-        @subject = interpreter.string ["subject"]
-        @time = interpreter.rfc3339_date_time ["time"]
+        @data_content_encoding = interpreter.string(["datacontentencoding", "data_content_encoding"])
+        @data_content_type = interpreter.content_type(["datacontenttype", "data_content_type"])
+        @schema_url = interpreter.uri(["schemaurl", "schema_url"])
+        @subject = interpreter.string(["subject"])
+        @time = interpreter.rfc3339_date_time(["time"])
         @attributes = interpreter.finish_attributes
         freeze
       end
@@ -102,8 +102,8 @@ module CloudEvents
       # @return [FunctionFramework::CloudEvents::Event]
       #
       def with **changes
-        attributes = @attributes.merge changes
-        V0.new set_attributes: attributes
+        attributes = @attributes.merge(changes)
+        V0.new(set_attributes: attributes)
       end
 
       ##
@@ -125,7 +125,7 @@ module CloudEvents
       # @param key [String,Symbol] The attribute name.
       # @return [String,nil]
       #
-      def [] key
+      def [](key)
         @attributes[key.to_s]
       end
 
@@ -136,7 +136,7 @@ module CloudEvents
       # @return [Hash]
       #
       def to_h
-        Utils.deep_dup @attributes
+        Utils.deep_dup(@attributes)
       end
 
       ##
@@ -225,7 +225,7 @@ module CloudEvents
       attr_reader :time
 
       ## @private
-      def == other
+      def ==(other)
         other.is_a?(V0) && @attributes == other.instance_variable_get(:@attributes)
       end
       alias eql? ==

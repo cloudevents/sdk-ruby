@@ -24,7 +24,7 @@ module CloudEvents
     # @param default_charset [String] Optional. The charset to use if none is
     #     specified. Defaults to `us-ascii`.
     #
-    def initialize string, default_charset: nil
+    def initialize(string, default_charset: nil)
       @string = string.to_s
       @media_type = "text"
       @subtype_base = @subtype = "plain"
@@ -32,9 +32,9 @@ module CloudEvents
       @params = []
       @charset = default_charset || "us-ascii"
       @error_message = nil
-      parse consume_comments @string.strip
+      parse(consume_comments(@string.strip))
       @canonical_string = "#{@media_type}/#{@subtype}" +
-                          @params.map { |k, v| "; #{k}=#{maybe_quote v}" }.join
+                          @params.map { |k, v| "; #{k}=#{maybe_quote(v)}" }.join
       full_freeze
     end
 
@@ -102,13 +102,13 @@ module CloudEvents
     # @param key [String]
     # @return [Array<String>]
     #
-    def param_values key
+    def param_values(key)
       key = key.downcase
       @params.inject([]) { |a, (k, v)| key == k ? a << v : a }
     end
 
     ## @private
-    def == other
+    def ==(other)
       other.is_a?(ContentType) && canonical_string == other.canonical_string
     end
     alias eql? ==
@@ -124,16 +124,16 @@ module CloudEvents
 
     private
 
-    def parse str
-      @media_type, str = consume_token str, downcase: true, error_message: "Failed to parse media type"
-      str = consume_special str, "/"
-      @subtype, str = consume_token str, downcase: true, error_message: "Failed to parse subtype"
-      @subtype_base, @subtype_format = @subtype.split "+", 2
+    def parse(str)
+      @media_type, str = consume_token(str, downcase: true, error_message: "Failed to parse media type")
+      str = consume_special(str, "/")
+      @subtype, str = consume_token(str, downcase: true, error_message: "Failed to parse subtype")
+      @subtype_base, @subtype_format = @subtype.split("+", 2)
       until str.empty?
-        str = consume_special str, ";"
-        name, str = consume_token str, downcase: true, error_message: "Faled to parse attribute name"
-        str = consume_special str, "=", error_message: "Failed to find value for attribute #{name}"
-        val, str = consume_token_or_quoted str, error_message: "Failed to parse value for attribute #{name}"
+        str = consume_special(str, ";")
+        name, str = consume_token(str, downcase: true, error_message: "Faled to parse attribute name")
+        str = consume_special(str, "=", error_message: "Failed to find value for attribute #{name}")
+        val, str = consume_token_or_quoted(str, error_message: "Failed to parse value for attribute #{name}")
         @params << [name, val]
         @charset = val if name == "charset"
       end
@@ -141,34 +141,34 @@ module CloudEvents
       @error_message = e.message
     end
 
-    def consume_token str, downcase: false, error_message: nil
-      match = /^([\w!#$%&'*+.\^`{|}-]+)(.*)$/.match str
-      raise ParseError, error_message || "Expected token" unless match
+    def consume_token(str, downcase: false, error_message: nil)
+      match = /^([\w!#$%&'*+.\^`{|}-]+)(.*)$/.match(str)
+      raise(ParseError, error_message || "Expected token") unless match
       token = match[1]
       token.downcase! if downcase
-      str = consume_comments match[2].strip
+      str = consume_comments(match[2].strip)
       [token, str]
     end
 
-    def consume_special str, expected, error_message: nil
-      raise ParseError, error_message || "Expected #{expected.inspect}" unless str.start_with? expected
-      consume_comments str[1..].strip
+    def consume_special(str, expected, error_message: nil)
+      raise(ParseError, error_message || "Expected #{expected.inspect}") unless str.start_with?(expected)
+      consume_comments(str[1..].strip)
     end
 
-    def consume_token_or_quoted str, error_message: nil
-      return consume_token str unless str.start_with? '"'
+    def consume_token_or_quoted(str, error_message: nil)
+      return consume_token(str) unless str.start_with?('"')
       arr = []
       index = 1
       loop do
         char = str[index]
         case char
         when nil
-          raise ParseError, error_message || "Quoted-string never finished"
+          raise(ParseError, error_message || "Quoted-string never finished")
         when "\""
           break
         when "\\"
           char = str[index + 1]
-          raise ParseError, error_message || "Quoted-string never finished" unless char
+          raise(ParseError, error_message || "Quoted-string never finished") unless char
           arr << char
           index += 2
         else
@@ -177,34 +177,34 @@ module CloudEvents
         end
       end
       index += 1
-      str = consume_comments str[index..].strip
+      str = consume_comments(str[index..].strip)
       [arr.join, str]
     end
 
-    def consume_comments str
-      return str unless str.start_with? "("
+    def consume_comments(str)
+      return str unless str.start_with?("(")
       index = 1
       loop do
         char = str[index]
         case char
         when nil
-          raise ParseError, "Comment never finished"
+          raise(ParseError, "Comment never finished")
         when ")"
           break
         when "\\"
           index += 2
         when "("
-          str = consume_comments str[index..]
+          str = consume_comments(str[index..])
           index = 0
         else
           index += 1
         end
       end
       index += 1
-      consume_comments str[index..].strip
+      consume_comments(str[index..].strip)
     end
 
-    def maybe_quote str
+    def maybe_quote(str)
       return str if /^[\w!#$%&'*+.\^`{|}-]+$/ =~ str
       str = str.gsub("\\", "\\\\\\\\").gsub("\"", "\\\\\"")
       "\"#{str}\""
