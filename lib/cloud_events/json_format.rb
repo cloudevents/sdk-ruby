@@ -37,7 +37,7 @@ module CloudEvents
     # @raise [CloudEvents::SpecVersionError] if an unsupported specversion is
     #     found.
     #
-    def decode_event content: nil, content_type: nil, data_decoder: nil, **_other_kwargs
+    def decode_event(content: nil, content_type: nil, data_decoder: nil, **_other_kwargs)
       return nil unless content && content_type&.media_type == "application" && content_type&.subtype_format == "json"
       case content_type.subtype_base
       when "cloudevents"
@@ -77,7 +77,7 @@ module CloudEvents
     # @return [nil] if declining the request.
     # @raise [CloudEvents::FormatSyntaxError] if the JSON could not be parsed
     #
-    def encode_event event: nil, event_batch: nil, data_encoder: nil, sort: false, **_other_kwargs
+    def encode_event(event: nil, event_batch: nil, data_encoder: nil, sort: false, **_other_kwargs)
       if event && !event_batch
         structure = encode_hash_structure(event, data_encoder: data_encoder)
         structure = sort_keys(structure) if sort
@@ -119,7 +119,7 @@ module CloudEvents
     # @raise [CloudEvents::SpecVersionError] if an unsupported specversion is
     #     found.
     #
-    def decode_data spec_version: nil, content: nil, content_type: nil, **_other_kwargs
+    def decode_data(spec_version: nil, content: nil, content_type: nil, **_other_kwargs)
       return nil unless spec_version
       return nil unless content
       return nil unless json_content_type?(content_type)
@@ -154,7 +154,7 @@ module CloudEvents
     # @return [Hash] if accepting the request.
     # @return [nil] if declining the request.
     #
-    def encode_data spec_version: nil, data: UNSPECIFIED, content_type: nil, sort: false, **_other_kwargs
+    def encode_data(spec_version: nil, data: UNSPECIFIED, content_type: nil, sort: false, **_other_kwargs)
       return nil unless spec_version
       return nil if data == UNSPECIFIED
       return nil unless json_content_type?(content_type)
