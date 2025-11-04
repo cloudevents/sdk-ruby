@@ -11,11 +11,16 @@ on:
         required: false
         default: ""
 
+permissions:
+  contents: write # required for creating releases
+  pull-requests: write # required for updating label on PR, posting comments
+  issues: write # required for creating new issues on failed releases
+
 jobs:
   release-retry:
     if: ${{ github.repository == 'cloudevents/sdk-ruby' }}
     env:
-      ruby_version: "2.7"
+      ruby_version: "3.4"
     runs-on: ubuntu-latest
     steps:
       - name: Install Ruby ${{ env.ruby_version }}
@@ -23,16 +28,15 @@ jobs:
         with:
           ruby-version: ${{ env.ruby_version }}
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
       - name: Install Toys
         run: "gem install --no-document toys"
       - name: Retry release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEM_HOST_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
         run: |
           toys release retry --yes --verbose \
-            "--enable-releases=${{ secrets.ENABLE_RELEASES }}" \
-            "--rubygems-api-key=${{ secrets.RUBYGEMS_API_KEY }}" \
             ${{ github.event.inputs.flags }} \
             "${{ github.event.inputs.release_pr }}" \
             < /dev/null
