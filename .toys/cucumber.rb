@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-toys_version! ">= 0.15"
+toys_version! ">= 0.16"
 
 desc "Run cucumber tests"
 

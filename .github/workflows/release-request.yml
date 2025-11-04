@@ -3,16 +3,20 @@ name: Open release request
 on:
   workflow_dispatch:
     inputs:
-      gems:
-        description: Gems to release (leave blank to release all gems)
+      names:
+        description: Components to release (leave blank to release all components)
         required: false
         default: ""
+
+permissions:
+  contents: write # required for pushing changes
+  pull-requests: write # required for creating release PRs
 
 jobs:
   release-request:
     if: ${{ github.repository == 'cloudevents/sdk-ruby' }}
     env:
-      ruby_version: "2.7"
+      ruby_version: "3.3"
     runs-on: ubuntu-latest
     steps:
       - name: Install Ruby ${{ env.ruby_version }}
@@ -20,14 +24,14 @@ jobs:
         with:
           ruby-version: ${{ env.ruby_version }}
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Install Toys
         run: "gem install --no-document toys"
       - name: Open release pull request
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOYS_RELEASE_REQUEST_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           toys release request --yes --verbose \
-            "--gems=${{ github.event.inputs.gems }}" \
-            "--release-ref=${{ github.ref }}" \
+            "--target-branch=${{ github.ref }}" \
+            ${{ github.event.inputs.names }} \
             < /dev/null
