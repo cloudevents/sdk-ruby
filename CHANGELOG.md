@@ -1,5 +1,14 @@
 # Changelog
 
+### v0.8.0 / 2025-11-04
+
+* BREAKING CHANGE: Raise AttributeError if an illegal attribute name is used
+* ADDED: Require Ruby 2.7 or later
+* FIXED: Improved hashing algorithm for opaque event objects
+* FIXED: Removed dependency on base64 gem
+* FIXED: Raise AttributeError if an illegal attribute name is used
+* DOCS: Add link to the security mailing list
+
 ### v0.7.1 / 2023-10-04
 
 * DOCS: Governance docs per CE PR 1226
