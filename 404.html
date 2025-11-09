@@ -5,18 +5,21 @@
   </head>
   <body>
     <p>
-      <a href="https://cloudevents.github.io/sdk-ruby/latest">Ruby CloudEvents SDK documentation</a>
+      <a href="https://cloudevents.github.io/sdk-ruby/index.html">Main documentation page</a>
     </p>
   </body>
   <script>
     var version = "0.8.0";
-    if (window.location.href.includes("//cloudevents.github.io/sdk-ruby/latest")) {
+    var location_updated = false;
+    if (!location_updated && window.location.href.includes("//cloudevents.github.io/sdk-ruby/./latest")) {
       var loc = window.location.href.replace(
-        "//cloudevents.github.io/sdk-ruby/latest",
-        "//cloudevents.github.io/sdk-ruby/v" + version);
+        "//cloudevents.github.io/sdk-ruby/./latest",
+        "//cloudevents.github.io/sdk-ruby/./v" + version);
       window.location.replace(loc);
-    } else {
-      window.location.replace("https://cloudevents.github.io/sdk-ruby/latest");
+      location_updated = true;
+    }
+    if (!location_updated) {
+      window.location.replace("https://cloudevents.github.io/sdk-ruby/./latest");
     }
   </script>
 </html>
