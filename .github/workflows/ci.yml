@@ -39,9 +39,10 @@ jobs:
           - os: ubuntu-latest
             ruby: jruby
             flags: "--test --cucumber"
-          - os: ubuntu-latest
-            ruby: truffleruby
-            flags: "--test --cucumber"
+          # TEMPORARY: Disable truffleruby due to some issues with bundler
+          # - os: ubuntu-latest
+          #   ruby: truffleruby
+          #   flags: "--test --cucumber"
           - os: macos-latest
             ruby: "3.4"
             flags: "--test --cucumber"
