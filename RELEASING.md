@@ -22,4 +22,3 @@ locally. See `toys release request --help` and `toys release perform --help`
 for more information.
 
 If a release fails, you may need to delete the release tag before retrying.
-
