@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.8.1 / 2025-11-10
+
+* DOCS: Some minor updates and corrections to the README and examples
+
 ### v0.8.0 / 2025-11-04
 
 * BREAKING CHANGE: Raise AttributeError if an illegal attribute name is used
