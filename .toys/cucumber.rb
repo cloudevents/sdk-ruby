@@ -20,8 +20,8 @@ def run
 end
 
 def setup_features
-  remote_features = git_cache.find "https://github.com/cloudevents/conformance", path: "features"
-  local_features = File.join context_directory, "features", "conformance"
-  rm_rf local_features
-  cp_r remote_features, local_features
+  remote_features = git_cache.find("https://github.com/cloudevents/conformance", path: "features")
+  local_features = File.join(context_directory, "features", "conformance")
+  rm_rf(local_features)
+  cp_r(remote_features, local_features)
 end

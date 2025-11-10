@@ -13,11 +13,11 @@ Features:
     JSON Batch Format.
  *  Support for sending and receiving CloudEvents via HTTP Bindings.
  *  Supports the [CloudEvent 0.3](https://github.com/cloudevents/spec/tree/v0.3)
-    and [CloudEvents 1.0](https://github.com/cloudevents/spec/tree/v1.0.1)
+    and [CloudEvents 1.0](https://github.com/cloudevents/spec/tree/v1.0.2)
     specifications.
  *  Extensible to additional formats and protocol bindings, and future
     specification versions.
- *  Compatible with Ruby 2.5 or later, or JRuby 9.2.x or later. No runtime gem
+ *  Compatible with Ruby 2.7 or later, or JRuby 9.2.x or later. No runtime gem
     dependencies.
 
 ## Quickstart
@@ -35,8 +35,10 @@ A simple [Sinatra](https://sinatrarb.com) app that receives CloudEvents:
 ```ruby
 # examples/server/Gemfile
 source "https://rubygems.org"
-gem "cloud_events", "~> 0.6"
-gem "sinatra", "~> 2.0"
+gem "cloud_events", "~> 0.8"
+gem "sinatra", "~> 4.0"
+gem "rackup"
+gem "puma"
 ```
 
 ```ruby
@@ -46,9 +48,9 @@ require "cloud_events"
 
 cloud_events_http = CloudEvents::HttpBinding.default
 
-post "/" do
-  event = cloud_events_http.decode_event request.env
-  logger.info "Received CloudEvent: #{event.to_h}"
+post("/") do
+  event = cloud_events_http.decode_event(request.env)
+  logger.info("Received CloudEvent: #{event.to_h}")
 end
 ```
 
@@ -59,7 +61,7 @@ A simple Ruby script that sends a CloudEvent:
 ```ruby
 # examples/client/Gemfile
 source "https://rubygems.org"
-gem "cloud_events", "~> 0.6"
+gem "cloud_events", "~> 0.8"
 ```
 
 ```ruby
@@ -69,17 +71,18 @@ require "net/http"
 require "uri"
 
 data = { message: "Hello, CloudEvents!" }
-event = CloudEvents::Event.create \
+event = CloudEvents::Event.create(
   spec_version:      "1.0",
   id:                "1234-1234-1234",
   source:            "/mycontext",
   type:              "com.example.someevent",
   data_content_type: "application/json",
   data:              data
+)
 
 cloud_events_http = CloudEvents::HttpBinding.default
-headers, body = cloud_events_http.encode_event event
-Net::HTTP.post URI("http://localhost:4567"), body, headers
+headers, body = cloud_events_http.encode_event(event)
+Net::HTTP.post(URI("http://localhost:4567"), body, headers)
 ```
 
 ### Putting it together
@@ -108,7 +111,8 @@ Hit `CTRL+C` to stop the server.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/cloudevents/sdk-ruby.
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/cloudevents/sdk-ruby.
 
 ### Development
 
@@ -145,11 +149,15 @@ toys test --help
 
 ### Code style
 
-Ruby code in this library generally follows the
-[Google Ruby Style Guide](https://github.com/googleapis/ruby-style), which is
-based on "Seattle Style" Ruby.
+Ruby code style is enforced by Rubocop rules. We've left the configuration
+largely on the Rubocop defaults, with a few exceptions, notably:
 
-Style is enforced by Rubocop rules. You can run rubocop directly using the
+* We prefer double-quoted strings rather than single-quoted strings.
+* We prefer trailing commas in multi-line array and hash literals.
+* Line length limit is 120
+* We've loosened a few additional checks that we felt were not helpful.
+
+You can run rubocop directly using the
 `rubocop` binary:
 
 ```sh
