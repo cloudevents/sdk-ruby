@@ -19,4 +19,4 @@ expand :gem_build
 
 expand :gem_build, name: "install", install_gem: true
 
-load_gem "toys-release", as: "release"
+load_gem "toys-release", version: "~> 0.2", as: "release"
