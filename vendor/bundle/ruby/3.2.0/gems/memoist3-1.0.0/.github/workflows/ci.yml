@@ -1,0 +1,46 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ruby: 2.7.2
+          - ruby: 2.7.5
+          - ruby: 3.0.1
+          - ruby: 3.0.3
+          - ruby: ruby-head
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install rvm
+      run: |
+        curl -sSL https://get.rvm.io | bash
+    - name: Install ruby
+      run: |
+        source $HOME/.rvm/scripts/rvm
+        rvm use ${{ matrix.ruby }} --default --install --binary --fuzzy --create
+    - name: Check ruby version
+      run: |
+        source $HOME/.rvm/scripts/rvm
+        ruby --version
+    - name: Update rubygems
+      run: |
+        source $HOME/.rvm/scripts/rvm
+        gem update --system ${{ matrix.rubygems }}
+    - name: Install bundler
+      run: |
+        source $HOME/.rvm/scripts/rvm
+        gem install bundler --no-document -v '~> 1.13'
+    - name: Install gems
+      run: |
+        source $HOME/.rvm/scripts/rvm
+        bundle install --jobs 4
+    - run: unset JRUBY_OPTS
+    - name: Run rake
+      run: |
+        source $HOME/.rvm/scripts/rvm
+        bundle exec rake

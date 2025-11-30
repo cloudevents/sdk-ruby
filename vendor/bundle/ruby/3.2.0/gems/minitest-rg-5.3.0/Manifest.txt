@@ -1,0 +1,17 @@
+.autotest
+.gemtest
+.rubocop.yml
+CHANGELOG.rdoc
+Gemfile
+LICENSE
+Manifest.txt
+README.rdoc
+Rakefile
+lib/minitest/rg.rb
+lib/minitest/rg_plugin.rb
+minitest-rg.gemspec
+scripts/run_error
+scripts/run_fail
+scripts/run_pass
+scripts/run_skip
+test/test_rg.rb

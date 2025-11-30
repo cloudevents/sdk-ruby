@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+$:.unshift File.expand_path('../lib', __FILE__)
+
+Dir['./rake/*.rb'].each do |f|
+  require f
+end
+
+require 'rspec/core/rake_task'
+RSpec::Core::RakeTask.new(:spec)
+
+task default: :spec

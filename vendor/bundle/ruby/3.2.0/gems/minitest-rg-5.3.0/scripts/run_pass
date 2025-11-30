@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+gem "minitest"
+require "minitest/autorun"
+
+$LOAD_PATH.unshift "#{File.dirname(__FILE__)}/../lib"
+require "minitest/rg"
+
+class TestPass < Minitest::Test
+  def test_pass
+    assert_equal 1, 1, "Pass should be GREEN"
+  end
+end
