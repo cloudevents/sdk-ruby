@@ -2,9 +2,6 @@ repo: cloudevents/sdk-ruby
 git_user_name: CNCF CloudEvents Bot
 git_user_email: cncfcloudevents@gmail.com
 signoff_commits: true
-commit_lint:
-  fail_checks: true
-  merge: squash
 
 gems:
   - name: cloud_events
