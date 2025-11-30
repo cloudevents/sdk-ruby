@@ -30,7 +30,7 @@ module CloudEvents
   #
   # Both the keyword arguments recognized and the returned hash members may
   # vary from formatter to formatter; similarly, the keyword arguments provided
-  # and the resturned hash members recognized may also vary for different
+  # and the returned hash members recognized may also vary for different
   # callers. This interface will define a set of common argument and result key
   # names, but both callers and formatters must gracefully handle the case of
   # missing or extra information. For example, if a formatter expects a certain

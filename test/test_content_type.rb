@@ -41,7 +41,7 @@ describe CloudEvents::ContentType do
     assert Ractor.shareable?(content_type) if defined? Ractor
   end
 
-  it "recognizes charseet param" do
+  it "recognizes charset param" do
     content_type = CloudEvents::ContentType.new("application/json; charset=utf-8")
     assert_equal [["charset", "utf-8"]], content_type.params
     assert_equal "utf-8", content_type.charset

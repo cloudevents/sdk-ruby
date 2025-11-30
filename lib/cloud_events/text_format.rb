@@ -37,7 +37,7 @@ module CloudEvents
     end
 
     ##
-    # Trivially an event data object using text format.
+    # Trivially encode an event data object using text format.
     # See {CloudEvents::Format#encode_data} for a general description.
     #
     # Expects `:data` and `:content_type` arguments, and will decline the
