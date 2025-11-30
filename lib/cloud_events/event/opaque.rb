@@ -8,7 +8,7 @@ module CloudEvents
     # single event or a batch of events.
     #
     # The event data is retained in a form that can be reserialized (in a
-    # structured cotent mode in the same format) but cannot otherwise be
+    # structured content mode in the same format) but cannot otherwise be
     # inspected.
     #
     # This object is immutable, and Ractor-shareable on Ruby 3.

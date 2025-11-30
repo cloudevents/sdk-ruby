@@ -131,7 +131,7 @@ module CloudEvents
       @subtype_base, @subtype_format = @subtype.split("+", 2)
       until str.empty?
         str = consume_special(str, ";")
-        name, str = consume_token(str, downcase: true, error_message: "Faled to parse attribute name")
+        name, str = consume_token(str, downcase: true, error_message: "Failed to parse attribute name")
         str = consume_special(str, "=", error_message: "Failed to find value for attribute #{name}")
         val, str = consume_token_or_quoted(str, error_message: "Failed to parse value for attribute #{name}")
         @params << [name, val]
