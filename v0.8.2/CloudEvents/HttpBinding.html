@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: CloudEvents::HttpBinding
+  
+    &mdash; CloudEvents
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "CloudEvents::HttpBinding";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (H)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../CloudEvents.html" title="CloudEvents (module)">CloudEvents</a></span></span>
+     &raquo; 
+    <span class="title">HttpBinding</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: CloudEvents::HttpBinding
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">CloudEvents::HttpBinding</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/cloud_events/http_binding.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>HTTP binding for CloudEvents.</p>
+
+<p>This class implements HTTP binding, including unmarshalling of events from
+Rack environment data, and marshalling of events to Rack environment data.
+It supports binary (i.e. header-based) HTTP content, as well as structured
+(body-based) content that can delegate to formatters such as JSON.</p>
+
+<p>Supports the CloudEvents 0.3 and CloudEvents 1.0 variants of this format.
+See <a href="https://github.com/cloudevents/spec/blob/v0.3/http-transport-binding.md">https://github.com/cloudevents/spec/blob/v0.3/http-transport-binding.md</a>
+and <a href="https://github.com/cloudevents/spec/blob/v1.0/http-protocol-binding.md">https://github.com/cloudevents/spec/blob/v1.0/http-protocol-binding.md</a>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="JSON_FORMAT-constant" class="">JSON_FORMAT =
+          <div class="docstring">
+  <div class="discussion">
+    <p>The name of the JSON decoder/encoder</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>json</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#default_encoder_name-instance_method" title="#default_encoder_name (instance method)">#<strong>default_encoder_name</strong>  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The name of the encoder to use if none is specified.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#default-class_method" title="default (class method)">.<strong>default</strong>  &#x21d2; HttpBinding </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns a default HTTP binding, including support for JSON format.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#decode_event-instance_method" title="#decode_event (instance method)">#<strong>decode_event</strong>(env, allow_opaque: false, **format_args)  &#x21d2; CloudEvents::Event<sup>+</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Decode an event from the given Rack environment hash.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public deprecated">
+  <span class="summary_signature">
+    
+      <a href="#decode_rack_env-instance_method" title="#decode_rack_env (instance method)">#<strong>decode_rack_env</strong>(env, **format_args)  &#x21d2; CloudEvents::Event, ... </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  <span class="deprecated note title">deprecated</span>
+  
+
+  
+    <span class="summary_desc"><strong>Deprecated.</strong> <div class='inline'><p>Will be removed in version 1.0. Use <span class='object_link'><a href="#decode_event-instance_method" title="CloudEvents::HttpBinding#decode_event (method)">#decode_event</a></span> instead.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public deprecated">
+  <span class="summary_signature">
+    
+      <a href="#encode_batched_content-instance_method" title="#encode_batched_content (instance method)">#<strong>encode_batched_content</strong>(event_batch, format_name, **format_args)  &#x21d2; Array(headers,String) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  <span class="deprecated note title">deprecated</span>
+  
+
+  
+    <span class="summary_desc"><strong>Deprecated.</strong> <div class='inline'><p>Will be removed in version 1.0. Use <span class='object_link'><a href="#encode_event-instance_method" title="CloudEvents::HttpBinding#encode_event (method)">#encode_event</a></span> instead.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public deprecated">
+  <span class="summary_signature">
+    
+      <a href="#encode_binary_content-instance_method" title="#encode_binary_content (instance method)">#<strong>encode_binary_content</strong>(event, legacy_data_encode: true, **format_args)  &#x21d2; Array(headers,String) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  <span class="deprecated note title">deprecated</span>
+  
+
+  
+    <span class="summary_desc"><strong>Deprecated.</strong> <div class='inline'><p>Will be removed in version 1.0. Use <span class='object_link'><a href="#encode_event-instance_method" title="CloudEvents::HttpBinding#encode_event (method)">#encode_event</a></span> instead.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#encode_event-instance_method" title="#encode_event (instance method)">#<strong>encode_event</strong>(event, structured_format: false, **format_args)  &#x21d2; Array(headers,String) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Encode an event or batch of events into HTTP headers and body.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public deprecated">
+  <span class="summary_signature">
+    
+      <a href="#encode_structured_content-instance_method" title="#encode_structured_content (instance method)">#<strong>encode_structured_content</strong>(event, format_name, **format_args)  &#x21d2; Array(headers,String) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  <span class="deprecated note title">deprecated</span>
+  
+
+  
+    <span class="summary_desc"><strong>Deprecated.</strong> <div class='inline'><p>Will be removed in version 1.0. Use <span class='object_link'><a href="#encode_event-instance_method" title="CloudEvents::HttpBinding#encode_event (method)">#encode_event</a></span> instead.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>  &#x21d2; HttpBinding </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Create an empty HTTP binding.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#probable_event%3F-instance_method" title="#probable_event? (instance method)">#<strong>probable_event?</strong>(env)  &#x21d2; boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Analyze a Rack environment hash and determine whether it is <em>probably</em> a CloudEvent.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_formatter-instance_method" title="#register_formatter (instance method)">#<strong>register_formatter</strong>(formatter, deprecated_name = nil, encoder_name: nil)  &#x21d2; self </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Register a formatter for all operations it supports, based on which methods are implemented by the formatter object.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_formatter_methods-instance_method" title="#register_formatter_methods (instance method)">#<strong>register_formatter_methods</strong>(formatter, decode_event: false, encode_event: nil, decode_data: false, encode_data: false)  &#x21d2; self </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Registers the given formatter for the given operations.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="CloudEvents::HttpBinding (class)">HttpBinding</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Create an empty HTTP binding.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/http_binding.rb', line 43</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
+  <span class='ivar'>@event_decoders</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Format.html" title="CloudEvents::Format (module)">Format</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Format/Multi.html" title="CloudEvents::Format::Multi (class)">Multi</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Format/Multi.html#initialize-instance_method" title="CloudEvents::Format::Multi#initialize (method)">new</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_result'>result</span><span class='op'>|</span>
+    <span class='id identifier rubyid_result'>result</span><span class='op'>&amp;.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:event</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_result'>result</span><span class='op'>&amp;.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:event_batch</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_result'>result</span> <span class='op'>:</span> <span class='kw'>nil</span>
+  <span class='kw'>end</span>
+  <span class='ivar'>@event_encoders</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='ivar'>@data_decoders</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Format.html" title="CloudEvents::Format (module)">Format</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Format/Multi.html" title="CloudEvents::Format::Multi (class)">Multi</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Format/Multi.html#initialize-instance_method" title="CloudEvents::Format::Multi#initialize (method)">new</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_result'>result</span><span class='op'>|</span>
+    <span class='id identifier rubyid_result'>result</span><span class='op'>&amp;.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:data</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:content_type</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_result'>result</span> <span class='op'>:</span> <span class='kw'>nil</span>
+  <span class='kw'>end</span>
+  <span class='ivar'>@data_encoders</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Format.html" title="CloudEvents::Format (module)">Format</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Format/Multi.html" title="CloudEvents::Format::Multi (class)">Multi</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Format/Multi.html#initialize-instance_method" title="CloudEvents::Format::Multi#initialize (method)">new</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_result'>result</span><span class='op'>|</span>
+    <span class='id identifier rubyid_result'>result</span><span class='op'>&amp;.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:content</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:content_type</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_result'>result</span> <span class='op'>:</span> <span class='kw'>nil</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_text_format'>text_format</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="TextFormat.html" title="CloudEvents::TextFormat (class)">TextFormat</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+  <span class='ivar'>@data_decoders</span><span class='period'>.</span><span class='id identifier rubyid_formats'>formats</span><span class='period'>.</span><span class='id identifier rubyid_replace'>replace</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='id identifier rubyid_text_format'>text_format</span><span class='comma'>,</span> <span class='const'>DefaultDataFormat</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@data_encoders</span><span class='period'>.</span><span class='id identifier rubyid_formats'>formats</span><span class='period'>.</span><span class='id identifier rubyid_replace'>replace</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='id identifier rubyid_text_format'>text_format</span><span class='comma'>,</span> <span class='const'>DefaultDataFormat</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+
+  <span class='ivar'>@default_encoder_name</span> <span class='op'>=</span> <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id="default_encoder_name=-instance_method"></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="default_encoder_name-instance_method">
+  
+    #<strong>default_encoder_name</strong>  &#x21d2; <tt>String</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The name of the encoder to use if none is specified</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+127
+128
+129</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/http_binding.rb', line 127</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_default_encoder_name'>default_encoder_name</span>
+  <span class='ivar'>@default_encoder_name</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="default-class_method">
+  
+    .<strong>default</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="CloudEvents::HttpBinding (class)">HttpBinding</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns a default HTTP binding, including support for JSON format.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="CloudEvents::HttpBinding (class)">HttpBinding</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+31
+32
+33
+34
+35
+36
+37
+38</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/http_binding.rb', line 31</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_default'>default</span>
+  <span class='ivar'>@default</span> <span class='op'>||=</span> <span class='kw'>begin</span>
+    <span class='id identifier rubyid_http_binding'>http_binding</span> <span class='op'>=</span> <span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_http_binding'>http_binding</span><span class='period'>.</span><span class='id identifier rubyid_register_formatter'>register_formatter</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="JsonFormat.html" title="CloudEvents::JsonFormat (class)">JsonFormat</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='label'>encoder_name:</span> <span class='const'><span class='object_link'><a href="#JSON_FORMAT-constant" title="CloudEvents::HttpBinding::JSON_FORMAT (constant)">JSON_FORMAT</a></span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_http_binding'>http_binding</span><span class='period'>.</span><span class='id identifier rubyid_default_encoder_name'>default_encoder_name</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#JSON_FORMAT-constant" title="CloudEvents::HttpBinding::JSON_FORMAT (constant)">JSON_FORMAT</a></span></span>
+    <span class='id identifier rubyid_http_binding'>http_binding</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="decode_event-instance_method">
+  
+    #<strong>decode_event</strong>(env, allow_opaque: false, **format_args)  &#x21d2; <tt><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span></tt><sup>+</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Decode an event from the given Rack environment hash. Following the
+CloudEvents spec, this chooses a handler based on the Content-Type of
+the request.</p>
+
+<p>Note that this method will read the body (i.e. <code>rack.input</code>) stream.
+If you need to access the body after calling this method, you will need
+to rewind the stream. To determine whether the request is a CloudEvent
+without reading the body, use <span class='object_link'><a href="#probable_event%3F-instance_method" title="CloudEvents::HttpBinding#probable_event? (method)">#probable_event?</a></span>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>env</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The Rack environment.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>allow_opaque</span>
+      
+      
+        <span class='type'>(<tt>boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>If true, returns opaque event objects if
+the input is not in a recognized format. If false, raises
+<span class='object_link'><a href="UnsupportedFormatError.html" title="CloudEvents::UnsupportedFormatError (class)">UnsupportedFormatError</a></span> in that case. Default is false.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>format_args</span>
+      
+      
+        <span class='type'>(<tt>keywords</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Extra args to pass to the formatter.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if the request includes a single structured
+or binary event.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span>&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if the request includes a batch of
+structured events.</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="CloudEventsError.html" title="CloudEvents::CloudEventsError (class)">CloudEvents::CloudEventsError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if an event could not be decoded
+from the request.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/http_binding.rb', line 169</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_decode_event'>decode_event</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='label'>allow_opaque:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_request_method'>request_method</span> <span class='op'>=</span> <span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>REQUEST_METHOD</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_raise'>raise</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="NotCloudEventError.html" title="CloudEvents::NotCloudEventError (class)">NotCloudEventError</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Request method is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_request_method'>request_method</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='const'>ILLEGAL_METHODS</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_request_method'>request_method</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_content_type_string'>content_type_string</span> <span class='op'>=</span> <span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>CONTENT_TYPE</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_content_type'>content_type</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="ContentType.html" title="CloudEvents::ContentType (class)">ContentType</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="ContentType.html#initialize-instance_method" title="CloudEvents::ContentType#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_content_type_string'>content_type_string</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_content_type_string'>content_type_string</span>
+  <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_read_with_charset'>read_with_charset</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rack.input</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_content_type'>content_type</span><span class='op'>&amp;.</span><span class='id identifier rubyid_charset'>charset</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_decode_binary_content'>decode_binary_content</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_content_type'>content_type</span><span class='comma'>,</span> <span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span> <span class='op'>||</span>
+           <span class='id identifier rubyid_decode_structured_content'>decode_structured_content</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_content_type'>content_type</span><span class='comma'>,</span> <span class='id identifier rubyid_allow_opaque'>allow_opaque</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+    <span class='id identifier rubyid_content_type_string'>content_type_string</span> <span class='op'>=</span> <span class='id identifier rubyid_content_type_string'>content_type_string</span> <span class='op'>?</span> <span class='id identifier rubyid_content_type_string'>content_type_string</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>not present</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_raise'>raise</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="NotCloudEventError.html" title="CloudEvents::NotCloudEventError (class)">NotCloudEventError</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Content-Type is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_content_type_string'>content_type_string</span><span class='embexpr_end'>}</span><span class='tstring_content'>, and CE-SpecVersion is not present</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_result'>result</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="decode_rack_env-instance_method">
+  
+    #<strong>decode_rack_env</strong>(env, **format_args)  &#x21d2; <tt><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span></tt>, ... 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <div class="note deprecated"><strong>Deprecated.</strong> <div class='inline'><p>Will be removed in version 1.0. Use <span class='object_link'><a href="#decode_event-instance_method" title="CloudEvents::HttpBinding#decode_event (method)">#decode_event</a></span> instead.</p>
+</div></div>
+<p>Decode an event from the given Rack environment hash. Following the
+CloudEvents spec, this chooses a handler based on the Content-Type of
+the request.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>env</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The Rack environment.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>format_args</span>
+      
+      
+        <span class='type'>(<tt>keywords</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Extra args to pass to the formatter.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if the request includes a single structured
+or binary event.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span>&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if the request includes a batch of
+structured events.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if the request does not appear to be a CloudEvent.</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="CloudEventsError.html" title="CloudEvents::CloudEventsError (class)">CloudEvents::CloudEventsError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if the request appears to be a
+CloudEvent but decoding failed.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+246
+247
+248
+249
+250
+251
+252
+253</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/http_binding.rb', line 246</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_decode_rack_env'>decode_rack_env</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_content_type_string'>content_type_string</span> <span class='op'>=</span> <span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>CONTENT_TYPE</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_content_type'>content_type</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="ContentType.html" title="CloudEvents::ContentType (class)">ContentType</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="ContentType.html#initialize-instance_method" title="CloudEvents::ContentType#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_content_type_string'>content_type_string</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_content_type_string'>content_type_string</span>
+  <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_read_with_charset'>read_with_charset</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rack.input</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_content_type'>content_type</span><span class='op'>&amp;.</span><span class='id identifier rubyid_charset'>charset</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rack.input</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_rewind'>rewind</span> <span class='kw'>rescue</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_decode_binary_content'>decode_binary_content</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_content_type'>content_type</span><span class='comma'>,</span> <span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span> <span class='op'>||</span>
+    <span class='id identifier rubyid_decode_structured_content'>decode_structured_content</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_content_type'>content_type</span><span class='comma'>,</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="encode_batched_content-instance_method">
+  
+    #<strong>encode_batched_content</strong>(event_batch, format_name, **format_args)  &#x21d2; <tt>Array(headers,String)</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <div class="note deprecated"><strong>Deprecated.</strong> <div class='inline'><p>Will be removed in version 1.0. Use <span class='object_link'><a href="#encode_event-instance_method" title="CloudEvents::HttpBinding#encode_event (method)">#encode_event</a></span> instead.</p>
+</div></div>
+<p>Encode a batch of events in structured content mode in the given format.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>event_batch</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span>&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The batch of events.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>format_name</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The format name.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>format_args</span>
+      
+      
+        <span class='type'>(<tt>keywords</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Extra args to pass to the formatter.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array(headers,String)</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>::ArgumentError</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+283
+284
+285
+286
+287
+288
+289</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/http_binding.rb', line 283</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_encode_batched_content'>encode_batched_content</span><span class='lparen'>(</span><span class='id identifier rubyid_event_batch'>event_batch</span><span class='comma'>,</span> <span class='id identifier rubyid_format_name'>format_name</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='ivar'>@event_encoders</span><span class='lbracket'>[</span><span class='id identifier rubyid_format_name'>format_name</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_encode_event'>encode_event</span><span class='lparen'>(</span><span class='label'>event_batch:</span> <span class='id identifier rubyid_event_batch'>event_batch</span><span class='comma'>,</span>
+                                                      <span class='label'>data_encoder:</span> <span class='ivar'>@data_encoders</span><span class='comma'>,</span>
+                                                      <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Content-Type</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:content_type</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='rbrace'>}</span><span class='comma'>,</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:content</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span>
+  <span class='id identifier rubyid_raise'>raise</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown format name: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_format_name'>format_name</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="encode_binary_content-instance_method">
+  
+    #<strong>encode_binary_content</strong>(event, legacy_data_encode: true, **format_args)  &#x21d2; <tt>Array(headers,String)</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <div class="note deprecated"><strong>Deprecated.</strong> <div class='inline'><p>Will be removed in version 1.0. Use <span class='object_link'><a href="#encode_event-instance_method" title="CloudEvents::HttpBinding#encode_event (method)">#encode_event</a></span> instead.</p>
+</div></div>
+<p>Encode an event in binary content mode.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>event</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The event.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>format_args</span>
+      
+      
+        <span class='type'>(<tt>keywords</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Extra args to pass to the formatter.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array(headers,String)</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/http_binding.rb', line 300</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_encode_binary_content'>encode_binary_content</span><span class='lparen'>(</span><span class='id identifier rubyid_event'>event</span><span class='comma'>,</span> <span class='label'>legacy_data_encode:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_headers'>headers</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='op'>|</span>
+    <span class='kw'>unless</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>data</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>data_encoded</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>datacontenttype</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_headers'>headers</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>CE-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_key'>key</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_percent_encode'>percent_encode</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_body'>body</span><span class='comma'>,</span> <span class='id identifier rubyid_content_type'>content_type</span> <span class='op'>=</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_legacy_data_encode'>legacy_data_encode</span> <span class='op'>||</span> <span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_spec_version'>spec_version</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_legacy_extract_event_data'>legacy_extract_event_data</span><span class='lparen'>(</span><span class='id identifier rubyid_event'>event</span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_normal_extract_event_data'>normal_extract_event_data</span><span class='lparen'>(</span><span class='id identifier rubyid_event'>event</span><span class='comma'>,</span> <span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='id identifier rubyid_headers'>headers</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Content-Type</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_content_type'>content_type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='kw'>if</span> <span class='id identifier rubyid_content_type'>content_type</span>
+  <span class='lbracket'>[</span><span class='id identifier rubyid_headers'>headers</span><span class='comma'>,</span> <span class='id identifier rubyid_body'>body</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="encode_event-instance_method">
+  
+    #<strong>encode_event</strong>(event, structured_format: false, **format_args)  &#x21d2; <tt>Array(headers,String)</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Encode an event or batch of events into HTTP headers and body.</p>
+
+<p>You may provide an event, an array of events, or an opaque event. You may
+also specify what content mode and format to use.</p>
+
+<p>The result is a two-element array where the first element is a headers
+list (as defined in the Rack specification) and the second is a string
+containing the HTTP body content. When using structured content mode, the
+headers list will contain only a <code>Content-Type</code> header and the body will
+contain the serialized event. When using binary mode, the header list
+will contain the serialized event attributes and the body will contain
+the serialized event data.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>event</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span></tt>, <tt>Array&lt;<span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span>&gt;</tt>, <tt><span class='object_link'><a href="Event/Opaque.html" title="CloudEvents::Event::Opaque (class)">CloudEvents::Event::Opaque</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The event, batch, or opaque event.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>structured_format</span>
+      
+      
+        <span class='type'>(<tt>boolean</tt>, <tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>If given, the data will be
+encoded in structured content mode. You can pass a string to select
+a format name, or pass <code>true</code> to use the default format. If set to
+<code>false</code> (the default), the data will be encoded in binary mode.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>format_args</span>
+      
+      
+        <span class='type'>(<tt>keywords</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Extra args to pass to the formatter.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array(headers,String)</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/http_binding.rb', line 207</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_encode_event'>encode_event</span><span class='lparen'>(</span><span class='id identifier rubyid_event'>event</span><span class='comma'>,</span> <span class='label'>structured_format:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">Event</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Event/Opaque.html" title="CloudEvents::Event::Opaque (class)">Opaque</a></span></span><span class='rparen'>)</span>
+    <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Content-Type</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_content_type'>content_type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='rbrace'>}</span><span class='comma'>,</span> <span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_content'>content</span><span class='rbracket'>]</span>
+  <span class='kw'>elsif</span> <span class='op'>!</span><span class='id identifier rubyid_structured_format'>structured_format</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>Array</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_raise'>raise</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Encoding a batch requires structured_format</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_encode_binary_content'>encode_binary_content</span><span class='lparen'>(</span><span class='id identifier rubyid_event'>event</span><span class='comma'>,</span> <span class='label'>legacy_data_encode:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_structured_format'>structured_format</span> <span class='op'>=</span> <span class='id identifier rubyid_default_encoder_name'>default_encoder_name</span> <span class='kw'>if</span> <span class='id identifier rubyid_structured_format'>structured_format</span> <span class='op'>==</span> <span class='kw'>true</span>
+    <span class='id identifier rubyid_raise'>raise</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Format name not specified, and no default is set</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_structured_format'>structured_format</span>
+    <span class='kw'>case</span> <span class='id identifier rubyid_event'>event</span>
+    <span class='kw'>when</span> <span class='op'>::</span><span class='const'>Array</span>
+      <span class='id identifier rubyid_encode_batched_content'>encode_batched_content</span><span class='lparen'>(</span><span class='id identifier rubyid_event'>event</span><span class='comma'>,</span> <span class='id identifier rubyid_structured_format'>structured_format</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+    <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">Event</a></span></span>
+      <span class='id identifier rubyid_encode_structured_content'>encode_structured_content</span><span class='lparen'>(</span><span class='id identifier rubyid_event'>event</span><span class='comma'>,</span> <span class='id identifier rubyid_structured_format'>structured_format</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_raise'>raise</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown event type: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="encode_structured_content-instance_method">
+  
+    #<strong>encode_structured_content</strong>(event, format_name, **format_args)  &#x21d2; <tt>Array(headers,String)</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <div class="note deprecated"><strong>Deprecated.</strong> <div class='inline'><p>Will be removed in version 1.0. Use <span class='object_link'><a href="#encode_event-instance_method" title="CloudEvents::HttpBinding#encode_event (method)">#encode_event</a></span> instead.</p>
+</div></div>
+<p>Encode a single event in structured content mode in the given format.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>event</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Event.html" title="CloudEvents::Event (module)">CloudEvents::Event</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The event.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>format_name</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The format name.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>format_args</span>
+      
+      
+        <span class='type'>(<tt>keywords</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Extra args to pass to the formatter.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array(headers,String)</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>::ArgumentError</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+265
+266
+267
+268
+269
+270
+271</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/http_binding.rb', line 265</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_encode_structured_content'>encode_structured_content</span><span class='lparen'>(</span><span class='id identifier rubyid_event'>event</span><span class='comma'>,</span> <span class='id identifier rubyid_format_name'>format_name</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='ivar'>@event_encoders</span><span class='lbracket'>[</span><span class='id identifier rubyid_format_name'>format_name</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_encode_event'>encode_event</span><span class='lparen'>(</span><span class='label'>event:</span> <span class='id identifier rubyid_event'>event</span><span class='comma'>,</span>
+                                                      <span class='label'>data_encoder:</span> <span class='ivar'>@data_encoders</span><span class='comma'>,</span>
+                                                      <span class='op'>**</span><span class='id identifier rubyid_format_args'>format_args</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Content-Type</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:content_type</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='rbrace'>}</span><span class='comma'>,</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:content</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span>
+  <span class='id identifier rubyid_raise'>raise</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown format name: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_format_name'>format_name</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="probable_event?-instance_method">
+  
+    #<strong>probable_event?</strong>(env)  &#x21d2; <tt>boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Analyze a Rack environment hash and determine whether it is <em>probably</em>
+a CloudEvent. This is done by examining headers only, and does not read
+or parse the request body. The result is a best guess: false negatives or
+false positives are possible for edge cases, but the logic should
+generally detect canonically-formatted events.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>env</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The Rack environment.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether the request is likely a CloudEvent.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+139
+140
+141
+142
+143
+144
+145</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/http_binding.rb', line 139</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_probable_event?'>probable_event?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='const'>ILLEGAL_METHODS</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>REQUEST_METHOD</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HTTP_CE_SPECVERSION</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_content_type'>content_type</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="ContentType.html" title="CloudEvents::ContentType (class)">ContentType</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="ContentType.html#initialize-instance_method" title="CloudEvents::ContentType#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>CONTENT_TYPE</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_content_type'>content_type</span><span class='period'>.</span><span class='id identifier rubyid_media_type'>media_type</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>application</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span>
+    <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>cloudevents</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>cloudevents-batch</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_content_type'>content_type</span><span class='period'>.</span><span class='id identifier rubyid_subtype_base'>subtype_base</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_formatter-instance_method">
+  
+    #<strong>register_formatter</strong>(formatter, deprecated_name = nil, encoder_name: nil)  &#x21d2; <tt>self</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Register a formatter for all operations it supports, based on which
+methods are implemented by the formatter object. See
+<span class='object_link'><a href="Format.html" title="CloudEvents::Format (module)">Format</a></span> for a list of possible methods.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>formatter</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The formatter</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>encoder_name</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The encoder name under which this formatter
+will register its encode operations. Optional. If not specified, any
+event encoder will <em>not</em> be registered.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>deprecated_name</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>This positional argument is deprecated
+and will be removed in version 1.0. Use encoder_name instead.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>self</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/http_binding.rb', line 74</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_formatter'>register_formatter</span><span class='lparen'>(</span><span class='id identifier rubyid_formatter'>formatter</span><span class='comma'>,</span> <span class='id identifier rubyid_deprecated_name'>deprecated_name</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>encoder_name:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_encoder_name'>encoder_name</span> <span class='op'>||=</span> <span class='id identifier rubyid_deprecated_name'>deprecated_name</span>
+  <span class='id identifier rubyid_encoder_name'>encoder_name</span> <span class='op'>=</span> <span class='id identifier rubyid_encoder_name'>encoder_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span> <span class='kw'>if</span> <span class='id identifier rubyid_encoder_name'>encoder_name</span>
+  <span class='id identifier rubyid_decode_event'>decode_event</span> <span class='op'>=</span> <span class='id identifier rubyid_formatter'>formatter</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:decode_event</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_encode_event'>encode_event</span> <span class='op'>=</span> <span class='id identifier rubyid_encoder_name'>encoder_name</span> <span class='kw'>if</span> <span class='id identifier rubyid_formatter'>formatter</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:encode_event</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_decode_data'>decode_data</span> <span class='op'>=</span> <span class='id identifier rubyid_formatter'>formatter</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:decode_data</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_encode_data'>encode_data</span> <span class='op'>=</span> <span class='id identifier rubyid_formatter'>formatter</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:encode_data</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_register_formatter_methods'>register_formatter_methods</span><span class='lparen'>(</span><span class='id identifier rubyid_formatter'>formatter</span><span class='comma'>,</span>
+                             <span class='label'>decode_event:</span> <span class='id identifier rubyid_decode_event'>decode_event</span><span class='comma'>,</span>
+                             <span class='label'>encode_event:</span> <span class='id identifier rubyid_encode_event'>encode_event</span><span class='comma'>,</span>
+                             <span class='label'>decode_data:</span> <span class='id identifier rubyid_decode_data'>decode_data</span><span class='comma'>,</span>
+                             <span class='label'>encode_data:</span> <span class='id identifier rubyid_encode_data'>encode_data</span><span class='rparen'>)</span>
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_formatter_methods-instance_method">
+  
+    #<strong>register_formatter_methods</strong>(formatter, decode_event: false, encode_event: nil, decode_data: false, encode_data: false)  &#x21d2; <tt>self</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Registers the given formatter for the given operations. Some arguments
+are activated by passing <code>true</code>, whereas those that rely on a format name
+are activated by passing in a name string.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>formatter</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The formatter</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>decode_event</span>
+      
+      
+        <span class='type'>(<tt>boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>If true, register the formatter&#39;s
+<span class='object_link'><a href="Format.html#decode_event-instance_method" title="CloudEvents::Format#decode_event (method)">Format#decode_event</a></span> method.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>encode_event</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>If set to a string, use the formatter&#39;s
+<span class='object_link'><a href="Format.html#encode_event-instance_method" title="CloudEvents::Format#encode_event (method)">Format#encode_event</a></span> method when that name is requested.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>decode_data</span>
+      
+      
+        <span class='type'>(<tt>boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>If true, register the formatter&#39;s
+<span class='object_link'><a href="Format.html#decode_data-instance_method" title="CloudEvents::Format#decode_data (method)">Format#decode_data</a></span> method.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>encode_data</span>
+      
+      
+        <span class='type'>(<tt>boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>If true, register the formatter&#39;s
+<span class='object_link'><a href="Format.html#encode_data-instance_method" title="CloudEvents::Format#encode_data (method)">Format#encode_data</a></span> method.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>self</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cloud_events/http_binding.rb', line 105</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_formatter_methods'>register_formatter_methods</span><span class='lparen'>(</span><span class='id identifier rubyid_formatter'>formatter</span><span class='comma'>,</span>
+                               <span class='label'>decode_event:</span> <span class='kw'>false</span><span class='comma'>,</span>
+                               <span class='label'>encode_event:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+                               <span class='label'>decode_data:</span> <span class='kw'>false</span><span class='comma'>,</span>
+                               <span class='label'>encode_data:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='ivar'>@event_decoders</span><span class='period'>.</span><span class='id identifier rubyid_formats'>formats</span><span class='period'>.</span><span class='id identifier rubyid_unshift'>unshift</span><span class='lparen'>(</span><span class='id identifier rubyid_formatter'>formatter</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_decode_event'>decode_event</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_encode_event'>encode_event</span>
+    <span class='id identifier rubyid_encoders'>encoders</span> <span class='op'>=</span> <span class='ivar'>@event_encoders</span><span class='lbracket'>[</span><span class='id identifier rubyid_encode_event'>encode_event</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Format.html" title="CloudEvents::Format (module)">Format</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Format/Multi.html" title="CloudEvents::Format::Multi (class)">Multi</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Format/Multi.html#initialize-instance_method" title="CloudEvents::Format::Multi#initialize (method)">new</a></span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_result'>result</span><span class='op'>|</span>
+      <span class='id identifier rubyid_result'>result</span><span class='op'>&amp;.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:content</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:content_type</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_result'>result</span> <span class='op'>:</span> <span class='kw'>nil</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_encoders'>encoders</span><span class='period'>.</span><span class='id identifier rubyid_formats'>formats</span><span class='period'>.</span><span class='id identifier rubyid_unshift'>unshift</span><span class='lparen'>(</span><span class='id identifier rubyid_formatter'>formatter</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='ivar'>@data_decoders</span><span class='period'>.</span><span class='id identifier rubyid_formats'>formats</span><span class='period'>.</span><span class='id identifier rubyid_unshift'>unshift</span><span class='lparen'>(</span><span class='id identifier rubyid_formatter'>formatter</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_decode_data'>decode_data</span>
+  <span class='ivar'>@data_encoders</span><span class='period'>.</span><span class='id identifier rubyid_formats'>formats</span><span class='period'>.</span><span class='id identifier rubyid_unshift'>unshift</span><span class='lparen'>(</span><span class='id identifier rubyid_formatter'>formatter</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_encode_data'>encode_data</span>
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun Nov 30 21:24:47 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.4.7).
+</div>
+
+    </div>
+  </body>
+</html>

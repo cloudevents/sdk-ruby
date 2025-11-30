@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: CHANGELOG
+  
+    &mdash; CloudEvents
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "CHANGELOG";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="file_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: CHANGELOG</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'><h1 id="changelog">Changelog</h1>
+
+<h3 id="v0-8-2-2025-11-30">v0.8.2 / 2025-11-30</h3>
+
+<ul>
+<li>DOCS: Fixed a few typos in documentation and error messages</li>
+</ul>
+
+<h3 id="v0-8-1-2025-11-10">v0.8.1 / 2025-11-10</h3>
+
+<ul>
+<li>DOCS: Some minor updates and corrections to the README and examples</li>
+</ul>
+
+<h3 id="v0-8-0-2025-11-04">v0.8.0 / 2025-11-04</h3>
+
+<ul>
+<li>BREAKING CHANGE: Raise AttributeError if an illegal attribute name is used</li>
+<li>ADDED: Require Ruby 2.7 or later</li>
+<li>FIXED: Improved hashing algorithm for opaque event objects</li>
+<li>FIXED: Removed dependency on base64 gem</li>
+<li>FIXED: Raise AttributeError if an illegal attribute name is used</li>
+<li>DOCS: Add link to the security mailing list</li>
+</ul>
+
+<h3 id="v0-7-1-2023-10-04">v0.7.1 / 2023-10-04</h3>
+
+<ul>
+<li>DOCS: Governance docs per CE PR 1226</li>
+</ul>
+
+<h3 id="v0-7-0-2022-01-14">v0.7.0 / 2022-01-14</h3>
+
+<ul>
+<li>HttpBinding#probable_event? returns false if the request method is GET or HEAD.</li>
+<li>HttpBinding#decode_event raises NotCloudEventError if the request method is GET or HEAD. </li>
+<li>Fixed a NoMethodError if nil content was passed to the ContentType constructor.</li>
+</ul>
+
+<h3 id="v0-6-0-2021-08-23">v0.6.0 / 2021-08-23</h3>
+
+<p>This update further clarifies and cleans up the encoding behavior of event payloads. In particular, the event object now includes explicitly encoded data in the new <code>data_encoded</code> field, and provides information on whether the existing <code>data</code> field contains an encoded or decoded form of the payload.</p>
+
+<ul>
+<li>Added <code>data_encoded</code>, <code>data_decoded?</code> and <code>data?</code> methods to <code>CloudEvents::Event::V1</code>, added <code>:data_encoded</code> as an input attribute, and clarified the encoding semantics of each field.</li>
+<li>Changed <code>:attributes</code> keyword argument in event constructors to <code>:set_attributes</code>, to avoid any possible collision with a real extension attribute name. (The old argument name is deprecated and will be removed in 1.0.)</li>
+<li>Fixed various inconsistencies in the data encoding behavior of <code>JsonFormat</code> and <code>HttpBinding</code>.</li>
+<li>Support passing a data content encoder/decoder into <code>JsonFormat#encode_event</code> and <code>JsonFormat#decode_event</code>.</li>
+<li>Provided <code>TextFormat</code> to handle media types with trivial encoding.</li>
+<li>Provided <code>Format::Multi</code> to handle checking a series of encoders/decoders.</li>
+</ul>
+
+<h3 id="v0-5-1-2021-06-28">v0.5.1 / 2021-06-28</h3>
+
+<ul>
+<li>ADDED: Add HttpBinding#probable_event? </li>
+<li>FIXED: Fixed a NoMethodError when a format declined to decode an http request </li>
+</ul>
+
+<h3 id="v0-5-0-2021-06-28">v0.5.0 / 2021-06-28</h3>
+
+<p>This is a significant update that provides several important spec-related and usability fixes. Some of the behavioral changes are breaking, so to preserve compatibility, new methods were added and old methods deprecated, particularly in the HttpBinding class. Additionally, the formatter interface has been simplified and expanded to support payload formatting.</p>
+
+<ul>
+<li>CHANGED: Deprecated HttpBinding#decode_rack_env and replaced with HttpBinding#decode_event. (The old method remains for backward compatibility, but will be removed in version 1.0). The new decode_event method has the following differences:
+
+<ul>
+<li>decode_event raises NotCloudEventError (rather than returning nil) if given an HTTP request that does not seem to have been intended as a CloudEvent.</li>
+<li>decode_event takes an allow_opaque argument that, when set to true, returns a CloudEvents::Event::Opaque (rather than raising an exception) if given a structured event with a format not known by the SDK. Opaque event objects cannot have their fields inspected, but can be reserialized for retransmission to another event handler.</li>
+<li>decode_event in binary content mode now parses JSON content-types and exposes the data attribute as a JSON value.</li>
+</ul></li>
+<li>CHANGED: Deprecated the HttpBinding encoding entrypoints (encode_structured_content, encode_batched_content, and encode_binary_content) and replaced with a single encode_event entrypoint that handles all cases via the structured_format argument. (The old methods remain for backward compatibility, but will be removed in version 1.0). In addition, the new encode_event method has the following differences:
+
+<ul>
+<li>encode_event in binary content mode now interprets a string-valued data attribute as a JSON string and serializes it (i.e. wraps it in quotes) if the data_content_type has a JSON format. This is for compatibility with the behavior of the JSON structured mode which always treats the data attribute as a JSON value if the data_content_type indicates JSON.</li>
+</ul></li>
+<li>CHANGED: The JsonFormat class interface was reworked to be more generic, combine the structured and batched calls, and add calls to handle data payloads. A Format module has been added to specify the interface used by JsonFormat and future formatters. (Breaking change of internal interfaces)</li>
+<li>CHANGED: Renamed HttpContentError to UnsupportedFormatError to better reflect the specific issue being reported, and to eliminate the coupling to http. The old name remains aliased to the new name, but is deprecated and will be removed in version 1.0.</li>
+<li>CHANGED: If format-driven parsing (e.g. parsing a JSON document) fails, a FormatSyntaxError will be raised instead of, for example, a JSON-specific error. The lower-level parser error can still be accessed from the exception&#39;s &quot;cause&quot;.</li>
+<li>FIXED: JsonFormat now sets the datacontenttype attribute explicitly to &quot;application/json&quot; if it isn&#39;t otherwise set.</li>
+</ul>
+
+<h3 id="v0-4-0-2021-05-26">v0.4.0 / 2021-05-26</h3>
+
+<ul>
+<li>ADDED: ContentType can take an optional default charset </li>
+<li>FIXED: Binary HTTP format parses quoted tokens according to RFC 7230 section 3.2.6 </li>
+<li>FIXED: When encoding structured events for HTTP transport, the content-type now includes the charset</li>
+</ul>
+
+<h3 id="v0-3-1-2021-04-25">v0.3.1 / 2021-04-25</h3>
+
+<ul>
+<li>FIXED: Fixed exception when decoding from a rack source that uses InputWrapper </li>
+<li>FIXED: Fixed equality checking for V0 events </li>
+</ul>
+
+<h3 id="v0-3-0-2021-03-02">v0.3.0 / 2021-03-02</h3>
+
+<ul>
+<li>ADDED: Require Ruby 2.5 or later</li>
+<li>FIXED: Deep-duplicated event attributes in to_h to avoid returning frozen objects </li>
+</ul>
+
+<h3 id="v0-2-0-2021-01-25">v0.2.0 / 2021-01-25</h3>
+
+<ul>
+<li>ADDED: Freeze event objects to make them Ractor-shareable</li>
+<li>DOCS: Fix formatting of Apache license </li>
+</ul>
+
+<h3 id="v0-1-2-2020-09-02">v0.1.2 / 2020-09-02</h3>
+
+<ul>
+<li>Fix: Convert extension attributes to strings, and ignore nils </li>
+<li>Documentation: Add code of conduct link to readme</li>
+</ul>
+
+<h3 id="v0-1-1-2020-07-20">v0.1.1 / 2020-07-20</h3>
+
+<ul>
+<li>Updated a few documentation links. No functional changes.</li>
+</ul>
+
+<h3 id="v0-1-0-2020-07-08">v0.1.0 / 2020-07-08</h3>
+
+<ul>
+<li>Initial release of the Ruby SDK.</li>
+</ul>
+</div></div>
+
+      <div id="footer">
+  Generated on Sun Nov 30 21:24:46 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.4.7).
+</div>
+
+    </div>
+  </body>
+</html>
