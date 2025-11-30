@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.8.2 / 2025-11-30
+
+* DOCS: Fixed a few typos in documentation and error messages
+
 ### v0.8.1 / 2025-11-10
 
 * DOCS: Some minor updates and corrections to the README and examples

@@ -5,5 +5,5 @@ module CloudEvents
   # Version of the Ruby CloudEvents SDK
   # @return [String]
   #
-  VERSION = "0.8.1"
+  VERSION = "0.8.2"
 end
