@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.8.3 / 2025-11-30
+
+* No significant updates.
+
 ### v0.8.2 / 2025-11-30
 
 * DOCS: Fixed a few typos in documentation and error messages
