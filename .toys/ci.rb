@@ -9,7 +9,7 @@ desc "Run all CI checks"
 expand("toys-ci") do |toys_ci|
   toys_ci.only_flag = true
   toys_ci.fail_fast_flag = true
-  toys_ci.job("Bundle update", flag: :bundle, exec: ["bundle", "update"])
+  toys_ci.job("Bundle update", flag: :bundle, exec: ["bundle", "update", "--all"])
   toys_ci.job("Rubocop", flag: :rubocop, tool: ["rubocop"])
   toys_ci.job("Tests", flag: :test, tool: ["test"])
   toys_ci.job("Cucumber", flag: :cucumber, tool: ["cucumber"])

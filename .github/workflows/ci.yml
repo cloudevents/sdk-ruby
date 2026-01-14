@@ -34,7 +34,10 @@ jobs:
             ruby: "3.4"
             flags: "--test --cucumber"
           - os: ubuntu-latest
-            ruby: "3.4"
+            ruby: "4.0"
+            flags: "--test --cucumber"
+          - os: ubuntu-latest
+            ruby: "4.0"
             flags: "--rubocop --yard --build"
           - os: ubuntu-latest
             ruby: jruby
@@ -44,10 +47,10 @@ jobs:
           #   ruby: truffleruby
           #   flags: "--test --cucumber"
           - os: macos-latest
-            ruby: "3.4"
+            ruby: "4.0"
             flags: "--test --cucumber"
           - os: windows-latest
-            ruby: "3.4"
+            ruby: "4.0"
             flags: "--test --cucumber"
       fail-fast: false
     runs-on: ${{ matrix.os }}
@@ -57,7 +60,7 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
       - name: Checkout repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Install dependencies
         shell: bash
         run: "bundle install && gem install --no-document toys"

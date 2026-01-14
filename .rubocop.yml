@@ -261,6 +261,8 @@ Style/MethodCallWithArgsParentheses:
   Enabled: true
 Style/MinMaxComparison:
   Enabled: true
+Style/ModuleMemberExistenceCheck:
+  Enabled: true
 Style/MultilineInPatternThen:
   Enabled: true
 Style/NegatedIfElseCondition:
