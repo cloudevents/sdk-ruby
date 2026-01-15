@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.8.3 / 2026-01-15
+
+* FIXED: Fixed default charset behavior for various non-text/plain content types
+
 ### v0.8.2 / 2025-11-30
 
 * DOCS: Fixed a few typos in documentation and error messages
