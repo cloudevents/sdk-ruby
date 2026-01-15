@@ -29,15 +29,39 @@ describe CloudEvents::ContentType do
     assert Ractor.shareable?(content_type) if defined? Ractor
   end
 
-  it "defaults to us-ascii charset" do
-    content_type = CloudEvents::ContentType.new("application/json")
+  it "defaults to us-ascii charset for text/plain" do
+    content_type = CloudEvents::ContentType.new("text/plain")
     assert_equal "us-ascii", content_type.charset
     assert Ractor.shareable?(content_type) if defined? Ractor
   end
 
-  it "defaults to a given charset" do
-    content_type = CloudEvents::ContentType.new("application/json", default_charset: "utf-8")
+  it "defaults to utf-8 charset for application/json" do
+    content_type = CloudEvents::ContentType.new("application/json")
     assert_equal "utf-8", content_type.charset
+    assert Ractor.shareable?(content_type) if defined? Ractor
+  end
+
+  it "defaults to utf-8 charset for application/cloudevents+json" do
+    content_type = CloudEvents::ContentType.new("application/cloudevents+json")
+    assert_equal "utf-8", content_type.charset
+    assert Ractor.shareable?(content_type) if defined? Ractor
+  end
+
+  it "defaults to utf-8 charset for text/html" do
+    content_type = CloudEvents::ContentType.new("text/html")
+    assert_equal "utf-8", content_type.charset
+    assert Ractor.shareable?(content_type) if defined? Ractor
+  end
+
+  it "does not default to a charset for image/png" do
+    content_type = CloudEvents::ContentType.new("image/png")
+    assert_nil content_type.charset
+    assert Ractor.shareable?(content_type) if defined? Ractor
+  end
+
+  it "defaults to a given charset" do
+    content_type = CloudEvents::ContentType.new("text/html", default_charset: "utf-16")
+    assert_equal "utf-16", content_type.charset
     assert Ractor.shareable?(content_type) if defined? Ractor
   end
 

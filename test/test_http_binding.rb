@@ -20,10 +20,11 @@ describe CloudEvents::HttpBinding do
   let(:encoded_quoted_type) { "Hello%20\"Ruby%20world\"%20\"this\\\"is\\\\a\\1string\"%20okay" }
   let(:spec_version) { "1.0" }
   let(:my_simple_data) { "12345" }
-  let(:my_json_escaped_simple_data) { '"12345"' }
+  let(:my_json_object) { {"a" => "ä", "b" => "😀"} }
+  let(:my_json_escaped_data) { '{"a":"ä","b":"😀"}' }
   let(:my_content_type_string) { "text/plain; charset=us-ascii" }
   let(:my_content_type) { CloudEvents::ContentType.new(my_content_type_string) }
-  let(:my_json_content_type_string) { "application/json; charset=us-ascii" }
+  let(:my_json_content_type_string) { "application/json" }
   let(:my_json_content_type) { CloudEvents::ContentType.new(my_json_content_type_string) }
   let(:my_schema_string) { "/my_schema" }
   let(:my_schema) { URI.parse(my_schema_string) }
@@ -31,7 +32,7 @@ describe CloudEvents::HttpBinding do
   let(:my_time_string) { "2020-01-12T20:52:05-08:00" }
   let(:my_time) { DateTime.rfc3339(my_time_string) }
   let(:my_trace_context) { "1234567890;9876543210" }
-  let :my_json_struct do
+  let(:my_json_struct) do
     {
       "data"            => my_simple_data,
       "datacontenttype" => my_content_type_string,
@@ -46,9 +47,9 @@ describe CloudEvents::HttpBinding do
   end
   let(:my_json_struct_encoded) { JSON.dump(my_json_struct) }
   let(:my_json_batch_encoded) { JSON.dump([my_json_struct]) }
-  let :my_json_data_struct do
+  let(:my_json_data_struct) do
     {
-      "data"            => my_simple_data,
+      "data"            => my_json_object,
       "datacontenttype" => my_json_content_type_string,
       "dataschema"      => my_schema_string,
       "id"              => my_id,
@@ -60,7 +61,7 @@ describe CloudEvents::HttpBinding do
     }
   end
   let(:my_json_data_struct_encoded) { JSON.dump(my_json_data_struct) }
-  let :my_simple_binary_mode do
+  let(:my_simple_binary_mode) do
     {
       "rack.input"          => StringIO.new(my_simple_data),
       "HTTP_CE_ID"          => my_id,
@@ -73,9 +74,9 @@ describe CloudEvents::HttpBinding do
       "HTTP_CE_TIME"        => my_time_string,
     }
   end
-  let :my_json_binary_mode do
+  let(:my_json_binary_mode) do
     {
-      "rack.input"          => StringIO.new(my_json_escaped_simple_data),
+      "rack.input"          => StringIO.new(my_json_escaped_data),
       "HTTP_CE_ID"          => my_id,
       "HTTP_CE_SOURCE"      => my_source_string,
       "HTTP_CE_TYPE"        => my_type,
@@ -86,7 +87,7 @@ describe CloudEvents::HttpBinding do
       "HTTP_CE_TIME"        => my_time_string,
     }
   end
-  let :my_minimal_binary_mode do
+  let(:my_minimal_binary_mode) do
     {
       "rack.input"          => StringIO.new(""),
       "HTTP_CE_ID"          => my_id,
@@ -95,7 +96,7 @@ describe CloudEvents::HttpBinding do
       "HTTP_CE_SPECVERSION" => spec_version,
     }
   end
-  let :my_extensions_binary_mode do
+  let(:my_extensions_binary_mode) do
     {
       "rack.input"           => StringIO.new(my_simple_data),
       "HTTP_CE_ID"           => my_id,
@@ -109,7 +110,7 @@ describe CloudEvents::HttpBinding do
       "HTTP_CE_TRACECONTEXT" => my_trace_context,
     }
   end
-  let :my_nonascii_binary_mode do
+  let(:my_nonascii_binary_mode) do
     {
       "rack.input"          => StringIO.new(my_simple_data),
       "HTTP_CE_ID"          => my_id,
@@ -122,7 +123,7 @@ describe CloudEvents::HttpBinding do
       "HTTP_CE_TIME"        => my_time_string,
     }
   end
-  let :my_simple_event do
+  let(:my_simple_event) do
     CloudEvents::Event::V1.new(data_encoded: my_simple_data,
                                data: my_simple_data,
                                datacontenttype: my_content_type_string,
@@ -134,9 +135,9 @@ describe CloudEvents::HttpBinding do
                                time: my_time_string,
                                type: my_type)
   end
-  let :my_json_event do
-    CloudEvents::Event::V1.new(data_encoded: my_json_escaped_simple_data,
-                               data: my_simple_data,
+  let(:my_json_event) do
+    CloudEvents::Event::V1.new(data_encoded: my_json_escaped_data,
+                               data: my_json_object,
                                datacontenttype: my_json_content_type_string,
                                dataschema: my_schema_string,
                                id: my_id,
@@ -146,7 +147,7 @@ describe CloudEvents::HttpBinding do
                                time: my_time_string,
                                type: my_type)
   end
-  let :my_minimal_event do
+  let(:my_minimal_event) do
     CloudEvents::Event::V1.new(data_encoded: "",
                                data: "",
                                id: my_id,
@@ -154,7 +155,7 @@ describe CloudEvents::HttpBinding do
                                specversion: spec_version,
                                type: my_type)
   end
-  let :my_extensions_event do
+  let(:my_extensions_event) do
     CloudEvents::Event::V1.new(data_encoded: my_simple_data,
                                data: my_simple_data,
                                datacontenttype: my_content_type_string,
@@ -167,7 +168,7 @@ describe CloudEvents::HttpBinding do
                                tracecontext: my_trace_context,
                                type: my_type)
   end
-  let :my_nonascii_event do
+  let(:my_nonascii_event) do
     CloudEvents::Event::V1.new(data_encoded: my_simple_data,
                                data: my_simple_data,
                                datacontenttype: my_content_type_string,

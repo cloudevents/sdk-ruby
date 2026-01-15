@@ -22,17 +22,15 @@ module CloudEvents
     #
     # @param string [String] Content-Type header value in RFC 2045 format
     # @param default_charset [String] Optional. The charset to use if none is
-    #     specified. Defaults to `us-ascii`.
+    #     specified. Defaults to `utf-8` for all types other than `text/plain`
+    #     for which it defaults to `us-ascii`.
     #
     def initialize(string, default_charset: nil)
       @string = string.to_s
-      @media_type = "text"
-      @subtype_base = @subtype = "plain"
-      @subtype_format = nil
+      @media_type = @subtype = @subtype_base = @subtype_format = @charset = nil
       @params = []
-      @charset = default_charset || "us-ascii"
       @error_message = nil
-      parse(consume_comments(@string.strip))
+      parse(consume_comments(@string.strip), default_charset)
       @canonical_string = "#{@media_type}/#{@subtype}" +
                           @params.map { |k, v| "; #{k}=#{maybe_quote(v)}" }.join
       full_freeze
@@ -86,8 +84,10 @@ module CloudEvents
     attr_reader :params
 
     ##
-    # The charset, defaulting to "us-ascii" if none is explicitly set.
-    # @return [String]
+    # Returns the charset, which may be an appropriate default (e.g. `us-ascii`
+    # for `text/plain`, or `utf-8` for `application/json`), or may be nil for
+    # non-text cases.
+    # @return [String,nil]
     #
     attr_reader :charset
 
@@ -124,7 +124,7 @@ module CloudEvents
 
     private
 
-    def parse(str)
+    def parse(str, default_charset)
       @media_type, str = consume_token(str, downcase: true, error_message: "Failed to parse media type")
       str = consume_special(str, "/")
       @subtype, str = consume_token(str, downcase: true, error_message: "Failed to parse subtype")
@@ -139,6 +139,13 @@ module CloudEvents
       end
     rescue ParseError => e
       @error_message = e.message
+    ensure
+      unless @subtype
+        @media_type = "text"
+        @subtype_base = @subtype = "plain"
+        @subtype_format = nil
+      end
+      @charset ||= default_charset || choose_default_charset
     end
 
     def consume_token(str, downcase: false, error_message: nil)
@@ -208,6 +215,14 @@ module CloudEvents
       return str if /^[\w!#$%&'*+.\^`{|}-]+$/ =~ str
       str = str.gsub("\\", "\\\\\\\\").gsub("\"", "\\\\\"")
       "\"#{str}\""
+    end
+
+    def choose_default_charset
+      if @media_type == "text" && @subtype == "plain"
+        "us-ascii"
+      elsif @media_type == "text" || @subtype_base == "json" || @subtype_format == "json"
+        "utf-8"
+      end
     end
 
     def full_freeze
