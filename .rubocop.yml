@@ -140,6 +140,7 @@ Metrics/AbcSize:
 Metrics/BlockLength:
   Exclude:
     - "test/**/test_*.rb"
+    - "cloud_events.gemspec"
 Metrics/ClassLength:
   Max: 300
 Metrics/CollectionLiteralLength:
