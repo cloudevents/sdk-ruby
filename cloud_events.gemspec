@@ -17,7 +17,16 @@ version = ::CloudEvents::VERSION
     "and unmarshalling event data."
   spec.homepage = "https://github.com/cloudevents/sdk-ruby"
 
-  spec.files = ::Dir.glob("lib/**/*.rb") + ::Dir.glob("*.md") + [".yardopts"]
+  spec.files = ::Dir.glob("lib/**/*.rb") +
+               [
+                 ".yardopts",
+                 "CHANGELOG.md",
+                 "CONTRIBUTING.md",
+                 "MAINTAINERS.md",
+                 "README.md",
+                 "RELEASING.md",
+                 "LICENSE",
+               ]
   spec.require_paths = ["lib"]
   spec.required_ruby_version = ">= 2.7"
 
