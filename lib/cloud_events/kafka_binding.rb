@@ -163,5 +163,85 @@ module CloudEvents
       return false unless content_type
       content_type.start_with?("application/cloudevents")
     end
+
+    ##
+    # Decode an event from a Kafka message hash.
+    #
+    # @param message [Hash] A hash with `:key`, `:value`, and `:headers` keys.
+    # @param allow_opaque [boolean] If true, returns {Event::Opaque} for
+    #     unrecognized structured formats. Default is false.
+    # @param reverse_key_mapper [Proc,nil,:NOT_SET] A callable
+    #     `(key) -> Hash`, or `nil` to skip key mapping. Defaults to the
+    #     instance's reverse_key_mapper.
+    # @param format_args [keywords] Extra args forwarded to formatters.
+    # @return [CloudEvents::Event] The decoded event.
+    # @raise [NotCloudEventError] if the message is not a CloudEvent.
+    # @raise [SpecVersionError] if the specversion is not supported.
+    # @raise [UnsupportedFormatError] if a structured format is not recognized.
+    # @raise [FormatSyntaxError] if the structured content is malformed.
+    #
+    def decode_event(message, allow_opaque: false, reverse_key_mapper: :NOT_SET, **format_args)
+      reverse_key_mapper = @reverse_key_mapper if reverse_key_mapper == :NOT_SET
+      headers = message[:headers] || {}
+      content_type_string = headers["content-type"]
+      content_type = ContentType.new(content_type_string) if content_type_string
+
+      event = if content_type&.media_type == "application" && content_type.subtype_base == "cloudevents"
+                decode_structured_content(message, content_type, allow_opaque, **format_args)
+              elsif headers.key?("ce_specversion")
+                decode_binary_content(message, content_type, **format_args)
+              end
+      unless event
+        ct_desc = content_type_string ? content_type_string.inspect : "not present"
+        raise NotCloudEventError, "content-type is #{ct_desc}, and ce_specversion header is not present"
+      end
+      apply_reverse_key_mapper(event, message[:key], reverse_key_mapper)
+    end
+
+    private
+
+    # @private
+    OMIT_ATTR_NAMES = ["specversion", "spec_version", "data", "datacontenttype", "data_content_type"].freeze
+
+    def decode_binary_content(message, content_type, **format_args)
+      headers = message[:headers] || {}
+      spec_version = headers["ce_specversion"]
+      unless spec_version =~ /^1(\.|$)/
+        raise SpecVersionError, "Unrecognized specversion: #{spec_version}"
+      end
+      attributes = { "spec_version" => spec_version }
+      headers.each do |key, value|
+        next unless key.start_with?("ce_")
+        attr_name = key[3..].downcase
+        attributes[attr_name] = value unless OMIT_ATTR_NAMES.include?(attr_name)
+      end
+      value = message[:value]
+      if value.nil?
+        attributes["data_content_type"] = content_type if content_type
+      else
+        attributes["data_encoded"] = value
+        result = @data_decoders.decode_data(spec_version: spec_version,
+                                            content: value,
+                                            content_type: content_type,
+                                            **format_args)
+        if result
+          attributes["data"] = result[:data]
+          content_type = result[:content_type]
+        end
+        attributes["data_content_type"] = content_type if content_type
+      end
+      Event.create(spec_version: spec_version, set_attributes: attributes)
+    end
+
+    def decode_structured_content(_message, _content_type, _allow_opaque, **_format_args)
+      nil
+    end
+
+    def apply_reverse_key_mapper(event, key, reverse_key_mapper)
+      return event unless reverse_key_mapper
+      mapped_attrs = reverse_key_mapper.call(key)
+      return event if mapped_attrs.nil? || mapped_attrs.empty?
+      event.with(**mapped_attrs.transform_keys(&:to_sym))
+    end
   end
 end

@@ -88,4 +88,182 @@ describe CloudEvents::KafkaBinding do
       refute kafka_binding.probable_event?(message)
     end
   end
+
+  describe "decode_event binary mode" do
+    it "decodes a binary message with text content type" do
+      message = {
+        key: nil,
+        value: my_simple_data,
+        headers: {
+          "ce_specversion" => spec_version,
+          "ce_id" => my_id,
+          "ce_source" => my_source_string,
+          "ce_type" => my_type,
+          "content-type" => my_content_type_string,
+          "ce_dataschema" => my_schema_string,
+          "ce_subject" => my_subject,
+          "ce_time" => my_time_string,
+        },
+      }
+      event = kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      assert_equal my_id, event.id
+      assert_equal my_source, event.source
+      assert_equal my_type, event.type
+      assert_equal spec_version, event.spec_version
+      assert_equal my_simple_data, event.data
+      assert_equal my_content_type_string, event.data_content_type.to_s
+      assert_equal my_schema, event.data_schema
+      assert_equal my_subject, event.subject
+      assert_equal my_time, event.time
+    end
+
+    it "decodes a binary message with JSON content type" do
+      message = {
+        key: nil,
+        value: my_json_escaped_data,
+        headers: {
+          "ce_specversion" => spec_version,
+          "ce_id" => my_id,
+          "ce_source" => my_source_string,
+          "ce_type" => my_type,
+          "content-type" => my_json_content_type_string,
+          "ce_dataschema" => my_schema_string,
+          "ce_subject" => my_subject,
+          "ce_time" => my_time_string,
+        },
+      }
+      event = kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      assert_equal my_json_object, event.data
+      assert_equal my_json_escaped_data, event.data_encoded
+    end
+
+    it "decodes a minimal binary message" do
+      message = {
+        key: nil,
+        value: nil,
+        headers: {
+          "ce_specversion" => spec_version,
+          "ce_id" => my_id,
+          "ce_source" => my_source_string,
+          "ce_type" => my_type,
+        },
+      }
+      event = kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      assert_equal my_id, event.id
+      assert_equal my_source, event.source
+      assert_equal my_type, event.type
+      assert_nil event.data
+      assert_nil event.data_content_type
+    end
+
+    it "decodes a binary message with extension attributes" do
+      message = {
+        key: nil,
+        value: my_simple_data,
+        headers: {
+          "ce_specversion" => spec_version,
+          "ce_id" => my_id,
+          "ce_source" => my_source_string,
+          "ce_type" => my_type,
+          "content-type" => my_content_type_string,
+          "ce_tracecontext" => my_trace_context,
+        },
+      }
+      event = kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      assert_equal my_trace_context, event["tracecontext"]
+    end
+
+    it "decodes a tombstone message (nil value)" do
+      message = {
+        key: nil,
+        value: nil,
+        headers: {
+          "ce_specversion" => spec_version,
+          "ce_id" => my_id,
+          "ce_source" => my_source_string,
+          "ce_type" => my_type,
+        },
+      }
+      event = kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      refute event.data?
+      assert_nil event.data
+    end
+
+    it "maps key to partitionkey with default reverse_key_mapper" do
+      message = {
+        key: "my-partition-key",
+        value: my_simple_data,
+        headers: {
+          "ce_specversion" => spec_version,
+          "ce_id" => my_id,
+          "ce_source" => my_source_string,
+          "ce_type" => my_type,
+          "content-type" => my_content_type_string,
+        },
+      }
+      event = kafka_binding.decode_event(message)
+      assert_equal "my-partition-key", event["partitionkey"]
+    end
+
+    it "uses custom reverse_key_mapper per-call" do
+      message = {
+        key: "custom-key",
+        value: my_simple_data,
+        headers: {
+          "ce_specversion" => spec_version,
+          "ce_id" => my_id,
+          "ce_source" => my_source_string,
+          "ce_type" => my_type,
+          "content-type" => my_content_type_string,
+        },
+      }
+      mapper = ->(key) { key.nil? ? {} : { "mykey" => key } }
+      event = kafka_binding.decode_event(message, reverse_key_mapper: mapper)
+      assert_equal "custom-key", event["mykey"]
+      assert_nil event["partitionkey"]
+    end
+
+    it "skips key mapping when reverse_key_mapper is nil" do
+      message = {
+        key: "my-partition-key",
+        value: my_simple_data,
+        headers: {
+          "ce_specversion" => spec_version,
+          "ce_id" => my_id,
+          "ce_source" => my_source_string,
+          "ce_type" => my_type,
+          "content-type" => my_content_type_string,
+        },
+      }
+      event = kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      assert_nil event["partitionkey"]
+    end
+
+    it "raises SpecVersionError for bad specversion" do
+      message = {
+        key: nil,
+        value: "hello",
+        headers: {
+          "ce_specversion" => "0.1",
+          "ce_id" => my_id,
+          "ce_source" => my_source_string,
+          "ce_type" => my_type,
+        },
+      }
+      assert_raises CloudEvents::SpecVersionError do
+        kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      end
+    end
+
+    it "raises NotCloudEventError for non-CE message" do
+      message = {
+        key: nil,
+        value: "hello",
+        headers: { "content-type" => "application/json" },
+      }
+      assert_raises CloudEvents::NotCloudEventError do
+        kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      end
+    end
+  end
 end
