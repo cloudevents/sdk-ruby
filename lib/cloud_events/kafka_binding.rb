@@ -193,7 +193,7 @@ module CloudEvents
               end
       unless event
         ct_desc = content_type_string ? content_type_string.inspect : "not present"
-        raise NotCloudEventError, "content-type is #{ct_desc}, and ce_specversion header is not present"
+        raise(NotCloudEventError, "content-type is #{ct_desc}, and ce_specversion header is not present")
       end
       apply_reverse_key_mapper(event, message[:key], reverse_key_mapper)
     end
@@ -223,17 +223,15 @@ module CloudEvents
       end
     end
 
-    private
-
     # @private
     OMIT_ATTR_NAMES = ["specversion", "spec_version", "data", "datacontenttype", "data_content_type"].freeze
+
+    private
 
     def decode_binary_content(message, content_type, **format_args)
       headers = message[:headers] || {}
       spec_version = headers["ce_specversion"]
-      unless spec_version =~ /^1(\.|$)/
-        raise SpecVersionError, "Unrecognized specversion: #{spec_version}"
-      end
+      raise(SpecVersionError, "Unrecognized specversion: #{spec_version}") unless spec_version =~ /^1(\.|$)/
       attributes = { "spec_version" => spec_version }
       headers.each do |key, value|
         next unless key.start_with?("ce_")
@@ -241,21 +239,24 @@ module CloudEvents
         attributes[attr_name] = value unless OMIT_ATTR_NAMES.include?(attr_name)
       end
       value = message[:value]
-      if value.nil?
-        attributes["data_content_type"] = content_type if content_type
-      else
-        attributes["data_encoded"] = value
-        result = @data_decoders.decode_data(spec_version: spec_version,
-                                            content: value,
-                                            content_type: content_type,
-                                            **format_args)
-        if result
-          attributes["data"] = result[:data]
-          content_type = result[:content_type]
-        end
-        attributes["data_content_type"] = content_type if content_type
+      unless value.nil?
+        content_type = populate_data_attributes(attributes, value, content_type, spec_version, format_args)
       end
+      attributes["data_content_type"] = content_type if content_type
       Event.create(spec_version: spec_version, set_attributes: attributes)
+    end
+
+    def populate_data_attributes(attributes, value, content_type, spec_version, format_args)
+      attributes["data_encoded"] = value
+      result = @data_decoders.decode_data(spec_version: spec_version,
+                                          content: value,
+                                          content_type: content_type,
+                                          **format_args)
+      if result
+        attributes["data"] = result[:data]
+        content_type = result[:content_type]
+      end
+      content_type
     end
 
     def decode_structured_content(message, content_type, allow_opaque, **format_args)
@@ -266,7 +267,7 @@ module CloudEvents
                                             **format_args)
       return result[:event] if result
       return Event::Opaque.new(content, content_type) if allow_opaque
-      raise UnsupportedFormatError, "Unknown cloudevents content type: #{content_type}"
+      raise(UnsupportedFormatError, "Unknown cloudevents content type: #{content_type}")
     end
 
     def apply_reverse_key_mapper(event, key, reverse_key_mapper)
@@ -291,11 +292,11 @@ module CloudEvents
     def encode_structured_event(event, structured_format, key_mapper, **format_args)
       key = key_mapper&.call(event)
       structured_format = default_encoder_name if structured_format == true
-      raise ::ArgumentError, "Format name not specified, and no default is set" unless structured_format
+      raise(::ArgumentError, "Format name not specified, and no default is set") unless structured_format
       result = @event_encoders[structured_format]&.encode_event(event: event,
                                                                 data_encoder: @data_encoders,
                                                                 **format_args)
-      raise ::ArgumentError, "Unknown format name: #{structured_format.inspect}" unless result
+      raise(::ArgumentError, "Unknown format name: #{structured_format.inspect}") unless result
       { key: key, value: result[:content], headers: { "content-type" => result[:content_type].to_s } }
     end
 
@@ -312,7 +313,7 @@ module CloudEvents
                                             data: event.data,
                                             content_type: event.data_content_type,
                                             **format_args)
-        raise UnsupportedFormatError, "Could not encode data content-type" unless result
+        raise(UnsupportedFormatError, "Could not encode data content-type") unless result
         [result[:content], result[:content_type]]
       else
         [nil, nil]

@@ -445,7 +445,7 @@ describe CloudEvents::KafkaBinding do
     end
 
     it "uses custom key_mapper per-call" do
-      message = kafka_binding.encode_event(my_simple_event, key_mapper: ->(e) { e.id })
+      message = kafka_binding.encode_event(my_simple_event, key_mapper: :id.to_proc)
       assert_equal my_id, message[:key]
     end
 
