@@ -50,4 +50,42 @@ describe CloudEvents::KafkaBinding do
       assert_respond_to CloudEvents::KafkaBinding::DEFAULT_REVERSE_KEY_MAPPER, :call
     end
   end
+
+  describe "probable_event?" do
+    it "detects a probable binary event" do
+      message = {
+        key: nil,
+        value: "hello",
+        headers: { "ce_specversion" => "1.0" },
+      }
+      assert kafka_binding.probable_event?(message)
+    end
+
+    it "detects a probable structured event" do
+      message = {
+        key: nil,
+        value: "{}",
+        headers: { "content-type" => "application/cloudevents+json" },
+      }
+      assert kafka_binding.probable_event?(message)
+    end
+
+    it "returns false for a non-CE message" do
+      message = {
+        key: nil,
+        value: "hello",
+        headers: { "content-type" => "application/json" },
+      }
+      refute kafka_binding.probable_event?(message)
+    end
+
+    it "returns false for a message with no relevant headers" do
+      message = {
+        key: nil,
+        value: "hello",
+        headers: {},
+      }
+      refute kafka_binding.probable_event?(message)
+    end
+  end
 end

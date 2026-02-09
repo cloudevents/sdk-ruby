@@ -148,5 +148,20 @@ module CloudEvents
     # @return [String,nil]
     #
     attr_accessor :default_encoder_name
+
+    ##
+    # Determine whether a Kafka message is likely a CloudEvent, by
+    # inspecting headers only (does not parse the value).
+    #
+    # @param message [Hash] The Kafka message hash.
+    # @return [boolean]
+    #
+    def probable_event?(message)
+      headers = message[:headers] || {}
+      return true if headers.key?("ce_specversion")
+      content_type = headers["content-type"]
+      return false unless content_type
+      content_type.start_with?("application/cloudevents")
+    end
   end
 end
