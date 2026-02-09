@@ -350,6 +350,25 @@ describe CloudEvents::KafkaBinding do
       end
     end
 
+    it "raises SpecVersionError for structured event with specversion 0.3" do
+      v03_hash = {
+        "data" => "hello",
+        "id" => my_id,
+        "source" => my_source_string,
+        "specversion" => "0.3",
+        "type" => my_type,
+      }
+      v03_struct = JSON.dump(v03_hash)
+      message = {
+        key: nil,
+        value: v03_struct,
+        headers: { "content-type" => "application/cloudevents+json" },
+      }
+      assert_raises CloudEvents::SpecVersionError do
+        kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      end
+    end
+
     it "raises FormatSyntaxError for malformed JSON" do
       message = {
         key: nil,

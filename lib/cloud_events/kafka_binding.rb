@@ -281,7 +281,13 @@ module CloudEvents
                                             content_type: content_type,
                                             data_decoder: @data_decoders,
                                             **format_args)
-      return result[:event] if result
+      if result
+        event = result[:event]
+        if event && !event.spec_version.start_with?("1")
+          raise(SpecVersionError, "Unrecognized specversion: #{event.spec_version}")
+        end
+        return event
+      end
       return Event::Opaque.new(content, content_type) if allow_opaque
       raise(UnsupportedFormatError, "Unknown cloudevents content type: #{content_type}")
     end
