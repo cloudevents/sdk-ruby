@@ -228,6 +228,8 @@ module CloudEvents
 
     private
 
+    # Decode a single event from binary content mode. Reads ce_* headers as
+    # attributes and the message value as event data.
     def decode_binary_content(message, content_type, **format_args)
       headers = message[:headers] || {}
       spec_version = headers["ce_specversion"]
@@ -246,6 +248,9 @@ module CloudEvents
       Event.create(spec_version: spec_version, set_attributes: attributes)
     end
 
+    # Populate data-related attributes (data_encoded, data, data_content_type)
+    # by running the value through registered data decoders. Returns the
+    # (possibly updated) content_type.
     def populate_data_attributes(attributes, value, content_type, spec_version, format_args)
       attributes["data_encoded"] = value
       result = @data_decoders.decode_data(spec_version: spec_version,
@@ -259,6 +264,8 @@ module CloudEvents
       content_type
     end
 
+    # Decode a single event from structured content mode. Delegates to
+    # registered event decoders, falling back to Event::Opaque if allowed.
     def decode_structured_content(message, content_type, allow_opaque, **format_args)
       content = message[:value].to_s
       result = @event_decoders.decode_event(content: content,
@@ -270,6 +277,9 @@ module CloudEvents
       raise(UnsupportedFormatError, "Unknown cloudevents content type: #{content_type}")
     end
 
+    # Apply the reverse_key_mapper to merge Kafka record key attributes into
+    # the decoded event. Returns the event unchanged if the mapper is nil or
+    # returns an empty hash.
     def apply_reverse_key_mapper(event, key, reverse_key_mapper)
       return event unless reverse_key_mapper
       mapped_attrs = reverse_key_mapper.call(key)
@@ -277,6 +287,8 @@ module CloudEvents
       event.with(**mapped_attrs.transform_keys(&:to_sym))
     end
 
+    # Encode an event in binary content mode. Writes attributes as ce_*
+    # headers and event data as the message value.
     def encode_binary_event(event, key_mapper, **format_args)
       key = key_mapper&.call(event)
       headers = {}
@@ -289,6 +301,8 @@ module CloudEvents
       { key: key, value: body, headers: headers }
     end
 
+    # Encode an event in structured content mode using a named format encoder.
+    # The entire event is serialized into the message value.
     def encode_structured_event(event, structured_format, key_mapper, **format_args)
       key = key_mapper&.call(event)
       structured_format = default_encoder_name if structured_format == true
@@ -300,10 +314,15 @@ module CloudEvents
       { key: key, value: result[:content], headers: { "content-type" => result[:content_type].to_s } }
     end
 
+    # Encode an opaque event by passing through its content and content_type
+    # directly, with a nil key.
     def encode_opaque_event(event)
       { key: nil, value: event.content, headers: { "content-type" => event.content_type.to_s } }
     end
 
+    # Extract the event data and content type for binary mode encoding.
+    # Uses data_encoded if present, otherwise delegates to data encoders.
+    # Returns [body, content_type], where body is nil for tombstones.
     def extract_event_data(event, format_args)
       body = event.data_encoded
       if body
