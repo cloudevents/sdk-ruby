@@ -352,4 +352,107 @@ describe CloudEvents::KafkaBinding do
       assert_equal "my-partition-key", event["partitionkey"]
     end
   end
+
+  describe "encode_event binary mode" do
+    let(:my_simple_event) do
+      CloudEvents::Event::V1.new(data_encoded: my_simple_data,
+                                 data: my_simple_data,
+                                 datacontenttype: my_content_type_string,
+                                 dataschema: my_schema_string,
+                                 id: my_id,
+                                 source: my_source_string,
+                                 specversion: spec_version,
+                                 subject: my_subject,
+                                 time: my_time_string,
+                                 type: my_type)
+    end
+    let(:my_json_event) do
+      CloudEvents::Event::V1.new(data_encoded: my_json_escaped_data,
+                                 data: my_json_object,
+                                 datacontenttype: my_json_content_type_string,
+                                 dataschema: my_schema_string,
+                                 id: my_id,
+                                 source: my_source_string,
+                                 specversion: spec_version,
+                                 subject: my_subject,
+                                 time: my_time_string,
+                                 type: my_type)
+    end
+    let(:my_minimal_event) do
+      CloudEvents::Event::V1.new(id: my_id,
+                                 source: my_source_string,
+                                 specversion: spec_version,
+                                 type: my_type)
+    end
+    let(:my_extensions_event) do
+      CloudEvents::Event::V1.new(data_encoded: my_simple_data,
+                                 data: my_simple_data,
+                                 datacontenttype: my_content_type_string,
+                                 id: my_id,
+                                 source: my_source_string,
+                                 specversion: spec_version,
+                                 type: my_type,
+                                 tracecontext: my_trace_context)
+    end
+
+    it "encodes an event with text content type to binary mode" do
+      message = kafka_binding.encode_event(my_simple_event, key_mapper: nil)
+      assert_equal my_simple_data, message[:value]
+      assert_equal my_content_type_string, message[:headers]["content-type"]
+      assert_equal spec_version, message[:headers]["ce_specversion"]
+      assert_equal my_id, message[:headers]["ce_id"]
+      assert_equal my_source_string, message[:headers]["ce_source"]
+      assert_equal my_type, message[:headers]["ce_type"]
+      assert_equal my_schema_string, message[:headers]["ce_dataschema"]
+      assert_equal my_subject, message[:headers]["ce_subject"]
+      assert_equal my_time_string, message[:headers]["ce_time"]
+      assert_nil message[:key]
+    end
+
+    it "encodes an event with JSON content type to binary mode" do
+      message = kafka_binding.encode_event(my_json_event, key_mapper: nil)
+      assert_equal my_json_escaped_data, message[:value]
+      assert_equal my_json_content_type_string, message[:headers]["content-type"]
+    end
+
+    it "encodes a minimal event" do
+      message = kafka_binding.encode_event(my_minimal_event, key_mapper: nil)
+      assert_nil message[:value]
+      assert_nil message[:headers]["content-type"]
+      assert_equal spec_version, message[:headers]["ce_specversion"]
+      assert_equal my_id, message[:headers]["ce_id"]
+    end
+
+    it "encodes an event with extension attributes" do
+      message = kafka_binding.encode_event(my_extensions_event, key_mapper: nil)
+      assert_equal my_trace_context, message[:headers]["ce_tracecontext"]
+    end
+
+    it "encodes an event with no data as tombstone (nil value)" do
+      message = kafka_binding.encode_event(my_minimal_event, key_mapper: nil)
+      assert_nil message[:value]
+    end
+
+    it "uses default key_mapper to set key from partitionkey" do
+      event = my_simple_event.with(partitionkey: "my-partition-key")
+      message = kafka_binding.encode_event(event)
+      assert_equal "my-partition-key", message[:key]
+    end
+
+    it "produces nil key when event has no partitionkey" do
+      message = kafka_binding.encode_event(my_simple_event)
+      assert_nil message[:key]
+    end
+
+    it "uses custom key_mapper per-call" do
+      message = kafka_binding.encode_event(my_simple_event, key_mapper: ->(e) { e.id })
+      assert_equal my_id, message[:key]
+    end
+
+    it "produces nil key when key_mapper is nil" do
+      event = my_simple_event.with(partitionkey: "my-partition-key")
+      message = kafka_binding.encode_event(event, key_mapper: nil)
+      assert_nil message[:key]
+    end
+  end
 end

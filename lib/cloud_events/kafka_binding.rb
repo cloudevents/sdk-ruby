@@ -198,6 +198,31 @@ module CloudEvents
       apply_reverse_key_mapper(event, message[:key], reverse_key_mapper)
     end
 
+    ##
+    # Encode an event into a Kafka message hash.
+    #
+    # @param event [CloudEvents::Event,CloudEvents::Event::Opaque] The event.
+    # @param structured_format [boolean,String] If false (default), encodes
+    #     in binary content mode. If true or a format name string, encodes
+    #     in structured content mode.
+    # @param key_mapper [Proc,nil,:NOT_SET] A callable
+    #     `(event) -> String|nil`, or `nil` to always produce a `nil` key.
+    #     Defaults to the instance's key_mapper.
+    # @param format_args [keywords] Extra args forwarded to formatters.
+    # @return [Hash] A hash with `:key`, `:value`, and `:headers` keys.
+    #
+    def encode_event(event, structured_format: false, key_mapper: :NOT_SET, **format_args)
+      key_mapper = @key_mapper if key_mapper == :NOT_SET
+      if event.is_a?(Event::Opaque)
+        return encode_opaque_event(event)
+      end
+      if structured_format
+        encode_structured_event(event, structured_format, key_mapper, **format_args)
+      else
+        encode_binary_event(event, key_mapper, **format_args)
+      end
+    end
+
     private
 
     # @private
@@ -249,6 +274,42 @@ module CloudEvents
       mapped_attrs = reverse_key_mapper.call(key)
       return event if mapped_attrs.nil? || mapped_attrs.empty?
       event.with(**mapped_attrs.transform_keys(&:to_sym))
+    end
+
+    def encode_binary_event(event, key_mapper, **format_args)
+      key = key_mapper&.call(event)
+      headers = {}
+      event.to_h.each do |attr_key, value|
+        next if ["data", "data_encoded", "datacontenttype"].include?(attr_key)
+        headers["ce_#{attr_key}"] = value.to_s
+      end
+      body, content_type = extract_event_data(event, format_args)
+      headers["content-type"] = content_type.to_s if content_type
+      { key: key, value: body, headers: headers }
+    end
+
+    def encode_structured_event(_event, _structured_format, _key_mapper, **_format_args)
+      raise ::ArgumentError, "Structured encoding not yet implemented"
+    end
+
+    def encode_opaque_event(event)
+      { key: nil, value: event.content, headers: { "content-type" => event.content_type.to_s } }
+    end
+
+    def extract_event_data(event, format_args)
+      body = event.data_encoded
+      if body
+        [body, event.data_content_type]
+      elsif event.data?
+        result = @data_encoders.encode_data(spec_version: event.spec_version,
+                                            data: event.data,
+                                            content_type: event.data_content_type,
+                                            **format_args)
+        raise UnsupportedFormatError, "Could not encode data content-type" unless result
+        [result[:content], result[:content_type]]
+      else
+        [nil, nil]
+      end
     end
   end
 end
