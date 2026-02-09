@@ -503,4 +503,39 @@ describe CloudEvents::KafkaBinding do
       end
     end
   end
+
+  describe "round-trip" do
+    let(:my_event) do
+      CloudEvents::Event::V1.new(data_encoded: my_json_escaped_data,
+                                 data: my_json_object,
+                                 datacontenttype: my_json_content_type_string,
+                                 dataschema: my_schema_string,
+                                 id: my_id,
+                                 source: my_source_string,
+                                 specversion: spec_version,
+                                 subject: my_subject,
+                                 time: my_time_string,
+                                 type: my_type)
+    end
+
+    it "round-trips through binary mode" do
+      message = kafka_binding.encode_event(my_event, key_mapper: nil)
+      decoded = kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      assert_equal my_event, decoded
+    end
+
+    it "round-trips through structured mode" do
+      message = kafka_binding.encode_event(my_event, structured_format: true, key_mapper: nil, sort: true)
+      decoded = kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      assert_equal my_event, decoded
+    end
+
+    it "round-trips with partitionkey extension" do
+      event = my_event.with(partitionkey: "my-partition-key")
+      message = kafka_binding.encode_event(event)
+      decoded = kafka_binding.decode_event(message)
+      assert_equal "my-partition-key", decoded["partitionkey"]
+      assert_equal my_id, decoded.id
+    end
+  end
 end
