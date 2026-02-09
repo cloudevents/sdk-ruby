@@ -534,8 +534,7 @@ describe CloudEvents::KafkaBinding do
       event = my_event.with(partitionkey: "my-partition-key")
       message = kafka_binding.encode_event(event)
       decoded = kafka_binding.decode_event(message)
-      assert_equal "my-partition-key", decoded["partitionkey"]
-      assert_equal my_id, decoded.id
+      assert_equal event, decoded
     end
   end
 end
