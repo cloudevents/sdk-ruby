@@ -79,6 +79,15 @@ describe CloudEvents::KafkaBinding do
       refute kafka_binding.probable_event?(message)
     end
 
+    it "detects a probable structured event with mixed-case content type" do
+      message = {
+        key: nil,
+        value: "{}",
+        headers: { "content-type" => "Application/CloudEvents+JSON" },
+      }
+      assert kafka_binding.probable_event?(message)
+    end
+
     it "returns false for a message with no relevant headers" do
       message = {
         key: nil,

@@ -159,9 +159,10 @@ module CloudEvents
     def probable_event?(message)
       headers = message[:headers] || {}
       return true if headers.key?("ce_specversion")
-      content_type = headers["content-type"]
-      return false unless content_type
-      content_type.start_with?("application/cloudevents")
+      content_type_string = headers["content-type"]
+      return false unless content_type_string
+      content_type = ContentType.new(content_type_string)
+      content_type.media_type == "application" && content_type.subtype_base == "cloudevents"
     end
 
     ##
