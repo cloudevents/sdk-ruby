@@ -209,6 +209,9 @@ module CloudEvents
       if event.is_a?(Event::Opaque)
         return encode_opaque_event(event)
       end
+      unless event.spec_version.start_with?("1")
+        raise(SpecVersionError, "Unrecognized specversion: #{event.spec_version}")
+      end
       if structured_format
         encode_structured_event(event, structured_format, key_mapper, **format_args)
       else

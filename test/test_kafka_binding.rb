@@ -493,6 +493,16 @@ describe CloudEvents::KafkaBinding do
       message = kafka_binding.encode_event(event, key_mapper: nil)
       assert_nil message[:key]
     end
+
+    it "raises SpecVersionError for a V0 event" do
+      v0_event = CloudEvents::Event::V0.new(id: my_id,
+                                            source: my_source_string,
+                                            specversion: "0.3",
+                                            type: my_type)
+      assert_raises CloudEvents::SpecVersionError do
+        kafka_binding.encode_event(v0_event, key_mapper: nil)
+      end
+    end
   end
 
   describe "encode_event structured mode" do
