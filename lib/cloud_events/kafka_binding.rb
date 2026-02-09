@@ -187,15 +187,7 @@ module CloudEvents
       content_type_string = headers["content-type"]
       content_type = ContentType.new(content_type_string) if content_type_string
 
-      event = if content_type&.media_type == "application" && content_type.subtype_base == "cloudevents"
-                decode_structured_content(message, content_type, allow_opaque, **format_args)
-              elsif headers.key?("ce_specversion")
-                decode_binary_content(message, content_type, **format_args)
-              end
-      unless event
-        ct_desc = content_type_string ? content_type_string.inspect : "not present"
-        raise(NotCloudEventError, "content-type is #{ct_desc}, and ce_specversion header is not present")
-      end
+      event = decode_content(message, headers, content_type, content_type_string, allow_opaque, **format_args)
       apply_reverse_key_mapper(event, message[:key], reverse_key_mapper)
     end
 
@@ -228,6 +220,22 @@ module CloudEvents
     OMIT_ATTR_NAMES = ["specversion", "spec_version", "data", "datacontenttype", "data_content_type"].freeze
 
     private
+
+    # Detect content mode, reject batches, and dispatch to the appropriate
+    # binary or structured decoder. Raises if the message is not a CloudEvent.
+    def decode_content(message, headers, content_type, content_type_string, allow_opaque, **format_args)
+      if content_type&.media_type == "application" && content_type.subtype_base == "cloudevents-batch"
+        raise(BatchNotSupportedError, "Kafka protocol binding does not support batch content mode")
+      end
+      if content_type&.media_type == "application" && content_type.subtype_base == "cloudevents"
+        return decode_structured_content(message, content_type, allow_opaque, **format_args)
+      end
+      if headers.key?("ce_specversion")
+        return decode_binary_content(message, content_type, **format_args)
+      end
+      ct_desc = content_type_string ? content_type_string.inspect : "not present"
+      raise(NotCloudEventError, "content-type is #{ct_desc}, and ce_specversion header is not present")
+    end
 
     # Decode a single event from binary content mode. Reads ce_* headers as
     # attributes and the message value as event data.

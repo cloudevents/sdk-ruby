@@ -274,6 +274,17 @@ describe CloudEvents::KafkaBinding do
         kafka_binding.decode_event(message, reverse_key_mapper: nil)
       end
     end
+
+    it "raises BatchNotSupportedError for batch content type" do
+      message = {
+        key: nil,
+        value: "[{}]",
+        headers: { "content-type" => "application/cloudevents-batch+json" },
+      }
+      assert_raises CloudEvents::BatchNotSupportedError do
+        kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      end
+    end
   end
 
   describe "decode_event structured mode" do
