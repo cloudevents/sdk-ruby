@@ -266,4 +266,90 @@ describe CloudEvents::KafkaBinding do
       end
     end
   end
+
+  describe "decode_event structured mode" do
+    let(:my_json_struct) do
+      {
+        "data" => my_simple_data,
+        "datacontenttype" => my_content_type_string,
+        "dataschema" => my_schema_string,
+        "id" => my_id,
+        "source" => my_source_string,
+        "specversion" => spec_version,
+        "subject" => my_subject,
+        "time" => my_time_string,
+        "type" => my_type,
+      }
+    end
+    let(:my_json_struct_encoded) { JSON.dump(my_json_struct) }
+
+    it "decodes a JSON-structured message" do
+      message = {
+        key: nil,
+        value: my_json_struct_encoded,
+        headers: { "content-type" => "application/cloudevents+json" },
+      }
+      event = kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      assert_equal my_id, event.id
+      assert_equal my_source, event.source
+      assert_equal my_type, event.type
+      assert_equal spec_version, event.spec_version
+      assert_equal my_simple_data, event.data
+    end
+
+    it "decodes a JSON-structured message with charset" do
+      message = {
+        key: nil,
+        value: my_json_struct_encoded,
+        headers: { "content-type" => "application/cloudevents+json; charset=utf-8" },
+      }
+      event = kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      assert_equal my_id, event.id
+      assert_equal my_type, event.type
+    end
+
+    it "returns opaque for unrecognized structured format when allow_opaque is true" do
+      message = {
+        key: nil,
+        value: "some content",
+        headers: { "content-type" => "application/cloudevents+foo" },
+      }
+      event = minimal_kafka_binding.decode_event(message, allow_opaque: true, reverse_key_mapper: nil)
+      assert_kind_of CloudEvents::Event::Opaque, event
+      assert_equal "some content", event.content
+    end
+
+    it "raises UnsupportedFormatError for unknown structured format" do
+      message = {
+        key: nil,
+        value: "some content",
+        headers: { "content-type" => "application/cloudevents+foo" },
+      }
+      assert_raises CloudEvents::UnsupportedFormatError do
+        kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      end
+    end
+
+    it "raises FormatSyntaxError for malformed JSON" do
+      message = {
+        key: nil,
+        value: "!!!",
+        headers: { "content-type" => "application/cloudevents+json" },
+      }
+      error = assert_raises(CloudEvents::FormatSyntaxError) do
+        kafka_binding.decode_event(message, reverse_key_mapper: nil)
+      end
+      assert_kind_of JSON::ParserError, error.cause
+    end
+
+    it "applies reverse_key_mapper to structured decoded events" do
+      message = {
+        key: "my-partition-key",
+        value: my_json_struct_encoded,
+        headers: { "content-type" => "application/cloudevents+json" },
+      }
+      event = kafka_binding.decode_event(message)
+      assert_equal "my-partition-key", event["partitionkey"]
+    end
+  end
 end

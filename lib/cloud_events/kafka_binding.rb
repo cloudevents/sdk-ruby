@@ -233,8 +233,15 @@ module CloudEvents
       Event.create(spec_version: spec_version, set_attributes: attributes)
     end
 
-    def decode_structured_content(_message, _content_type, _allow_opaque, **_format_args)
-      nil
+    def decode_structured_content(message, content_type, allow_opaque, **format_args)
+      content = message[:value].to_s
+      result = @event_decoders.decode_event(content: content,
+                                            content_type: content_type,
+                                            data_decoder: @data_decoders,
+                                            **format_args)
+      return result[:event] if result
+      return Event::Opaque.new(content, content_type) if allow_opaque
+      raise UnsupportedFormatError, "Unknown cloudevents content type: #{content_type}"
     end
 
     def apply_reverse_key_mapper(event, key, reverse_key_mapper)
