@@ -455,4 +455,52 @@ describe CloudEvents::KafkaBinding do
       assert_nil message[:key]
     end
   end
+
+  describe "encode_event structured mode" do
+    let(:my_simple_event) do
+      CloudEvents::Event::V1.new(data_encoded: my_simple_data,
+                                 data: my_simple_data,
+                                 datacontenttype: my_content_type_string,
+                                 dataschema: my_schema_string,
+                                 id: my_id,
+                                 source: my_source_string,
+                                 specversion: spec_version,
+                                 subject: my_subject,
+                                 time: my_time_string,
+                                 type: my_type)
+    end
+
+    it "encodes an event to JSON structured format" do
+      message = kafka_binding.encode_event(my_simple_event, structured_format: true,
+                                                            key_mapper: nil, sort: true)
+      assert_equal "application/cloudevents+json; charset=utf-8", message[:headers]["content-type"]
+      parsed = JSON.parse(message[:value])
+      assert_equal my_id, parsed["id"]
+      assert_equal my_type, parsed["type"]
+      assert_equal my_source_string, parsed["source"]
+      assert_nil message[:key]
+    end
+
+    it "encodes an opaque event" do
+      opaque = CloudEvents::Event::Opaque.new("some content",
+                                              CloudEvents::ContentType.new("application/cloudevents+json"))
+      message = kafka_binding.encode_event(opaque)
+      assert_equal "some content", message[:value]
+      assert_equal "application/cloudevents+json", message[:headers]["content-type"]
+      assert_nil message[:key]
+    end
+
+    it "applies key_mapper in structured mode" do
+      event = my_simple_event.with(partitionkey: "my-partition-key")
+      message = kafka_binding.encode_event(event, structured_format: true)
+      assert_equal "my-partition-key", message[:key]
+    end
+
+    it "raises ArgumentError when format name not specified and no default" do
+      binding_obj = CloudEvents::KafkaBinding.new
+      assert_raises ::ArgumentError do
+        binding_obj.encode_event(my_simple_event, structured_format: true, key_mapper: nil)
+      end
+    end
+  end
 end

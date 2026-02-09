@@ -288,8 +288,15 @@ module CloudEvents
       { key: key, value: body, headers: headers }
     end
 
-    def encode_structured_event(_event, _structured_format, _key_mapper, **_format_args)
-      raise ::ArgumentError, "Structured encoding not yet implemented"
+    def encode_structured_event(event, structured_format, key_mapper, **format_args)
+      key = key_mapper&.call(event)
+      structured_format = default_encoder_name if structured_format == true
+      raise ::ArgumentError, "Format name not specified, and no default is set" unless structured_format
+      result = @event_encoders[structured_format]&.encode_event(event: event,
+                                                                data_encoder: @data_encoders,
+                                                                **format_args)
+      raise ::ArgumentError, "Unknown format name: #{structured_format.inspect}" unless result
+      { key: key, value: result[:content], headers: { "content-type" => result[:content_type].to_s } }
     end
 
     def encode_opaque_event(event)
