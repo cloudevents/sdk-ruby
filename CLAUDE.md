@@ -90,6 +90,7 @@ All errors inherit from `CloudEventsError`: `NotCloudEventError`, `UnsupportedFo
 
 ## Contributing
 
+- Use red-green test-driven development when making changes, unless instructed otherwise.
 - Conventional Commits format required (`fix:`, `feat:`, `docs:`, etc.)
 - Commits must be signed off (`git commit --signoff`)
 - Run `toys ci` before submitting PRs

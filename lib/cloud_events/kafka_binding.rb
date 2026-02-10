@@ -209,7 +209,10 @@ module CloudEvents
       if event.is_a?(Event::Opaque)
         return encode_opaque_event(event)
       end
-      unless event.respond_to?(:spec_version) && event.spec_version.start_with?("1.")
+      unless event.respond_to?(:spec_version)
+        raise(SpecVersionError, "Unable to determine specversion")
+      end
+      unless event.spec_version.start_with?("1.")
         raise(SpecVersionError, "Unrecognized specversion: #{event.spec_version}")
       end
       if structured_format
@@ -286,7 +289,8 @@ module CloudEvents
                                             **format_args)
       if result
         event = result[:event]
-        if event && !(event.respond_to?(:spec_version) && event.spec_version.start_with?("1."))
+        raise(SpecVersionError, "Unable to determine specversion") unless event.respond_to?(:spec_version)
+        unless event.spec_version.start_with?("1.")
           raise(SpecVersionError, "Unrecognized specversion: #{event.spec_version}")
         end
         return event
