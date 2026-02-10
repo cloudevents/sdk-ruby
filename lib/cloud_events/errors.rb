@@ -52,6 +52,14 @@ module CloudEvents
   end
 
   ##
+  # An error raised when a protocol binding that does not support batch
+  # content mode receives a batch. For example, the Kafka protocol binding
+  # does not support batches per the CloudEvents spec.
+  #
+  class BatchNotSupportedError < CloudEventsError
+  end
+
+  ##
   # Alias of UnsupportedFormatError, for backward compatibility.
   #
   # @deprecated Will be removed in version 1.0. Use {UnsupportedFormatError}.

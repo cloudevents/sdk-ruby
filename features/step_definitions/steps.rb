@@ -50,17 +50,21 @@ Then "the data is equal to the following JSON:" do |str|
 end
 
 Given "Kafka Protocol Binding is supported" do
-  pending "Kafka Protocol Binding is not yet implemented"
+  @kafka_binding = CloudEvents::KafkaBinding.default
 end
 
-Given "a Kafka message with payload:" do |_str|
-  pending
+Given "a Kafka message with payload:" do |str|
+  @kafka_value = str
 end
 
-Given "Kafka headers:" do |_table|
-  pending
+Given "Kafka headers:" do |table|
+  @kafka_headers = {}
+  table.hashes.each do |hash|
+    @kafka_headers[hash["key"].strip] = hash["value"]
+  end
 end
 
 When "parsed as Kafka message" do
-  pending
+  message = { key: nil, value: @kafka_value, headers: @kafka_headers }
+  @event = @kafka_binding.decode_event(message, reverse_key_mapper: nil)
 end

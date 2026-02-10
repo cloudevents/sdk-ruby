@@ -59,6 +59,19 @@ Handles encoding/decoding CloudEvents to/from HTTP (Rack env hashes). Supports:
 
 `HttpBinding.default` returns a singleton with `JsonFormat` and `TextFormat` pre-registered. Custom formatters are registered via `register_formatter`.
 
+### Kafka Binding (`KafkaBinding`)
+
+Handles encoding/decoding CloudEvents to/from Kafka messages. CloudEvents 1.0 only (no V0.3). Supports:
+- **Binary content mode** — event attributes as `ce_*` headers (plain UTF-8, no percent-encoding), data in value
+- **Structured content mode** — entire event serialized in value (e.g., JSON)
+- **No batch mode** (per the Kafka spec)
+- **Tombstone support** — `nil` value represents an event with no data
+- **Key mapping** — configurable callables to map between Kafka record keys and event attributes (default: `partitionkey` extension)
+
+Kafka messages are represented as plain `{ key:, value:, headers: }` Hashes, decoupled from any specific Kafka client library.
+
+`KafkaBinding.default` returns a singleton with `JsonFormat` and `TextFormat` pre-registered. Key mappers are configurable at construction and overridable per-call via `key_mapper:` / `reverse_key_mapper:` keyword arguments.
+
 ### Format Layer
 
 - **`JsonFormat`** — Encodes/decodes `application/cloudevents+json` and batch format. Also handles JSON data encoding/decoding for binary mode.
@@ -77,6 +90,7 @@ All errors inherit from `CloudEventsError`: `NotCloudEventError`, `UnsupportedFo
 
 ## Contributing
 
+- Use red-green test-driven development when making changes, unless instructed otherwise.
 - Conventional Commits format required (`fix:`, `feat:`, `docs:`, etc.)
 - Commits must be signed off (`git commit --signoff`)
 - Run `toys ci` before submitting PRs
