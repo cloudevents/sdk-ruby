@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-toys_version! ">= 0.19"
+toys_version! ">= 0.20"
 
-expand :clean, paths: :gitignore
+expand :clean, paths: :gitignore, preserve: ".claude/"
 
 expand :minitest, libs: ["lib"], bundler: true
 
@@ -19,4 +19,4 @@ expand :gem_build
 
 expand :gem_build, name: "install", install_gem: true
 
-load_gem "toys-release", version: "~> 0.4", as: "release"
+load_gem "toys-release", version: ">= 0.8.1", as: "release"

@@ -1,5 +1,6 @@
 .DS_STORE
 .bundle/
+.claude/
 .yardoc/
 Gemfile.lock
 coverage/
