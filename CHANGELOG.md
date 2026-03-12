@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.9.0 / 2026-03-12
+
+* ADDED: Added an implementation of Kafka Binding
+
 ### v0.8.3 / 2026-01-15
 
 * FIXED: Fixed default charset behavior for various non-text/plain content types
