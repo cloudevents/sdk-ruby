@@ -2,6 +2,8 @@ repo: cloudevents/sdk-ruby
 git_user_name: CNCF CloudEvents Bot
 git_user_email: cncfcloudevents@gmail.com
 signoff_commits: true
+update_existing_requests: true
+issue_number_suffix_handling: delete
 
 gems:
   - name: cloud_events

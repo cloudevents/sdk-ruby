@@ -1,18 +1,23 @@
 # frozen_string_literal: true
 
-load_git remote: "https://github.com/dazuma/toys.git",
-         path: "common-tools/ci",
-         update: 3600
+load_gem "toys-ci"
 
-desc "Run all CI checks"
+desc "CI target that runs CI jobs in this repo"
 
-expand("toys-ci") do |toys_ci|
-  toys_ci.only_flag = true
-  toys_ci.fail_fast_flag = true
-  toys_ci.job("Bundle update", flag: :bundle, exec: ["bundle", "update", "--all"])
-  toys_ci.job("Rubocop", flag: :rubocop, tool: ["rubocop"])
-  toys_ci.job("Tests", flag: :test, tool: ["test"])
-  toys_ci.job("Cucumber", flag: :cucumber, tool: ["cucumber"])
-  toys_ci.job("Yardoc", flag: :yard, tool: ["yardoc"])
-  toys_ci.job("Gem build", flag: :build, tool: ["build"])
+flag :bundle_update, "--update", "--bundle-update", desc: "Update instead of install bundles"
+
+expand(Toys::CI::Template) do |ci|
+  ci.only_flag = true
+  ci.fail_fast_flag = true
+
+  ci.job("Bundle install", flag: :bundle) do
+    cmd = bundle_update ? ["bundle", "update", "--all"] : ["bundle", "install"]
+    exec(cmd, name: "Bundle").success?
+  end
+
+  ci.tool_job("Rubocop", ["rubocop"], flag: :rubocop)
+  ci.tool_job("Tests", ["test"], flag: :test)
+  ci.tool_job("Cucumber", ["cucumber"], flag: :cucumber)
+  ci.tool_job("Yardoc", ["yardoc"], flag: :yard)
+  ci.tool_job("Gem build", ["build"], flag: :build)
 end
